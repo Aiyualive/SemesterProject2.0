@@ -172,7 +172,7 @@ class NN():
                                            #min_delta = 1e-04,
                                            verbose=2,
                                            mode='min')
-        callbacks = [early_stopping, checkpoint]
+        callbacks      = [early_stopping, checkpoint]
 
         start = time.time()
         self.history = self.model.fit(
