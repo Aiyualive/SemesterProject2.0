@@ -1,0 +1,155 @@
+%\documentclass[11pt]{report}
+%\usepackage[a4paper]{geometry}
+\input{prelude}
+
+%%%%%%%%%%%%%%%%%%
+% BEGIN DOCUMENT %
+%%%%%%%%%%%%%%%%%%
+
+%\usepackage[final]{listings}
+
+%\input{csvfiles}
+
+\begin{document}
+
+\maketitle
+%\frontmatter
+%\makedecl
+\input{acknowledgement}
+%\include{abstract}
+%\mainmatter
+%\setcounter{tocdepth}{3}
+%\setcounter{secnumdepth}{3} dunno what this does.
+{
+  \hypersetup{linkcolor=black}
+  \tableofcontents
+  % Two times compilation
+  %\listoffigures
+  %\listoftables
+   
+}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Intro
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+%%%%%%%%%%% PARSER %%%%%%%%%%%
+\section{Motivation}
+Railway companies need to continuously and sufficiently maintain the train and the train tracks and opti- mally predict the future defects in order to have a more punctual and more effective train system. However, the current systems are expensive, time consuming and ineffective.
+
+
+\section{Objective}
+
+\section{Defects}
+Defect can be of any type, which defects do we want to focus on
+\todo{insert pictures}
+\section{Data}
+Data is provided by SBB
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Design and implementation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Design and Implementation}
+
+First we need to analyse the data,
+
+
+\section{Peak windows}
+To find
+
+\section{Neural network architecture}
+
+Trained a neural network, although we were only able to achieve max
+Based on the analysis we
+
+\section{Visualisation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Evaluation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Evaluation}
+\section{Results}
+\section{Discussion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Conclusion and future work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Conclusion and future work}
+\section{Conclusion}
+\section{Future work}
+
+\begin{itemize}
+	\item
+\end{itemize}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\newpage
+\section{TODO}
+\begin{itemize}
+	\item very fast speed, overlap between switch and ins, old vs new rail, ax1 arrow 2 arrow 3 arrow 4
+	\item 3D plots?
+	\item \verb|pd.options.display.max_rows = 15|
+\end{itemize}
+
+\newpage
+whats this
+\begin{verbatim}
+def conv(df):
+    """
+    has to be series
+    """
+    return np.vstack([v for v in df])
+
+dup_ins = s_features.ins_joints.copy()[['accelerations']]
+dup_swi = s_features.switches.copy()[['accelerations']]
+dup_def = s_features.defects.copy()[['accelerations']]
+
+dup_ins['accelerations'] = np.sum(conv(dup_ins.accelerations),1)
+dup_swi['accelerations'] = np.sum(conv(dup_swi.accelerations),1)
+dup_def['accelerations'] = np.sum(conv(dup_def.accelerations),1)
+
+# s_features.ins_joints[['vehicle_speed(m/s)', 'Axle', 'campagin_ID']].duplicated() or
+
+idx_ins = dup_ins.accelerations.duplicated()
+idx_swi = dup_swi.accelerations.duplicated()
+idx_def = dup_def.accelerations.duplicated()
+new_ins = s_features.ins_joints[~idx_ins]
+new_swi = s_features.switches[~idx_swi]
+new_def = s_features.switches[~idx_def]
+
+print("Duplcated samples: ", len(dup_ins) - len(new_ins))
+print("Duplcated samples: ", len(dup_swi) - len(new_swi))
+print("Duplcated samples: ", len(dup_def) - len(new_def))
+\end{verbatim}
+
+test sample
+\begin{verbatim}
+ii = pd.DataFrame([
+    [np.array([1,2]),2], 
+    [np.array([1,2]),2], 
+    [np.array([1,2]),2]])
+    
+    
+x = a
+[u,I,J] = unique(x, 'rows', 'first')
+hasDuplicates = size(u,1) < size(x,1)
+ixDupRows = setdiff(1:size(x,1), I)
+dupRowValues = x(ixDupRows,:)
+
+s_features.ins_joints.timestamps[:2].duplicated()
+\end{verbatim}
+
+
+
+\newpage
+\cleardoublepage
+\appendix
+\chapter{Appendix}
+\label{newgrammar}
+Include the src files?
+
+\end{document}

@@ -1,0 +1,28 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces The basic idea of GTM. Latent data points (left) are mapped to corresponding centres of Gaussions (green 'blobs') in the higher-dimensional data space, using a non-linear, parameterised mapping function $\mathbf {y}(\mathbf {z}; \mathbf {W})$. The illustration shows the two-dimensional manifold in 3D data space. The data dimension is usually higher but harder to visualise. Note, the $x$s represent the latent variables, while the $t$s represent the data (source: \cite {bishop1998gtm})\relax }}{12}{figure.caption.7}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Error value comparisons for the synthetic dataset\relax }}{24}{figure.caption.13}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Error value comparisons for the Clave Vectors dataset. $10800$ and $2000$ instances in the left and right plot respectively.\relax }}{25}{figure.caption.14}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Error value comparisons for MNIST BD (all instances). Left is trained for 15 iterations, right is 100 iterations\relax }}{25}{figure.caption.15}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Error value comparisons for MNIST AD\relax }}{26}{figure.caption.16}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Benchmarking results, first row shows the average running times whereas second row shows the relative speed differences\relax }}{27}{figure.caption.18}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces DVMS vs Weka: Synthetic dataset\relax }}{28}{figure.caption.19}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces DVMS vs Weka: Clave Vectors dataset\relax }}{28}{figure.caption.20}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces DVMS vs Weka: Clave Vectors dataset (2000 instances)\relax }}{29}{figure.caption.21}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces DVMS vs Weka (MNIST binary digits)\relax }}{29}{figure.caption.22}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces DVMS vs Weka (MNIST All digits)\relax }}{29}{figure.caption.23}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Runtime performances for different matrix libraries (source: \cite {benchmark})\relax }}{30}{figure.caption.24}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {D.1}{\ignorespaces Once weka is started, this interface is shown\relax }}{41}{figure.caption.30}
+\contentsline {figure}{\numberline {D.2}{\ignorespaces The Weka Explorer interface\relax }}{42}{figure.caption.31}
+\contentsline {figure}{\numberline {D.3}{\ignorespaces Open-file pane\relax }}{42}{figure.caption.32}
+\contentsline {figure}{\numberline {D.4}{\ignorespaces The supported file formats\relax }}{43}{figure.caption.33}
+\contentsline {figure}{\numberline {D.5}{\ignorespaces The Explorer interface once data has been loaded\relax }}{43}{figure.caption.34}
+\contentsline {figure}{\numberline {D.6}{\ignorespaces The supported file formats\relax }}{44}{figure.caption.35}
+\contentsline {figure}{\numberline {D.7}{\ignorespaces The mandatory search method\relax }}{44}{figure.caption.36}

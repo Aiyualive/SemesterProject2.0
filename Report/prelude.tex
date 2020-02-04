@@ -1,0 +1,89 @@
+
+\documentclass[ % the name of the author
+                    author={Aiyu Liu},
+                % the name of the supervisor
+                supervisor={Supervised by: Cyprien Hoelzl, Prof. Eleni Chatzi},
+                % the degree programme
+                    degree={BSc},
+                % the dissertation    title (which cannot be blank)
+                     title={Data driven identification and classification of rail surface defects},
+                % the dissertation subtitle (which can    be blank)
+                  subtitle={},
+                % the dissertation     type
+                %  type={enterprise},
+                % the year of submission
+                      year={2019} ]{dissertation}
+
+%\input{config/prelude}
+
+
+
+%%% URL line break      
+\expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks%  save the current one
+  \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j%
+  \do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t%
+  \do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D%
+  \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
+  \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
+  \do\Y\do\Z}
+\usepackage{minted}
+
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{todonotes}
+\usepackage{amssymb}
+%\PassOptionsToPackage{hyphens}{url}
+%\usepackage[hidelinks]{hyperref}
+\usepackage{diagbox}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{makecell}
+\usepackage{comment}
+\usepackage[noend]{algpseudocode}
+%\usepackage[usenames, dvipsnames, svgnames, table]{xcolor}
+\usepackage{bm}
+\usepackage{array}
+\usepackage{pgffor}
+\usepackage{changepage}
+\usepackage{pbox}
+\usepackage{tabularx}
+\usepackage{afterpage}
+\usepackage{forest} % for making directory trees
+\usepackage{emptypage} % get rid of numbering after title page
+\usepackage{enumitem}
+\usepackage{filecontents}
+
+\usepackage{pgfplotstable} 
+\usepackage{booktabs} 
+\usepackage{filecontents}
+
+%\usepackage[lite]{mtpro2}
+%\newcommand{\todo}[1]{{\color{red} #1}}
+
+\newcommand{\forceindent}{\leavevmode{\parindent=1cm\indent}}
+\newcommand{\forceindenthalf}{\leavevmode{\parindent=0.5cm\indent}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{%frame=tb,
+%  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2
+}
+%backgroundcolor = \color{lightgray}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
