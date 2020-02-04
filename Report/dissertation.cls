@@ -36,7 +36,7 @@
 
 % load base class, then general-purpose packages
 
-\LoadClass[10pt,a4paper,twosided]{book}
+\LoadClass[12pt, a4paper,twosided]{book}
 
 % http://www.ctan.org/tex-archive/macros/latex/required/graphics
 \RequirePackage{graphicx}

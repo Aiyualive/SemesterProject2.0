@@ -87,17 +87,33 @@ Based on the analysis we
 	\item 
 \end{itemize}
 
+
 \newpage
 \section{TODO}
 \begin{itemize}
 	\item very fast speed, overlap between switch and ins, old vs new rail, ax1 arrow 2 arrow 3 arrow 4
 	\item 3D plots?
-	\item \verb|pd.options.display.max_rows = 15|
+	\item change the defect library to use pandas instead?
+	\item visualise what the network is doing using Harry's code
+	\item use speed as a feature also
 \end{itemize}
 
+
 \newpage
+\section{Notes}
+1D convolution tutorial
+Height = acc length
+Width = the number of features
+Output is determined by kernnel size and height of data
+
+Misc:
+\begin{itemize}
+	\item \verb|pd.options.display.max_rows = 15|
+	\item \verb|#np.bincount(y.class_label.values)/4 where does 151.5 coem from??|
+\end{itemize}
+
 whats this
-\begin{verbatim}
+\begin{minted}{python}
 def conv(df):
     """
     has to be series
@@ -124,10 +140,20 @@ new_def = s_features.switches[~idx_def]
 print("Duplcated samples: ", len(dup_ins) - len(new_ins))
 print("Duplcated samples: ", len(dup_swi) - len(new_swi))
 print("Duplcated samples: ", len(dup_def) - len(new_def))
-\end{verbatim}
 
-test sample
-\begin{verbatim}
+# Load weight example 
+# Could just save entire model and then load entire model
+# Could also make this into a function
+clf2 = NN(N_FEATURES, N_CLASSES)
+clf2.prepare_data(X, y)
+clf2.make_model2()
+clf2.load_weights('model_01-12-2019_150004.hdf5')
+clf2.predict() ### on validation set
+clf2.measure_performance(accuracy_score)
+\end{minted}
+
+Test sample
+\begin{minted}{python}
 ii = pd.DataFrame([
     [np.array([1,2]),2], 
     [np.array([1,2]),2], 
@@ -141,8 +167,7 @@ ixDupRows = setdiff(1:size(x,1), I)
 dupRowValues = x(ixDupRows,:)
 
 s_features.ins_joints.timestamps[:2].duplicated()
-\end{verbatim}
-
+\end{minted}
 
 
 \newpage
