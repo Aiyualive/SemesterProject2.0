@@ -4,6 +4,9 @@ from scipy.signal import find_peaks
 from tqdm import tqdm
 
 class featureset():
+    """
+    Generate the dataframe
+    """
     def __init__(self, obj, peak_offset=1, window_offset=0.5):
         self.peak_offset   = peak_offset
         self.window_offset = window_offset
@@ -16,17 +19,6 @@ class featureset():
         self.ins_joints   = makeGenericDF(obj, "insulationjoint",
                                           peak_offset=peak_offset,
                                           window_offset=window_offset)
-    def makeSwitches(self, obj):
-        self.switches11   = makeSwitchesDF(obj, "AXLE_11")
-        self.switches12   = makeSwitchesDF(obj, "AXLE_12")
-        self.switches41   = makeSwitchesDF(obj, "AXLE_41")
-        self.switches42   = makeSwitchesDF(obj, "AXLE_42")
-
-    def makeInsJoints(self, obj):
-        self.ins_joints11 = makeInsulationJointsDF(obj, "AXLE_11")
-        self.ins_joints12 = makeInsulationJointsDF(obj, "AXLE_12")
-        self.ins_joints41 = makeInsulationJointsDF(obj, "AXLE_41")
-        self.ins_joints42 = makeInsulationJointsDF(obj, "AXLE_42")
 
     def makeDefects(self, obj):
         self.defect11     = makeDefectDF(obj, "AXLE_11")
@@ -39,6 +31,36 @@ class featureset():
                                        self.defect42])
 
         return self.defects
+
+    def makeSwitches(self, obj):
+        """
+        DEPRECATED
+        """
+        self.switches11   = makeSwitchesDF(obj, "AXLE_11")
+        self.switches12   = makeSwitchesDF(obj, "AXLE_12")
+        self.switches41   = makeSwitchesDF(obj, "AXLE_41")
+        self.switches42   = makeSwitchesDF(obj, "AXLE_42")
+        self.switches      = pd.concat([self.switches11,
+                                       self.switches12,
+                                       self.switches41,
+                                       self.switches42])
+        return self.switches
+
+    def makeInsJoints(self, obj):
+        """
+        DEPRECATED
+        """
+        self.ins_joints11 = makeInsulationJointsDF(obj, "AXLE_11")
+        self.ins_joints12 = makeInsulationJointsDF(obj, "AXLE_12")
+        self.ins_joints41 = makeInsulationJointsDF(obj, "AXLE_41")
+        self.ins_joints42 = makeInsulationJointsDF(obj, "AXLE_42")
+        self.ins_joints   = pd.concat([self.ins_joints11,
+                                       self.ins_joints12,
+                                       self.ins_joints41,
+                                       self.ins_joints42])
+        return self.ins_joints
+
+
 
 def find_index(timestamps, start, end):
     """
@@ -125,6 +147,7 @@ def get_peak_window(von, bis, find_peak_offset, window_offset, acc_time, a):
 
 def get_severity(severity):
     """
+    Converts the recorded severity into integer codes
     """
     if 'sehr' in severity:
         return 1
@@ -351,9 +374,9 @@ def save_pickle(campaign_objects, identifier, path="AiyuDocs/pickles/"):
     switches.to_pickle(path + identifier + "_switches_df.pickle")
     ins_joints.to_pickle(path + identifier + "_ins_joints_df.pickle")
 
-###
-### DEPRECATED
-###
+##################
+### DEPRECATED ###
+##################
 
 def makeSwitchesDF(obj, axle):
     """

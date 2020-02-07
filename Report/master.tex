@@ -34,11 +34,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
 %%%%%%%%%%% PARSER %%%%%%%%%%%
-\section{Problem description and motivation}
+\section{Problem description and motivation} \todo{maybe remove this section}
 Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current system is expensive, time consuming and ineffective. That is, maintenance agents need to walk along tracks and check them for defects. For visualisation purposes, there is roughly 5200 km of rails in Switzerland which needs to be inspected by 40 experienced inspectors.
 
 
-In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new diagnostic vehicles designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track
+In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track
 \todo{insert picture, mention boogey?}
 
 A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \todo{https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf}
@@ -62,29 +62,55 @@ For this project, we have solely focused on the point defects for analysis, as t
 
 
 \section{Data}
-The data has been collected and provided by SBB. Using their special diagnostic vehicle, SBB has made trips back and forth to different cities in Switzerland
+The data has been collected and provided by SBB. Using their SDV, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After getting the data from SBB, it then goes through a processing pipeline (designed by Cyprien), after which the data can be manipulated with \verb|python| dataframes (from \verb|pd.DataFrame|). The accelerometer captures the accelerations at the XYZ-axes (along with the timestamps at each recording), of which we are only concerned with the Y-axis for the vertical pertubations.
 
-\todo{Which data did I work on}
+\todo{make a table of the equipment and sample frequencies}
 
-Credits to Cyprien for cleaning up the data
+Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien.
+
+\todo{Which data did I work on, put in tables, switches, ins joints and defects}
+
 
 \section{Code}
-The code can be found on github: \url{sdds}
+The code is written purely in python. The code can be found on github: \\
+\url{https://github.com/Aiyualive/SemesterProject2.0}.
+
+\todo{Brief explanation of the code?}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Design and implementation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and Implementation}
-First we need to analyse the data, show a few defects and their signals \todo{appendix for more signals?}
 
+
+\todo{insert pipeline picture?}
+
+%\verb|signal --> shift GPS timestamps --> localise defects --> create a library of peak windows --> feed to convolutional NN --> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
+
+First we need to analyse the data, 
+
+\todo{show a few defects and their signals} \todo{appendix for more signals?}
+\section{Shift of GPS timestamps}
+The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers, we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
+
+Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body.
+
+
+\todo{insert drawing of how it is calculated?}
 
 \section{Peak windows}
-To find,
-we can change the parameters for the peak findings
-\section{Neural network architecture}
+This was altered.
 
+find
+
+%Find all peaks with scipy.signal.find_peaks (https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html)
+%According to defect timestamp at a given axle, search around for the highest peak within a 2 sec window (tunable parameter)
+%Center the window at the highest peak with a window size of 1 sec (tunable)
+
+\section{Neural network architecture}
 Trained a neural network, although we were only able to achieve max
+
 Based on the analysis we
 
 \section{Visualisation}
@@ -94,17 +120,24 @@ This step should have been done first
 %%% Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
+
 \section{Results}
+
+
 \section{Discussion}
+I tried to increase the outliers, but this was a hugely naive approach
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Conclusion and future work
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion and future work}
+
 \section{Conclusion}
+
 \section{Future work}
 
 \begin{itemize}
+	\item Might be interesting to also consider the XZ-axes.
 	\item Line defects
 	\item tune the peak finding parameters
 \end{itemize}
