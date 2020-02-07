@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  4 FEB 2020 16:25
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  7 FEB 2020 10:37
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1603,13 +1603,13 @@ ick labels; missing features). Consider writing \pgfplotsset{compat=1.13} into
 your preamble.
  on input line 13.
 
-<logo/eth.png, id=75, 1284.8pt x 213.79875pt>
+<logo/eth.png, id=87, 1284.8pt x 213.79875pt>
 File: logo/eth.png Graphic file (type png)
  <use logo/eth.png>
 Package pdftex.def Info: logo/eth.png used on input line 15.
 (pdftex.def)             Requested size: 256.95544pt x 42.75899pt.
 
-Overfull \hbox (92.06053pt too wide) in paragraph at lines 15--15
+Overfull \hbox (13.04037pt too wide) in paragraph at lines 15--15
  [][] 
  []
 
@@ -1638,12 +1638,32 @@ eth.png>] [2
 ]
 Chapter 1.
 Package hyperref Info: bookmark level for unknown todo defaults to 0 on input l
-ine 45.
-[7] [8
+ine 42.
 
-]
+Overfull \hbox (154.04483pt too wide) in paragraph at lines 44--44
+[][][][]\OT1/cmr/m/n/12 https://blog.goodaudience.com/introduction- 
+ []
+
+
+Overfull \hbox (154.04483pt too wide) in paragraph at lines 44--44
+[][][][]\OT1/cmr/m/n/12 https://blog.goodaudience.com/introduction- 
+ []
+
+
+Overfull \hbox (154.04483pt too wide) in paragraph at lines 44--44
+[][][][]\OT1/cmr/m/n/12 https://blog.goodaudience.com/introduction- 
+ []
+
+
+Overfull \hbox (154.04483pt too wide) in paragraph at lines 44--44
+[][][][]\OT1/cmr/m/n/12 https://blog.goodaudience.com/introduction- 
+ []
+
+[7] [8]
 Chapter 2.
-[9] [10
+[9
+
+] [10
 
 ]
 Chapter 3.
@@ -1651,18 +1671,15 @@ Chapter 3.
 
 ]
 Chapter 4.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 84.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 101.
+
 (/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 84.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 101.
  [13] [14]
 \openout4 = `master.pyg'.
-
-runsystem(pygmentize -l python -f latex -P commandprefix=PYG -F tokenmerge -o "
-_minted-master/974B73C949D74F2C404171DD23294CE022779287BE07124B95CB8A8CAE72113E
-.pygtex" "master.pyg" )...executed.
 
 
 (./_minted-master/974B73C949D74F2C404171DD23294CE022779287BE07124B95CB8A8CAE721
@@ -1672,59 +1689,83 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
 )
 \openout4 = `master.pyg'.
 
-runsystem(pygmentize -l python -f latex -P commandprefix=PYG -F tokenmerge -o "
-_minted-master/8927FE87350C295822BD000905FFE3C422779287BE07124B95CB8A8CAE72113E
-.pygtex" "master.pyg" )...executed.
-
 
 (./_minted-master/8927FE87350C295822BD000905FFE3C422779287BE07124B95CB8A8CAE721
 13E.pygtex [15]) [16]
-Appendix A.
-runsystem(rm "master.pyg")...executed.
+Chapter 5.
+
+LaTeX Warning: Marginpar on page 17 moved.
 
 [17
 
+] [18
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 180.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 180.
+Appendix A.
+
+(./_minted-master/5B2A55658D5284D80B430C3E0AC00A8D5E7752B265702134BB0B6D96E7574
+DBE.pygtex
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <8> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 2.
+ [19
+
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [20]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [21]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [22]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [23]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [24]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [25])
+runsystem(rm "master.pyg")...executed.
+
+
+[26]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 200.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 200.
  (./master.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 180.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 180.
-
-
-Package rerunfilecheck Warning: File `master.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `master.out':
-(rerunfilecheck)             Before: 780E9C52675CC8F8D007D262185CC7B2;941
-(rerunfilecheck)             After:  187A5415D74C2293F3F009AA886B52A7;993.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 200.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 200.
+Package rerunfilecheck Info: File `master.out' has not changed.
+(rerunfilecheck)             Checksum: 7ACE96A9DA08C0937E5C1C177004A65E;1112.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 1061 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 50948 strings out of 493014
- 1184079 string characters out of 6133352
- 1567932 words of memory out of 5000000
- 53656 multiletter control sequences out of 15000+600000
- 13200 words of font info for 49 fonts, out of 8000000 for 9000
+ 51029 strings out of 493014
+ 1185875 string characters out of 6133352
+ 1584058 words of memory out of 5000000
+ 53716 multiletter control sequences out of 15000+600000
+ 13368 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,11n,92p,10436b,35790s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 63i,11n,92p,10436b,35873s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmbx12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmitt10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmr12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmr17.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mr8.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
-10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt1
-2.pfb>
-Output written on master.pdf (17 pages, 112686 bytes).
+mr6.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
+.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.
+pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.p
+fb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb
+>
+Output written on master.pdf (26 pages, 158036 bytes).
 PDF statistics:
- 213 PDF objects out of 1000 (max. 8388607)
- 183 compressed objects within 2 object streams
- 39 named destinations out of 1000 (max. 500000)
- 154 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 284 PDF objects out of 1000 (max. 8388607)
+ 242 compressed objects within 3 object streams
+ 56 named destinations out of 1000 (max. 500000)
+ 178 words of extra memory for PDF output out of 10000 (max. 10000000)
 

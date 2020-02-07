@@ -144,10 +144,14 @@
                               \vspace*{2.0cm}
   \mbox{\IfEq{\dissertation@title@major}{}{}{\LARGE \dissertation@title@major}} \\
                               \vspace*{0.5cm}
+  %\mbox{\IfEq{\dissertation@title@major}{}{}{\LARGE } \LARGE Data-driven identification and classification} \\
+  %                            \vspace*{0.5cm}
+  %\mbox{\IfEq{\dissertation@title@major}{}{}{\LARGE } \LARGE of rail surface defects}\\
+  %                            \vspace*{0.5cm}
   \mbox{\IfEq{\dissertation@title@minor}{}{}{\Large \dissertation@title@minor}} \\
-                              \vspace*{1.0cm}
+                              \vspace*{2.5cm}
                           {\Large \dissertation@author}                         \\
-                              \vspace*{2.0cm}
+                              \vspace*{2.5cm}
                           {\large \dissertation@supervisor}                         \\
 
                               \vspace*{1.0cm}
