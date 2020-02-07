@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  7 FEB 2020 10:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  7 FEB 2020 11:57
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1659,7 +1659,14 @@ Overfull \hbox (154.04483pt too wide) in paragraph at lines 44--44
 [][][][]\OT1/cmr/m/n/12 https://blog.goodaudience.com/introduction- 
  []
 
-[7] [8]
+
+LaTeX Warning: Marginpar on page 7 moved.
+
+[7]
+
+LaTeX Warning: Marginpar on page 8 moved.
+
+[8]
 Chapter 2.
 [9
 
@@ -1671,13 +1678,13 @@ Chapter 3.
 
 ]
 Chapter 4.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 101.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 108.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 101.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 108.
  [13] [14]
 \openout4 = `master.pyg'.
 
@@ -1732,26 +1739,30 @@ runsystem(rm "master.pyg")...executed.
 
 
 [26]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 200.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 200.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 209.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 209.
  (./master.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 200.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 200.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 209.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 209.
 Package rerunfilecheck Info: File `master.out' has not changed.
 (rerunfilecheck)             Checksum: 7ACE96A9DA08C0937E5C1C177004A65E;1112.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 1061 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 51029 strings out of 493014
- 1185875 string characters out of 6133352
- 1584058 words of memory out of 5000000
- 53716 multiletter control sequences out of 15000+600000
+ 51067 strings out of 493014
+ 1186689 string characters out of 6133352
+ 1583058 words of memory out of 5000000
+ 53750 multiletter control sequences out of 15000+600000
  13368 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,11n,92p,10436b,35873s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 63i,11n,92p,10436b,35929s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmbx12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmitt10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
@@ -1762,10 +1773,10 @@ mr6.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
 pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.p
 fb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb
 >
-Output written on master.pdf (26 pages, 158036 bytes).
+Output written on master.pdf (26 pages, 160112 bytes).
 PDF statistics:
- 284 PDF objects out of 1000 (max. 8388607)
- 242 compressed objects within 3 object streams
- 56 named destinations out of 1000 (max. 500000)
+ 288 PDF objects out of 1000 (max. 8388607)
+ 246 compressed objects within 3 object streams
+ 60 named destinations out of 1000 (max. 500000)
  178 words of extra memory for PDF output out of 10000 (max. 10000000)
 

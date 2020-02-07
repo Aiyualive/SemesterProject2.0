@@ -46,19 +46,27 @@ A defect in train tracks can be seen as a discontinuity. As a train passes over 
 By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. The first step in this process consists of identification and classification, while the second step consists of future defect prediction.
 
 \section{Objective}
-The objective 
+As the title implies, the objective of this project is to identify and classify rail surface defects. 
+
+apply machine learning techniques on the problem
 
 \section{Defects}
-Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. Here is a few examples:
+Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. Here is a few examples: \todo{insert pictures}
 
 
-Generally, a defect can be split into two overarching types: line-defects and type-defects. For this project
-SBB has done the classification themselves
-Defect can be of any type, which defects do we want to focus on
-\todo{insert pictures}
+Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths -- e.g. \todo{give example}.
+
+For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. \todo{show signal types?}. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
+
+\todo{See list of defect types in appendix?}
+
 
 \section{Data}
-Data is provided by SBB
+The data has been collected and provided by SBB. Using their special diagnostic vehicle, SBB has made trips back and forth to different cities in Switzerland
+
+\todo{Which data did I work on}
+
+Credits to Cyprien for cleaning up the data
 
 \section{Code}
 The code can be found on github: \url{sdds}
@@ -80,7 +88,7 @@ Trained a neural network, although we were only able to achieve max
 Based on the analysis we
 
 \section{Visualisation}
-
+This step should have been done first
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Evaluation
@@ -97,7 +105,8 @@ Based on the analysis we
 \section{Future work}
 
 \begin{itemize}
-	\item
+	\item Line defects
+	\item tune the peak finding parameters
 \end{itemize}
 
 \begin{itemize}
