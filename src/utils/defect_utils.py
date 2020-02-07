@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 class featureset():
     """
-    Generate the dataframe
+    Generate dataframe containing features for classification
     """
     def __init__(self, obj, peak_offset=1, window_offset=0.5):
         self.peak_offset   = peak_offset
@@ -59,8 +59,6 @@ class featureset():
                                        self.ins_joints41,
                                        self.ins_joints42])
         return self.ins_joints
-
-
 
 def find_index(timestamps, start, end):
     """
