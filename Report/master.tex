@@ -68,8 +68,11 @@ The data has been collected and provided by SBB. Using their SDV, SBB has made t
 
 Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien.
 
+
 \todo{Which data did I work on, put in tables, switches, ins joints and defects}
 
+We need to define terminlogy of these: defects, ins joints = 
+in the following we will use defect as an umbrella term for these entities.
 
 \section{Code}
 The code is written purely in python. The code can be found on github: \\
@@ -83,23 +86,45 @@ The code is written purely in python. The code can be found on github: \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and Implementation}
 
+For the process of defect classification we employed the following pipeline:
+\todo{insert pipeline picture}
 
-\todo{insert pipeline picture?}
+In the following, I would like to give an overview of how these was implemented
 
 %\verb|signal --> shift GPS timestamps --> localise defects --> create a library of peak windows --> feed to convolutional NN --> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
 
-First we need to analyse the data, 
+\todo{which track entities are we actually analysing}
+\todo{show a few defects and their signals} 
+\todo{appendix for more signals?}
 
-\todo{show a few defects and their signals} \todo{appendix for more signals?}
 \section{Shift of GPS timestamps}
 The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers, we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
 
 Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body.
 
-
 \todo{insert drawing of how it is calculated?}
 
 \section{Peak windows}
+Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length -- wherein Within the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
+
+Since we are assuming that each track entity is identified by a well-formed peak, we first need to find this peak within a reasonable offset from the defect location, after which we center around that within another reasonable offset. 
+
+In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
+
+
+
+
+
+
+
+
+
+\todo{insert a drawing of how this works?}
+
+First finds the highest peak within a peak finding window.
+    Then this highest peak is centered by defining a window offset.
+    Then we get the start and end index of this window
+    These indexes are then used to index the timestamps and acceleration for the axle
 This was altered.
 
 find
@@ -122,7 +147,7 @@ This step should have been done first
 \chapter{Evaluation}
 
 \section{Results}
-
+\todo{insert table for different architectures}
 
 \section{Discussion}
 I tried to increase the outliers, but this was a hugely naive approach
@@ -140,12 +165,9 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item Might be interesting to also consider the XZ-axes.
 	\item Line defects
 	\item tune the peak finding parameters
+	\item track entity dependent/specific window offsets
+	\item we must not set the findpeakoffset too high
 \end{itemize}
-
-\begin{itemize}
-	\item 
-\end{itemize}
-
 
 \newpage
 \section{TODO}
@@ -155,21 +177,14 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item change the defect library to use pandas instead?
 	\item visualise what the network is doing using Harry's code
 	\item use speed as a feature also
+	\item be consistent with function naming and variable names
+	\item 
 \end{itemize}
 
 
 \newpage
 \section{Notes}
-1D convolution tutorial
-Height = acc length
-Width = the number of features
-Output is determined by kernnel size and height of data
 
-Misc:
-\begin{itemize}
-	\item \verb|pd.options.display.max_rows = 15|
-	\item \verb|#np.bincount(y.class_label.values)/4 where does 151.5 coem from??|
-\end{itemize}
 
 whats this
 \begin{minted}{python}
