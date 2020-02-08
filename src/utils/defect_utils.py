@@ -205,7 +205,6 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
     nanosec   = 10**9
     samp_freq = 24000 # per sec
     window_offset = window_offset * samp_freq
-
     driving_direction = getDirection(obj)
 
     for ax in axle:

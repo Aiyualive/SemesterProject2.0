@@ -111,30 +111,16 @@ Since we are assuming that each track entity is identified by a well-formed peak
 
 In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
 
-
-
-
-
-
-
-
-
 \todo{insert a drawing of how this works?}
 
-First finds the highest peak within a peak finding window.
-    Then this highest peak is centered by defining a window offset.
-    Then we get the start and end index of this window
-    These indexes are then used to index the timestamps and acceleration for the axle
-This was altered.
-
-find
-
-%Find all peaks with scipy.signal.find_peaks (https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html)
-%According to defect timestamp at a given axle, search around for the highest peak within a 2 sec window (tunable parameter)
-%Center the window at the highest peak with a window size of 1 sec (tunable)
 
 \section{Neural network architecture}
+Using tensorflow, we then feed these windows into our neural network architecture as seen in listing. 
+\todo{insert table}
+
 Trained a neural network, although we were only able to achieve max
+
+Create the models and train it 
 
 Based on the analysis we
 
@@ -145,9 +131,10 @@ This step should have been done first
 %%% Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
+Here we will present the results and discuss the findings herein.
 
 \section{Results}
-\todo{insert table for different architectures}
+\todo{insert table for different architectures -- insert in previous chapter?} get the bachelor thesis for reference.
 
 \section{Discussion}
 I tried to increase the outliers, but this was a hugely naive approach
@@ -163,7 +150,7 @@ I tried to increase the outliers, but this was a hugely naive approach
 
 \begin{itemize}
 	\item Might be interesting to also consider the XZ-axes.
-	\item Line defects
+	\item range defects
 	\item tune the peak finding parameters
 	\item track entity dependent/specific window offsets
 	\item we must not set the findpeakoffset too high
