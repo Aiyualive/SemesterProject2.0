@@ -45,13 +45,12 @@ class ModelMaker():
         self.n_classes = n_classes
         self.metrics   = metrics
 
-    def model_chooser(self, model_name, verbose = True):
+    def model_chooser(self, model_name, verbose = 2):
         """
         Returns the chosen model
         params:
             model_name: name of model
         """
-
         # Could instead use a dictionary containing lambda funcs?
         print("########## Make " + model_name + " ##########")
         if model_name == "model1":
@@ -69,7 +68,6 @@ class ModelMaker():
             self.model.summary()
 
         return self.model
-
 
     def _makeModel1(self):
         model = Sequential()
@@ -147,7 +145,7 @@ class ModelMaker():
 ### NN class ###
 ################
 class NN():
-    def __init__(self, create_dir_bool = True):
+    def __init__(self, create_dir_bool = True, verbose = 2):
         print("########## Init NN ##########")
         self.metrics =  ['accuracy',
                               tkm.TruePositives(),
@@ -159,6 +157,7 @@ class NN():
                               tkm.Recall(name='recall'),
                               tkm.AUC(name='auc')]
 
+        self.verbose = verbose
 
         self.date = datetime.now().strftime("%d-%m_%H%M%S")
         if (create_dir_bool):
@@ -204,18 +203,18 @@ class NN():
         self.X     = np.expand_dims(self.X, axis=2)
         self.X_val = np.expand_dims(self.X_val, axis=2)
 
-    def make_model(self, model_name, verbose = True):
+    def make_model(self, model_name):
         """
         Makes a specified model from, using ModelMaker class
         params:
             model: the model to be made
         """
         model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
-        self.model = model_maker.model_chooser(model_name, verbose)
+        self.model = model_maker.model_chooser(model_name, self.verbose)
         self.model_name = model_name
         self._set_callbacks()
 
-    def fit(self, epochs, batch_size, verbose = 2):
+    def fit(self, epochs, batch_size):
         """
         Fit the model; define callbacks
         """
@@ -228,7 +227,7 @@ class NN():
                             epochs=epochs,
                             batch_size=batch_size,
                             class_weight=self.class_weights,
-                            verbose=verbose,
+                            verbose=self.verbose,
                             shuffle=False,
                             callbacks=self.callbacks)
         end = time.time()
@@ -266,18 +265,18 @@ class NN():
         print("########## Load Model ##########")
         self.model = load_model(model_file)
 
-    def save_model(self):
+    def save_model(self, optional=""):
         print("########## Save Model ##########")
         score = str(self.score)[:4]
-        self.model.save(self.date + "/SAVED_" + self.model_name + "_" + score + ".hdf5")
+        self.model.save(self.date + "/SAVE_MODEL_" + self.model_name + "_" + optional + "_" + score + ".hdf5")
 
-    def save_history(self):
+    def save_history(self, optional=""):
         """
         Saves the training history into pickle file
         """
         print("########## Save History ##########")
         pickle.dump(self.history.history,
-                    open(self.date + "/history" + ".pickle", "wb" ))
+                    open(self.date + "/SAVE_HISTORY_" + self.model_name + "_" + optional + ".pickle", "wb" ))
 
     def save_prediction_to_csv(self, name):
         print("########## Save Prediction ##########")
@@ -292,27 +291,14 @@ class NN():
         filename = "" + name0 + name1 + name2 + ".csv"
         df_predict.to_csv(filename)
 
-    def run_experiment(self, epochs, batch_size, rep=10):
-        scores = []
-        for i in range(rep):
-            print("******************* EXP " + str(i) + " *******************")
-            self.make_model("model1", verbose = False)
-            self.fit(epochs, batch_size, verbose=0)
-            self.predict()
-            self.measure_performance(accuracy_score, print_score = False)
-            print('>#%d: %.3f' % (i+1, self.score))
-            scores.append(self.score)
-            print("*********************************************\n")
-        m, s = np.mean(scores), np.std(scores)
-        print('Accuracy: %.3f%% (+/-%.3f)' % (m, s))
-
-    def plot_metrics(self):
+    def plot_metrics(self, optional=""):
         print("########## Plot Metrics ##########")
         history = self.history
+        #fig = plt.figure(figsize=(20,5))
         for n, metric in enumerate(self.model.metrics_names):
+            fig = plt.figure(figsize=(20,5))
             name = metric.replace("_", " ").capitalize()
             plt.subplot(5, 2, n + 1)
-
             plt.plot(history.epoch, history.history[metric], color=colors[0], label='Train')
             plt.plot(history.epoch, history.history['val_' + metric],
                      color=colors[0], linestyle="--", label='Val')
@@ -329,8 +315,10 @@ class NN():
             else:
                 plt.ylim([0, 1])
             plt.legend()
+            fig.set_size_inches(20, 5, forward=True)
+            fig.savefig(self.date + "/METRIC_" + metric + "_" + optional,  bbox_inches='tight')
 
-    def show_confusion_matrix(self):
+    def show_confusion_matrix(self,):
         print("########## Confusiion Matrix ##########")
         matrix = confusion_matrix(self.true_y_val,
                                   self.prediction,
@@ -354,6 +342,8 @@ class NN():
         plt.xlabel("Predicted Label")
         plt.show()
 
+        fig.savefig(self.date + "/CONFMAT_" + optional,  bbox_inches='tight')
+
     def test(self):
       print("########## Test ##########")
       print(self.model.layers[0].get_config())
@@ -361,10 +351,29 @@ class NN():
       print(self.model.layers[0].get_weights())
       print(self.model.layers[0].weights)
 
+    def run_experiment(self, epochs, batch_size, rep=10):
+        scores = []
+        self.verbose = 0
+        # create a folder
+        for i in range(rep):
+            print("******************* EXP " + str(i) + " *******************")
+            desc = "EXP " + str(i) + "_"
+            self.fit(epochs, batch_size)
+            self.predict()
+            self.save_history(optional = desc)
+            self.measure_performance(accuracy_score, print_score = False)
+            self.save_model(optional = desc)
+            self.plot_metrics(optional = desc)
+            print('>#%d: %.3f' % (i+1, self.score))
+            scores.append(self.score)
+            print("*********************************************\n")
+        m, s = np.mean(scores), np.std(scores)
+        print('Overall accuracy: %.3f%% (+/-%.3f)' % (m, s))
+
     def _set_callbacks(self):
         checkpoint     = ModelCheckpoint(self.date + "/w_ckp_" + self.model_name +  ".hdf5",
                                         monitor='val_loss',
-                                        verbose=2,
+                                        verbose=self.verbose,
                                         save_best_only=True,
                                         mode='min')
 
@@ -395,5 +404,5 @@ class NN():
         cl   = np.nonzero(pct)[0]
         print(desc)
         for i in cl:
-          print("    " + str(i) + ": " + str(pct[i]*100)[:5] )
+          print("    " + str(i) + ": " + str(pct[i]*100)[:5] + "%")
         print()

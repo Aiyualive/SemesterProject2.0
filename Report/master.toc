@@ -16,6 +16,4 @@
 \contentsline {section}{\numberline {4.1}Conclusion}{13}{section.4.1}
 \contentsline {section}{\numberline {4.2}Future work}{13}{section.4.2}
 \contentsline {section}{\numberline {4.3}TODO}{14}{section.4.3}
-\contentsline {section}{\numberline {4.4}Notes}{15}{section.4.4}
-\contentsline {chapter}{\numberline {5}Appendix}{17}{chapter.5}
-\contentsline {chapter}{\numberline {A}Appendix}{19}{appendix.A}
+\contentsline {chapter}{\numberline {A}Results}{17}{appendix.A}

@@ -134,7 +134,28 @@ This step should have been done first
 Here we will present the results and discuss the findings herein.
 
 \section{Results}
-\todo{insert table for different architectures -- insert in previous chapter?} get the bachelor thesis for reference.
+
+\begin{table}[H]
+	\centering
+\begin{tabular}{|lcccc|}
+	\hline
+	\backslashbox{run \#}{Dataset}
+&{Synthetic}&{ClaveVectors}&{MNIST-bin-digits}&{MNIST-all-digits} \\\hline\hline
+	1 & 14.458 & 61.355 & 3212.497 & 2454.585 \\ \hline
+	2 & 16.568 & 62.396 & 3346.047 & 2782.271 \\ \hline
+	3 & 14.362 & 59.282 & 2908.446 & 2618.519 \\ \hline
+	4 & 13.85 & 62.193 & 3043.189 &  2600.233 \\ \hline
+	5 & 13.755 & 61.024 & 3309.422 & 2470.139 \\ \hline
+	6 & 12.218 & 58.531 & 3192.178 & 2823.685 \\ \hline
+	7 & 12.232 & 60.187 & 3287.289 & 2452.566 \\ \hline
+	8 & 13.346 & 59.398 & 3026.486 & 2810.943 \\ \hline
+	9 & 11.433 & 61.892 & 3127.583 & 2528.202 \\ \hline
+	10 & 11.63 & 60.925 & 3018.402 & 2746.729 \\ \hline
+\end{tabular}
+	\caption{Architecture of model number}
+\end{table}
+\todo{insert the different defect types and class distributions?}
+
 
 \section{Discussion}
 I tried to increase the outliers, but this was a hugely naive approach
@@ -154,91 +175,73 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item tune the peak finding parameters
 	\item track entity dependent/specific window offsets
 	\item we must not set the findpeakoffset too high
+	\item Questions, what if you want to use multiple features with 1 CNN
+	
 \end{itemize}
 
 \newpage
 \section{TODO}
 \begin{itemize}
+	\item get percentage of each class in the validation set
+	\item create an average of the model ie run model for more times
+	\item add speed as a feature
+	\item what does each filter do? what is kernel size?
 	\item very fast speed, overlap between switch and ins, old vs new rail, ax1 arrow 2 arrow 3 arrow 4
 	\item 3D plots?
 	\item change the defect library to use pandas instead?
 	\item visualise what the network is doing using Harry's code
 	\item use speed as a feature also
-	\item be consistent with function naming and variable names
-	\item 
+	\item be consistent with function naming and variable names: function names with underscore and variable names with camelcase
+	\item save confusion matrix, and metrics (modify the plotting of this) \item citation \cite{benchmark}
+	\item what if we just use evaluate instead of using measuring the accuracy score
 \end{itemize}
 
-
-\newpage
-\section{Notes}
-
-
-whats this
-\begin{minted}{python}
-def conv(df):
-    """
-    has to be series
-    """
-    return np.vstack([v for v in df])
-
-dup_ins = s_features.ins_joints.copy()[['accelerations']]
-dup_swi = s_features.switches.copy()[['accelerations']]
-dup_def = s_features.defects.copy()[['accelerations']]
-
-dup_ins['accelerations'] = np.sum(conv(dup_ins.accelerations),1)
-dup_swi['accelerations'] = np.sum(conv(dup_swi.accelerations),1)
-dup_def['accelerations'] = np.sum(conv(dup_def.accelerations),1)
-
-# s_features.ins_joints[['vehicle_speed(m/s)', 'Axle', 'campagin_ID']].duplicated() or
-
-idx_ins = dup_ins.accelerations.duplicated()
-idx_swi = dup_swi.accelerations.duplicated()
-idx_def = dup_def.accelerations.duplicated()
-new_ins = s_features.ins_joints[~idx_ins]
-new_swi = s_features.switches[~idx_swi]
-new_def = s_features.switches[~idx_def]
-
-print("Duplcated samples: ", len(dup_ins) - len(new_ins))
-print("Duplcated samples: ", len(dup_swi) - len(new_swi))
-print("Duplcated samples: ", len(dup_def) - len(new_def))
-
-# Load weight example 
-# Could just save entire model and then load entire model
-# Could also make this into a function
-clf2 = NN(N_FEATURES, N_CLASSES)
-clf2.prepare_data(X, y)
-clf2.make_model2()
-clf2.load_weights('model_01-12-2019_150004.hdf5')
-clf2.predict() ### on validation set
-clf2.measure_performance(accuracy_score)
-\end{minted}
-
-Test sample
-\begin{minted}{python}
-ii = pd.DataFrame([
-    [np.array([1,2]),2], 
-    [np.array([1,2]),2], 
-    [np.array([1,2]),2]])
-    
-    
-x = a
-[u,I,J] = unique(x, 'rows', 'first')
-hasDuplicates = size(u,1) < size(x,1)
-ixDupRows = setdiff(1:size(x,1), I)
-dupRowValues = x(ixDupRows,:)
-
-s_features.ins_joints.timestamps[:2].duplicated()
-\end{minted}
-
-\chapter{Appendix}
-\todo{Figure out references}
-\todo{New paper with train}
+\bibliography{master}
+%\todo{New paper with train}
 
 \newpage
 \cleardoublepage
 \appendix
-\chapter{Appendix}
-\label{code}
-\inputminted[linenos, fontsize = \scriptsize]{haskell}{../src/utils/defect_utils.py}
+% A chapter for each section
+\chapter{Results}
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c| c|} \hline
+		\textbf{Dataset} & \textbf{Size} & \textbf{Dimensions} & \textbf{Labels} \\ \hline \hline 
+		Synthetic data & 2000 &  9 &  4 (1 to 4) \\ \hline 
+		ClaveVectors data & 10800 & 16  &  4 (1 to 4) \\ \hline 
+		MNIST binary digits & 12665 & 784 &  2 (0 to 1) \\ \hline 
+		MNIST all digits & 11000 & 784 &  10 (0 to 9) \\ \hline 
+	\end{tabular}
+	\caption{Dataset formats}
+	\label{datasets}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|} \hline
+		\textbf{Latent Dimension} & $2$ \\ \hline
+		\textbf{Shape} & 8 $\times$ $8$ \\ \hline
+		\textbf{Latent Points} &  $64$\\ \hline
+		\textbf{Dist. Mixtures} &  Bernoulli\\ \hline \hline
+		\textbf{Regularisation $\alpha$ } & $0.001$ \\ \hline
+	\end{tabular}
+	\hspace*{0.5cm}
+	\begin{tabular}{|l|c|} \hline
+		\textbf{RBF Dimension} & $2$ \\ \hline
+		\textbf{RBF grid}  & $4\times4$ \\ \hline 
+		\textbf{RBF centres} & $16$ \\ \hline
+		\textbf{Basis function} & Gaussian \\ \hline
+	    \textbf{Widths $\bm{\sigma}$} & $1.0$\\ \hline
+	\end{tabular}
+	\caption{The parameters for the latent model and the RBF neural network. Distribution mixtures and basis functions cannot be altered as our implementation is specific for the Bernoulli GTM version}
+	\label{eval:model}
+\end{table}
+
+
+%\label{code}
+%\inputminted[linenos, fontsize = \scriptsize]{python}{../src/utils/defect_utils.py}
 
 \end{document}
