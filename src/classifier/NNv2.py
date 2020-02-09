@@ -5,15 +5,18 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import regularizers
-
 import tensorflow.keras.metrics as tkm
 import tensorflow as tf
-import random
 
 from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
+import time
+from datetime import date, datetime
+import random
 import pickle
 import os
 import glob
@@ -28,26 +31,99 @@ np.random.seed(2)     # numpy
 #tf.set_random_seed(2) # tensorflow
 tf.random.set_seed(2)
 
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from sklearn.metrics import accuracy_score, classification_report
-
-import time
-from datetime import date, datetime
-
 def create_dir(folder):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+  if not os.path.exists(folder):
+    os.makedirs(folder)
 
-# kernel_initializer = 'uniform'
-# https://stackoverflow.com/questions/43235531/convolutional-neural-network-conv1d-input-shape
+################
+### ModelMaker class ###
+################
+class ModelMaker():
+    # seq len, n classes, metrics
+    def __init__(self, seq_len, n_classes, metrics):
+        self.seq_len   = seq_len
+        self.n_classes = n_classes
+        self.metrics   = metrics
+        self.models    = ["model1", "model2", "model3"]
+
+    def modelChooser(self, model_name):
+        """
+        Returns the chosen model
+        params:
+            model_name: name of model
+        """
+        if model_name in self.models:
+            raise Warning("Model name does not exist")
+
+        # Could instead use a dictionary containing lambda funcs?
+        print("##################### Make " + model_name + " #####################")
+        if model_name == "model1":
+            return _makeModel1()
+        elif model_name == "model2":
+            return _makeModel2()
+        else
+            return _makeModel3()
+
+    def _makeModel1(self):
+        model = Sequential()
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         input_shape=(self.seq_len, 1),
+                         activation= 'relu',
+                         )) #kernel_regularizer=regularizers.l2(0.002)
+        model.add(Flatten())
+        model.add(Dense(32, activation='relu'))
+        model.add(Dropout(rate=0.3,seed=1))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.summary()
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.00001),
+                      metrics=self.metrics)
+        return model
+
+    #https://github.com/ni79ls/har-keras-cnn/blob/master/20180903_Keras_HAR_WISDM_CNN_v1.0_for_medium.py
+    # https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf
+    def _makeModel2(self):
+        model = Sequential()
+        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
+        model.add(Conv1D(30, 10, activation='relu'))
+        model.add(MaxPooling1D(3))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(GlobalAveragePooling1D())
+        model.add(Dropout(rate=0.5, seed=2))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.summary()
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.001),
+                      metrics=self.metrics)
+        return model
+
+
+    def _makeModel3(self):
+        model = Sequential()
+        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.4, seed=2))
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.4, seed=2))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.summary()
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.001),
+                      metrics=self.metrics)
+        return model
+
+################
+### NN class ###
+################
+
 class NN():
-
-    def __init__(self, n_features, n_classes):
+    def __init__(self, create_dir_bool = True):
         print("##################### Init NN #####################")
-        self.N_FEATURES = n_features
-        self.N_CLASSES  = n_classes
-        self.METRICS    =  ['accuracy',
+        self.metrics =  ['accuracy',
                               tkm.TruePositives(),
                               tkm.FalsePositives(name='fp'),
                               tkm.TrueNegatives(name='tn'),
@@ -57,12 +133,16 @@ class NN():
                               tkm.Recall(name='recall'),
                               tkm.AUC(name='auc')]
 
+        self.date = datetime.now().strftime("%d-%m_%H%M%S")
 
-        self.DATE = datetime.now().strftime("%d-%m_%H%M%S")
-        create_dir(self.DATE)
+        if (create_dir_bool):
+            create_dir(self.date)
 
     def prepare_data(self, X, y):
         print("##################### Prepare Data #####################")
+        self.n_features = len(X.columns)
+        self.n_classes  = len(np.unique(y))
+
         # np.bincount(np.hstack(y.values))
         tmp_X = np.vstack([v for v in X.accelerations])
 
@@ -90,70 +170,22 @@ class NN():
         self.X     = np.expand_dims(self.X, axis=2)
         self.X_val = np.expand_dims(self.X_val, axis=2)
 
-    def make_model1(self):
-        print("##################### Make Model #####################")
-        model = Sequential()
-        model.add(Conv1D(filters=20,
-                         kernel_size=10,
-                         input_shape=(self.seq_len, 1),
-                         activation= 'relu',
-                         )) #kernel_regularizer=regularizers.l2(0.002)
-        model.add(Flatten())
-        model.add(Dense(32, activation='relu'))
-        model.add(Dropout(rate=0.3,seed=1))
-        model.add(Dense(self.N_CLASSES, activation='softmax'))
-        model.summary()
-        model.compile(loss='categorical_crossentropy',
-                      optimizer=Adam(learning_rate=0.00001),
-                      metrics=self.METRICS)
-        self.model = model
-        self.MODEL_NAME = "Model1"
+    def makeModel(self, model_name):
+        """
+        Makes a specified model from, using ModelMaker class
+        params:
+            model: the model to be made
+        """
+        model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
+        self.model = model_maker.modelChooser(model_name)
+        self.model_name = model_name
 
-    #https://github.com/ni79ls/har-keras-cnn/blob/master/20180903_Keras_HAR_WISDM_CNN_v1.0_for_medium.py
-
-    # https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf
-    def make_model2(self):
-        print("##################### Make Model #####################")
-        model = Sequential()
-        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
-        model.add(Conv1D(30, 10, activation='relu'))
-        model.add(MaxPooling1D(3))
-        model.add(Conv1D(60, 10, activation='relu'))
-        model.add(Conv1D(60, 10, activation='relu'))
-        model.add(GlobalAveragePooling1D())
-        model.add(Dropout(rate=0.5, seed=2))
-        model.add(Dense(self.N_CLASSES, activation='softmax'))
-        model.summary()
-        model.compile(loss='categorical_crossentropy',
-                      optimizer=Adam(learning_rate=0.001),
-                      metrics=self.METRICS)
-        self.model = model
-        self.MODEL_NAME = "Model2"
-
-    def make_model3(self):
-        print("##################### Make Model #####################")
-        model = Sequential()
-        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
-        model.add(Conv1D(60, 10, activation='relu'))
-        model.add(Flatten())
-        model.add(Dense(16, activation='relu'))
-        model.add(Dropout(rate=0.4, seed=2))
-        model.add(Dense(16, activation='relu'))
-        model.add(Dropout(rate=0.4, seed=2))
-        model.add(Dense(self.N_CLASSES, activation='softmax'))
-        model.summary()
-        model.compile(loss='categorical_crossentropy',
-                      optimizer=Adam(learning_rate=0.001),
-                      metrics=self.METRICS)
-
-        self.model = model
-        self.MODEL_NAME = "Model3"
 
     def fit(self, epochs, batch_size):
+        """
+        Fit  the model
+        """
         print("##################### Fit Model #####################")
-        #####
-        #### use {} format
-        ###
         checkpoint     = ModelCheckpoint(self.DATE + "/w_ckp_" + self.MODEL_NAME +  ".hdf5",
                                          monitor='val_loss',
                                          verbose=2,
@@ -172,7 +204,7 @@ class NN():
                                            #min_delta = 1e-04,
                                            verbose=2,
                                            mode='min')
-        callbacks      = [early_stopping, checkpoint]
+        callbacks = [early_stopping, checkpoint]
 
         start = time.time()
         self.history = self.model.fit(
@@ -219,6 +251,17 @@ class NN():
 
     def load_model_(self, model_file):
         return load_model(model_file)
+
+    def load_weights(self, weights_file):
+        """
+        """
+        clf2 = NN(N_FEATURES, N_CLASSES)
+        clf2.prepare_data(X, y)
+        clf2.make_model2()
+        clf2.load_weights('model_01-12-2019_150004.hdf5')
+        clf2.predict() ### on validation set
+        clf2.measure_performance(accuracy_score)
+
 
     def save_model(self):
         print("##################### Save Model #####################")
@@ -270,7 +313,7 @@ class NN():
 
     def show_confusion_matrix(self):
         print("##################### Confusiion Matrix #####################")
-        matrix = metrics.confusion_matrix(self.true_y_val,
+        matrix = confusion_matrix(self.true_y_val,
                                           self.prediction,
                                           labels=np.arange(self.N_CLASSES))
         fig = plt.figure(figsize=(12, 10))
@@ -291,11 +334,10 @@ class NN():
         plt.ylabel("True Label")
         plt.xlabel("Predicted Label")
         plt.show()
-
-
     def test(self):
-        print("##################### Test #####################")
-        print(self.model.layers[0].get_config())
-        print(self.model.layers[0].output)
-        print(self.model.layers[0].get_weights())
-        print(self.model.layers[0].weights)
+      print("##################### Test #####################")
+
+      print(self.model.layers[0].get_config())
+      print(self.model.layers[0].output)
+      print(self.model.layers[0].get_weights())
+      print(self.model.layers[0].weights)
