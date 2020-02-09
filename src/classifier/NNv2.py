@@ -45,7 +45,7 @@ class ModelMaker():
         self.n_classes = n_classes
         self.metrics   = metrics
 
-    def modelChooser(self, model_name):
+    def model_chooser(self, model_name, verbose = True):
         """
         Returns the chosen model
         params:
@@ -55,15 +55,21 @@ class ModelMaker():
         # Could instead use a dictionary containing lambda funcs?
         print("########## Make " + model_name + " ##########")
         if model_name == "model1":
-            return self._makeModel1()
+            self._makeModel1()
         elif model_name == "model2":
-            return self._makeModel2()
+            self._makeModel2()
         elif model_name == "model3":
-            return self._makeModel3()
+            self._makeModel3()
         elif model_name == "model4":
-            return self._makeModel4()
+            self._makeModel4()
         else:
             raise Warning("Model name does not exist")
+
+        if verbose:
+            self.model.summary()
+
+        return self.model
+
 
     def _makeModel1(self):
         model = Sequential()
@@ -76,11 +82,10 @@ class ModelMaker():
         model.add(Dense(16, activation='relu'))
         model.add(Dropout(rate=0.3,seed=1))
         model.add(Dense(self.n_classes, activation='softmax'))
-        model.summary()
         model.compile(loss='categorical_crossentropy',
                       optimizer=Adam(learning_rate=0.00001),
                       metrics=self.metrics)
-        return model
+        self.model = model
 
     def _makeModel2(self):
         """
@@ -100,7 +105,7 @@ class ModelMaker():
         model.compile(loss='categorical_crossentropy',
                       optimizer=Adam(learning_rate=0.001),
                       metrics=self.metrics)
-        return model
+        self.model = model
 
     def _makeModel3(self):
         model = Sequential()
@@ -112,11 +117,10 @@ class ModelMaker():
         model.add(Dense(16, activation='relu'))
         model.add(Dropout(rate=0.4, seed=2))
         model.add(Dense(self.n_classes, activation='softmax'))
-        model.summary()
         model.compile(loss='categorical_crossentropy',
                       optimizer=Adam(learning_rate=0.001),
                       metrics=self.metrics)
-        return model
+        self.model = model
 
     def _makeModel4(self):
         model = Sequential()
@@ -133,11 +137,10 @@ class ModelMaker():
         model.add(Dense(16, activation='relu'))
         model.add(Dropout(rate=0.3,seed=1))
         model.add(Dense(self.n_classes, activation='softmax'))
-        model.summary()
         model.compile(loss='categorical_crossentropy',
                       optimizer=Adam(learning_rate=0.01),
                       metrics=self.metrics)
-        return model
+        self.model = model
 
 
 ################
@@ -155,6 +158,7 @@ class NN():
                               tkm.Precision(name='precision'),
                               tkm.Recall(name='recall'),
                               tkm.AUC(name='auc')]
+
 
         self.date = datetime.now().strftime("%d-%m_%H%M%S")
         if (create_dir_bool):
@@ -200,14 +204,14 @@ class NN():
         self.X     = np.expand_dims(self.X, axis=2)
         self.X_val = np.expand_dims(self.X_val, axis=2)
 
-    def makeModel(self, model_name):
+    def make_model(self, model_name, verbose = True):
         """
         Makes a specified model from, using ModelMaker class
         params:
             model: the model to be made
         """
         model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
-        self.model = model_maker.modelChooser(model_name)
+        self.model = model_maker.model_chooser(model_name, verbose)
         self.model_name = model_name
         self._set_callbacks()
 
@@ -292,13 +296,13 @@ class NN():
         scores = []
         for i in range(rep):
             print("******************* EXP " + str(i) + " *******************")
-            print("*********************************************")
+            self.make_model("model1", verbose = False)
             self.fit(epochs, batch_size, verbose=0)
             self.predict()
             self.measure_performance(accuracy_score, print_score = False)
             print('>#%d: %.3f' % (i+1, self.score))
             scores.append(self.score)
-            print("*********************************************")
+            print("*********************************************\n")
         m, s = np.mean(scores), np.std(scores)
         print('Accuracy: %.3f%% (+/-%.3f)' % (m, s))
 
