@@ -28,23 +28,22 @@ import matplotlib.pyplot as plt
 
 random.seed(2)        # Python
 np.random.seed(2)     # numpy
-#tf.set_random_seed(2) # tensorflow
-tf.random.set_seed(2)
+tf.set_random_seed(2) # tensorflow
+#tf.random.set_seed(2)
 
 def create_dir(folder):
   if not os.path.exists(folder):
     os.makedirs(folder)
 
-########################
+#############
 ### ModelMaker class ###
-########################
+#############
 class ModelMaker():
     # seq len, n classes, metrics
     def __init__(self, seq_len, n_classes, metrics):
         self.seq_len   = seq_len
         self.n_classes = n_classes
         self.metrics   = metrics
-        self.models    = ["model1", "model2", "model3"]
 
     def modelChooser(self, model_name):
         """
@@ -52,27 +51,29 @@ class ModelMaker():
         params:
             model_name: name of model
         """
-        if model_name in self.models:
-            raise Warning("Model name does not exist")
 
         # Could instead use a dictionary containing lambda funcs?
-        print("##################### Make " + model_name + " #####################")
+        print("########## Make " + model_name + " ##########")
         if model_name == "model1":
             return self._makeModel1()
         elif model_name == "model2":
             return self._makeModel2()
-        else
+        elif model_name == "model3":
             return self._makeModel3()
+        elif model_name == "model4":
+            return self._makeModel4()
+        else:
+            raise Warning("Model name does not exist")
 
     def _makeModel1(self):
         model = Sequential()
         model.add(Conv1D(filters=20,
                          kernel_size=10,
                          input_shape=(self.seq_len, 1),
-                         activation= 'relu',
-                         )) #kernel_regularizer=regularizers.l2(0.002)
+                         activation= 'relu')) #kernel_regularizer=regularizers.l2(0.002)
+        model.add(MaxPooling1D(pool_size=2))
         model.add(Flatten())
-        model.add(Dense(32, activation='relu'))
+        model.add(Dense(16, activation='relu'))
         model.add(Dropout(rate=0.3,seed=1))
         model.add(Dense(self.n_classes, activation='softmax'))
         model.summary()
@@ -81,9 +82,11 @@ class ModelMaker():
                       metrics=self.metrics)
         return model
 
-    #https://github.com/ni79ls/har-keras-cnn/blob/master/20180903_Keras_HAR_WISDM_CNN_v1.0_for_medium.py
-    # https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf
     def _makeModel2(self):
+        """
+        https://github.com/ni79ls/har-keras-cnn/blob/master/20180903_Keras_HAR_WISDM_CNN_v1.0_for_medium.py
+        https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf
+        """
         model = Sequential()
         model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
         model.add(Conv1D(30, 10, activation='relu'))
@@ -115,12 +118,34 @@ class ModelMaker():
                       metrics=self.metrics)
         return model
 
+    def _makeModel4(self):
+        model = Sequential()
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         input_shape=(self.seq_len, 1),
+                         activation= 'relu'))
+        model.add(MaxPooling1D(pool_size=3))
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         activation= 'relu'))
+        model.add(MaxPooling1D(pool_size=3))
+        model.add(Flatten())
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.3,seed=1))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.summary()
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.01),
+                      metrics=self.metrics)
+        return model
+
+
 ################
 ### NN class ###
 ################
 class NN():
     def __init__(self, create_dir_bool = True):
-        print("##################### Init NN #####################")
+        print("########## Init NN ##########")
         self.metrics =  ['accuracy',
                               tkm.TruePositives(),
                               tkm.FalsePositives(name='fp'),
@@ -132,7 +157,6 @@ class NN():
                               tkm.AUC(name='auc')]
 
         self.date = datetime.now().strftime("%d-%m_%H%M%S")
-
         if (create_dir_bool):
             create_dir(self.date)
 
@@ -140,7 +164,7 @@ class NN():
         """
         Prepare data; normalisation, validation split
         """
-        print("##################### Prepare Data #####################")
+        print("########## Prepare Data ##########")
         self.n_features = len(X.columns)
         self.n_classes  = len(np.unique(y))
 
@@ -163,8 +187,10 @@ class NN():
                                                                  random_state=2,
                                                                  shuffle=True)
 
-        self.true_y_val    = _convertFromCategorical(self.y_val)
-        self.true_y        = _convertFromCategorical(self.y)
+        self.true_y_val    = self._convertFromCategorical(self.y_val)
+        self.true_y        = self._convertFromCategorical(self.y)
+        self._printClassDist(self.true_y, "Train set class distribution")
+        self._printClassDist(self.true_y_val, "Validation set class distribution")
 
         self.class_weights = compute_class_weight('balanced',
                                                  np.unique(self.true_y),
@@ -183,31 +209,13 @@ class NN():
         model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
         self.model = model_maker.modelChooser(model_name)
         self.model_name = model_name
+        self._set_callbacks()
 
-    def fit(self, epochs, batch_size):
+    def fit(self, epochs, batch_size, verbose = 2):
         """
         Fit the model; define callbacks
         """
-        print("##################### Fit Model #####################")
-        checkpoint     = ModelCheckpoint(self.DATE + "/w_ckp_" + self.model_name +  ".hdf5",
-                                         monitor='val_loss',
-                                         verbose=2,
-                                         save_best_only=True,
-                                         mode='min')
-
-        early_stopping = EarlyStopping(monitor='val_loss',
-                                        verbose=1,
-                                        patience=6,
-                                        mode='min',
-                                        restore_best_weights=True)
-
-        reduce_lr      = ReduceLROnPlateau(monitor='val_loss',
-                                           factor=0.8,
-                                           patience=4,
-                                           #min_delta = 1e-04,
-                                           verbose=2,
-                                           mode='min')
-        callbacks      = [early_stopping, checkpoint]
+        print("########## Fit Model ##########")
 
         start = time.time()
         self.history = self.model.fit(
@@ -215,46 +223,47 @@ class NN():
                             validation_data=(self.X_val, self.y_val),
                             epochs=epochs,
                             batch_size=batch_size,
-                            class_weight=self.CLASS_WEIGHTS,
-                            verbose=2,
+                            class_weight=self.class_weights,
+                            verbose=verbose,
                             shuffle=False,
-                            callbacks=callbacks)
+                            callbacks=self.callbacks)
         end = time.time()
-        print("Running time: \n", (end - start)/60)
+        print("Running time: ", (end - start)/60)
 
     def predict(self):
         """
         Computes predictions for the validation set
         """
-        print("##################### Make Prediction #####################")
+        print("########## Make Prediction ##########")
         tmp_prediction = self.model.predict(self.X_val)
-        self.prediction = _convertFromCategorical(tmp_prediction)
+        self.prediction = self._convertFromCategorical(tmp_prediction)
 
-    def measure_performance(self, performance_function):
+    def measure_performance(self, performance_function, print_score = True):
         """
         Compute validation score
         """
-        print("##################### Measure Performance #####################")
+        print("########## Measure Performance ##########")
         self.score = performance_function(self.true_y_val, self.prediction)
-        print("Validation score: \n", self.score)
+        if print_score:
+            print("Validation score: \n", self.score)
 
     def load_weights(self, weights_file):
         """
         Loads weights into the same model that the weights was created from.
         So the prevous steps of creating the correct model has to be performed
         """
-        print("##################### Load Model #####################")
+        print("########## Load Model ##########")
         self.model.load_weights(weights_file)
 
     def load_model_(self, model_file):
         """
         Model_file has to be generated with save_model; have not tested.
         """
-        print("##################### Load Model #####################")
+        print("########## Load Model ##########")
         self.model = load_model(model_file)
 
     def save_model(self):
-        print("##################### Save Model #####################")
+        print("########## Save Model ##########")
         score = str(self.score)[:4]
         self.model.save(self.date + "/SAVED_" + self.model_name + "_" + score + ".hdf5")
 
@@ -262,12 +271,12 @@ class NN():
         """
         Saves the training history into pickle file
         """
-        print("##################### Save History #####################")
+        print("########## Save History ##########")
         pickle.dump(self.history.history,
                     open(self.date + "/history" + ".pickle", "wb" ))
 
     def save_prediction_to_csv(self, name):
-        print("##################### Save Prediction #####################")
+        print("########## Save Prediction ##########")
         df_predict = pd.DataFrame(columns=['id', 'y'])
 
         df_predict['id'] = np.arange(len(self.prediction))
@@ -279,14 +288,28 @@ class NN():
         filename = "" + name0 + name1 + name2 + ".csv"
         df_predict.to_csv(filename)
 
+    def run_experiment(self, epochs, batch_size, rep=10):
+        scores = []
+        for i in range(rep):
+            print("******************* EXP " + str(i) + " *******************")
+            print("*********************************************")
+            self.fit(epochs, batch_size, verbose=0)
+            self.predict()
+            self.measure_performance(accuracy_score, print_score = False)
+            print('>#%d: %.3f' % (i+1, self.score))
+            scores.append(self.score)
+            print("*********************************************")
+        m, s = np.mean(scores), np.std(scores)
+        print('Accuracy: %.3f%% (+/-%.3f)' % (m, s))
+
     def plot_metrics(self):
-        print("##################### Plot Metrics #####################")
+        print("########## Plot Metrics ##########")
         history = self.history
         for n, metric in enumerate(self.model.metrics_names):
-            name = metric.replace("_"," ").capitalize()
+            name = metric.replace("_", " ").capitalize()
             plt.subplot(5, 2, n + 1)
 
-            plt.plot(history.epoch,  history.history[metric], color=colors[0], label='Train')
+            plt.plot(history.epoch, history.history[metric], color=colors[0], label='Train')
             plt.plot(history.epoch, history.history['val_' + metric],
                      color=colors[0], linestyle="--", label='Val')
             plt.xlabel('Epoch')
@@ -304,10 +327,10 @@ class NN():
             plt.legend()
 
     def show_confusion_matrix(self):
-        print("##################### Confusiion Matrix #####################")
+        print("########## Confusiion Matrix ##########")
         matrix = confusion_matrix(self.true_y_val,
-                                          self.prediction,
-                                          labels=np.arange(self.N_CLASSES))
+                                  self.prediction,
+                                  labels=np.arange(self.n_classes))
         fig = plt.figure(figsize=(12, 10))
         ax = fig.add_subplot()
 
@@ -315,8 +338,8 @@ class NN():
                     cmap="coolwarm",
                     linecolor='white',
                     linewidths=1,
-                    xticklabels=np.arange(self.N_CLASSES),
-                    yticklabels=np.arange(self.N_CLASSES),
+                    xticklabels=np.arange(self.n_classes),
+                    yticklabels=np.arange(self.n_classes),
                     annot=True,
                     fmt="d", ax=ax)
         bottom, top = ax.get_ylim()
@@ -328,14 +351,45 @@ class NN():
         plt.show()
 
     def test(self):
-      print("##################### Test #####################")
+      print("########## Test ##########")
       print(self.model.layers[0].get_config())
       print(self.model.layers[0].output)
       print(self.model.layers[0].get_weights())
       print(self.model.layers[0].weights)
+
+    def _set_callbacks(self):
+        checkpoint     = ModelCheckpoint(self.date + "/w_ckp_" + self.model_name +  ".hdf5",
+                                        monitor='val_loss',
+                                        verbose=2,
+                                        save_best_only=True,
+                                        mode='min')
+
+        early_stopping = EarlyStopping(monitor='val_loss',
+                                        verbose=1,
+                                        patience=6,
+                                        mode='min',
+                                        restore_best_weights=True)
+
+        reduce_lr      = ReduceLROnPlateau(monitor='val_loss',
+                                        factor=0.8,
+                                        patience=4,
+                                        #min_delta = 1e-04,
+                                        verbose=2,
+                                        mode='min')
+
+        self.callbacks      = [early_stopping, checkpoint]
 
     def _convertFromCategorical(self, arr):
         """
         Convert array from categorical to ordinary class integers
         """
         return np.asarray(list(map(np.argmax, arr)))
+
+    def _printClassDist(self, arr, desc):
+        cnt = np.bincount(arr)
+        pct = cnt/sum(cnt)
+        cl   = np.nonzero(pct)[0]
+        print(desc)
+        for i in cl:
+          print("    " + str(i) + ": " + str(pct[i]*100)[:5] )
+        print()
