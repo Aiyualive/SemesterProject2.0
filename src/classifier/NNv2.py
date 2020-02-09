@@ -58,11 +58,11 @@ class ModelMaker():
         # Could instead use a dictionary containing lambda funcs?
         print("##################### Make " + model_name + " #####################")
         if model_name == "model1":
-            return _makeModel1()
+            return self._makeModel1()
         elif model_name == "model2":
-            return _makeModel2()
+            return self._makeModel2()
         else
-            return _makeModel3()
+            return self._makeModel3()
 
     def _makeModel1(self):
         model = Sequential()
@@ -138,7 +138,7 @@ class NN():
 
     def prepare_data(self, X, y, oversampling = False):
         """
-        Prepares data
+        Prepare data; normalisation, validation split
         """
         print("##################### Prepare Data #####################")
         self.n_features = len(X.columns)
@@ -146,12 +146,12 @@ class NN():
 
         # np.bincount(np.hstack(y.values))
         tmp_X = np.vstack([v for v in X.accelerations])
+        tmp_y = to_categorical(y.values, num_classes=self.n_classes)
 
         if oversampling:
             print("    *Oversampling*")
             smote = SMOTE('all', k_neighbors=3,random_state=2)
             tmp_X, tmp_y = smote.fit_sample(tmp_X, y.values)
-            tmp_y = to_categorical(tmp_y, num_classes=self.N_CLASSES)
 
         print("    *Normalisation*")
         scaler = StandardScaler()
@@ -170,6 +170,7 @@ class NN():
                                                  np.unique(self.true_y),
                                                  self.true_y)
 
+        # Need to expand dim in order for conv1D to work
         self.X     = np.expand_dims(self.X, axis=2)
         self.X_val = np.expand_dims(self.X_val, axis=2)
 
@@ -185,7 +186,7 @@ class NN():
 
     def fit(self, epochs, batch_size):
         """
-        Fit the model
+        Fit the model; define callbacks
         """
         print("##################### Fit Model #####################")
         checkpoint     = ModelCheckpoint(self.DATE + "/w_ckp_" + self.model_name +  ".hdf5",
@@ -214,57 +215,56 @@ class NN():
                             validation_data=(self.X_val, self.y_val),
                             epochs=epochs,
                             batch_size=batch_size,
-                            #class_weight=self.CLASS_WEIGHTS,
+                            class_weight=self.CLASS_WEIGHTS,
                             verbose=2,
                             shuffle=False,
                             callbacks=callbacks)
         end = time.time()
         print("Running time: \n", (end - start)/60)
 
-
     def predict(self):
         """
-        Computes predictions for a new set of points.
+        Computes predictions for the validation set
         """
         print("##################### Make Prediction #####################")
         tmp_prediction = self.model.predict(self.X_val)
-
-        ### softmax and categorical
         self.prediction = _convertFromCategorical(tmp_prediction)
 
     def measure_performance(self, performance_function):
+        """
+        Compute validation score
+        """
         print("##################### Measure Performance #####################")
-        self.SCORE = performance_function(self.true_y_val, self.prediction)
-        print("Validation score: \n", self.SCORE)
+        self.score = performance_function(self.true_y_val, self.prediction)
+        print("Validation score: \n", self.score)
 
     def load_weights(self, weights_file):
+        """
+        Loads weights into the same model that the weights was created from.
+        So the prevous steps of creating the correct model has to be performed
+        """
         print("##################### Load Model #####################")
         self.model.load_weights(weights_file)
 
     def load_model_(self, model_file):
-        return load_model(model_file)
-
-    def load_weights(self, weights_file):
         """
-        Loads weights into the same model that the weights was created from
+        Model_file has to be generated with save_model; have not tested.
         """
-        clf2 = NN(N_FEATURES, N_CLASSES)
-        clf2.prepare_data(X, y)
-        clf2.make_model2()
-        clf2.load_weights('model_01-12-2019_150004.hdf5')
-        clf2.predict() ### on validation set
-        clf2.measure_performance(accuracy_score)
-
+        print("##################### Load Model #####################")
+        self.model = load_model(model_file)
 
     def save_model(self):
         print("##################### Save Model #####################")
-        score = str(self.SCORE)[:4]
-        self.model.save(self.DATE + "/SAVED_" + self.MODEL_NAME + "_" + score + ".hdf5")
+        score = str(self.score)[:4]
+        self.model.save(self.date + "/SAVED_" + self.model_name + "_" + score + ".hdf5")
 
     def save_history(self):
+        """
+        Saves the training history into pickle file
+        """
         print("##################### Save History #####################")
         pickle.dump(self.history.history,
-                    open(self.DATE + "/history" + ".pickle", "wb" ))
+                    open(self.date + "/history" + ".pickle", "wb" ))
 
     def save_prediction_to_csv(self, name):
         print("##################### Save Prediction #####################")
@@ -284,24 +284,23 @@ class NN():
         history = self.history
         for n, metric in enumerate(self.model.metrics_names):
             name = metric.replace("_"," ").capitalize()
-            plt.subplot(5,2,n+1)
+            plt.subplot(5, 2, n + 1)
 
             plt.plot(history.epoch,  history.history[metric], color=colors[0], label='Train')
-            plt.plot(history.epoch, history.history['val_'+metric],
+            plt.plot(history.epoch, history.history['val_' + metric],
                      color=colors[0], linestyle="--", label='Val')
             plt.xlabel('Epoch')
             plt.ylabel(name)
             if metric == 'loss':
                 plt.ylim([0, 3])
             elif ("true_positives" in metric) or ("fn" in metric) or ("fp" in metric):
-                plt.ylim([0,10000])
+                plt.ylim([0, 10000])
             elif ("tn" in metric):
-                plt.ylim([0,20000])
+                plt.ylim([0, 20000])
             elif metric == 'auc':
-                plt.ylim([0.8,1])
+                plt.ylim([0.8, 1])
             else:
-                plt.ylim([0,1])
-
+                plt.ylim([0, 1])
             plt.legend()
 
     def show_confusion_matrix(self):
