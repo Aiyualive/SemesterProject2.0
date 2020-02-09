@@ -35,9 +35,9 @@ def create_dir(folder):
   if not os.path.exists(folder):
     os.makedirs(folder)
 
-################
+########################
 ### ModelMaker class ###
-################
+########################
 class ModelMaker():
     # seq len, n classes, metrics
     def __init__(self, seq_len, n_classes, metrics):
@@ -99,7 +99,6 @@ class ModelMaker():
                       metrics=self.metrics)
         return model
 
-
     def _makeModel3(self):
         model = Sequential()
         model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
@@ -119,7 +118,6 @@ class ModelMaker():
 ################
 ### NN class ###
 ################
-
 class NN():
     def __init__(self, create_dir_bool = True):
         print("##################### Init NN #####################")
@@ -138,7 +136,10 @@ class NN():
         if (create_dir_bool):
             create_dir(self.date)
 
-    def prepare_data(self, X, y):
+    def prepare_data(self, X, y, oversampling = False):
+        """
+        Prepares data
+        """
         print("##################### Prepare Data #####################")
         self.n_features = len(X.columns)
         self.n_classes  = len(np.unique(y))
@@ -146,24 +147,26 @@ class NN():
         # np.bincount(np.hstack(y.values))
         tmp_X = np.vstack([v for v in X.accelerations])
 
-        print("    *Oversampling*")
-        smote = SMOTE('all', k_neighbors=3,random_state=2)
-        tmp_X, tmp_y = smote.fit_sample(tmp_X, y.values)
-        tmp_y = to_categorical(tmp_y, num_classes=self.N_CLASSES)
+        if oversampling:
+            print("    *Oversampling*")
+            smote = SMOTE('all', k_neighbors=3,random_state=2)
+            tmp_X, tmp_y = smote.fit_sample(tmp_X, y.values)
+            tmp_y = to_categorical(tmp_y, num_classes=self.N_CLASSES)
 
         print("    *Normalisation*")
         scaler = StandardScaler()
         tmp_X = scaler.fit_transform(tmp_X)
-
 
         self.seq_len = tmp_X.shape[1]
         self.X, self.X_val, self.y, self.y_val = train_test_split(tmp_X, tmp_y,
                                                                  test_size=0.15,
                                                                  random_state=2,
                                                                  shuffle=True)
-        self.true_y_val = np.asarray(list(map(np.argmax, self.y_val)))
-        self.true_y     = np.asarray(list(map(np.argmax, self.y)))
-        self.CLASS_WEIGHTS = compute_class_weight('balanced',
+
+        self.true_y_val    = _convertFromCategorical(self.y_val)
+        self.true_y        = _convertFromCategorical(self.y)
+
+        self.class_weights = compute_class_weight('balanced',
                                                  np.unique(self.true_y),
                                                  self.true_y)
 
@@ -180,13 +183,12 @@ class NN():
         self.model = model_maker.modelChooser(model_name)
         self.model_name = model_name
 
-
     def fit(self, epochs, batch_size):
         """
-        Fit  the model
+        Fit the model
         """
         print("##################### Fit Model #####################")
-        checkpoint     = ModelCheckpoint(self.DATE + "/w_ckp_" + self.MODEL_NAME +  ".hdf5",
+        checkpoint     = ModelCheckpoint(self.DATE + "/w_ckp_" + self.model_name +  ".hdf5",
                                          monitor='val_loss',
                                          verbose=2,
                                          save_best_only=True,
@@ -204,7 +206,7 @@ class NN():
                                            #min_delta = 1e-04,
                                            verbose=2,
                                            mode='min')
-        callbacks = [early_stopping, checkpoint]
+        callbacks      = [early_stopping, checkpoint]
 
         start = time.time()
         self.history = self.model.fit(
@@ -223,22 +225,12 @@ class NN():
     def predict(self):
         """
         Computes predictions for a new set of points.
-
-        Parameters
-        ----------
-        X : Array of shape [n_samples, n_features]
-
-        Returns
-        -------
-        predictions : Array of shape [n_samples, D]
-        depending on the activation function
         """
         print("##################### Make Prediction #####################")
-
         tmp_prediction = self.model.predict(self.X_val)
 
         ### softmax and categorical
-        self.prediction = np.asarray(list(map(np.argmax, tmp_prediction)))
+        self.prediction = _convertFromCategorical(tmp_prediction)
 
     def measure_performance(self, performance_function):
         print("##################### Measure Performance #####################")
@@ -254,6 +246,7 @@ class NN():
 
     def load_weights(self, weights_file):
         """
+        Loads weights into the same model that the weights was created from
         """
         clf2 = NN(N_FEATURES, N_CLASSES)
         clf2.prepare_data(X, y)
@@ -334,10 +327,16 @@ class NN():
         plt.ylabel("True Label")
         plt.xlabel("Predicted Label")
         plt.show()
+
     def test(self):
       print("##################### Test #####################")
-
       print(self.model.layers[0].get_config())
       print(self.model.layers[0].output)
       print(self.model.layers[0].get_weights())
       print(self.model.layers[0].weights)
+
+    def _convertFromCategorical(self, arr):
+        """
+        Convert array from categorical to ordinary class integers
+        """
+        return np.asarray(list(map(np.argmax, arr)))
