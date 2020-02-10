@@ -173,7 +173,6 @@ class NN():
         self.n_features = len(X.columns)
         self.n_classes  = len(np.unique(y))
 
-        # np.bincount(np.hstack(y.values))
         tmp_X = np.vstack([v for v in X.accelerations])
         tmp_y = to_categorical(y.values, num_classes=self.n_classes)
 
@@ -214,7 +213,7 @@ class NN():
         model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
         self.model = model_maker.model_chooser(model_name, self.verbose)
         self.model_name = model_name
-        self._set_callbacks()
+        self._set_callbacks() #self.verbose not set in here
 
     def fit(self):
         """
@@ -243,14 +242,14 @@ class NN():
         tmp_prediction = self.model.predict(self.X_val)
         self.prediction = self._convertFromCategorical(tmp_prediction)
 
-    def measure_performance(self, performance_function, print_score = True):
+    def measure_performance(self):
         """
-        Compute validation score
+        Evaluate model on validation set.
         """
         print("########## Measure Performance ##########")
-        self.score = performance_function(self.true_y_val, self.prediction)
-        if print_score:
-            print("Validation score: \n", self.score)
+        self.results = self.model.evaluate(self.X_val, self.y_val,
+                                           batch_size=self.batch_size,
+                                           verbose=self.verbose)
 
     def load_weights(self, weights_file):
         """
@@ -269,8 +268,7 @@ class NN():
 
     def save_model(self):
         print("########## Save Model ##########")
-        score = str(self.score)[:4]
-        self.model.save(self.date + "/SAVE_MODEL_" + self.model_name + "_" + self.exp_desc + "_" + score + ".hdf5")
+        self.model.save(self.date + "/SAVE_MODEL_%s_%s_%3.2f.hdf5"%(self.model_name, self.exp_desc, self.results[1]))
 
     def save_history(self):
         """
@@ -278,7 +276,7 @@ class NN():
         """
         print("########## Save History ##########")
         pickle.dump(self.history.history,
-                    open(self.date + "/SAVE_HISTORY_" + self.model_name + "_" + self.exp_desc + ".pickle", "wb" ))
+                    open(self.date + "/SAVE_HISTORY_%s_%s.pickle"%(self.model_name, self.exp_desc), "wb" ))
 
     def save_prediction_to_csv(self, name):
         print("########## Save Prediction ##########")
@@ -296,11 +294,6 @@ class NN():
     def plot_metrics(self):
         print("########## Plot Metrics ##########")
         history = self.history
-        print("evaluate")
-        print(self.model.evaluate(self.X_val, self.y_val, batch_size=self.batch_size, verbose=1))
-        print(self.model.metrics_names)
-        print(history.history)
-        #fig = plt.figure(figsize=(20,5))
         for n, metric in enumerate(self.model.metrics_names):
             fig = plt.figure(figsize=(20,5))
             name = metric.replace("_", " ").capitalize()
@@ -322,7 +315,7 @@ class NN():
                 plt.ylim([0, 1])
             plt.legend()
             fig.set_size_inches(20, 5, forward=True)
-            fig.savefig(self.date + "/METRIC_" + metric + "_" + self.exp_desc,  bbox_inches='tight')
+            fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
 
     def show_confusion_matrix(self,):
         print("########## Confusiion Matrix ##########")
@@ -348,7 +341,7 @@ class NN():
         plt.xlabel("Predicted Label")
         plt.show()
 
-        fig.savefig(self.date + "/CONFMAT_" + self.exp_desc,  bbox_inches='tight')
+        fig.savefig(self.date + "/CONFMAT_%s"%(self.exp_desc),  bbox_inches='tight')
 
     def test(self):
       print("########## Test ##########")
@@ -361,25 +354,24 @@ class NN():
     def run_experiment(self, rep=10):
         scores = []
         self.verbose = 0
-        # create a folder
         for i in range(rep):
             print("******************* EXP " + str(i) + " *******************")
-            self.exp_desc = "EXP " + str(i) + "_"
+            self.exp_desc = "EXP" + str(i)
             self.fit()
             self.predict()
             self.save_history()
-            self.measure_performance(accuracy_score, print_score = False)
+            self.measure_performance()
             self.save_model()
             self.plot_metrics()
             self.show_confusion_matrix()
-            print('>#%d: %.3f' % (i+1, self.score))
-            scores.append(self.score)
+            for n, metric in enumerate(self.model.metrics_names):
+                print(">%d %s: %3.2f"%(i, metric, self.results[n]))
+            scores.append(self.results)
             print("*********************************************\n")
-        m, s = np.mean(scores), np.std(scores)
-        print('Overall accuracy: %.3f%% (+/-%.3f)' % (m, s))
+        self._summarize_results(scores)
 
     def _set_callbacks(self):
-        checkpoint     = ModelCheckpoint(self.date + "/w_ckp_" + self.model_name +  ".hdf5",
+        checkpoint     = ModelCheckpoint(self.date + "/w_ckp_%s.hdf5"%(self.model_name),
                                         monitor='val_loss',
                                         verbose=self.verbose,
                                         save_best_only=True,
@@ -412,5 +404,11 @@ class NN():
         cl   = np.nonzero(pct)[0]
         print(desc)
         for i in cl:
-          print("    " + str(i) + ": " + str(pct[i]*100)[:5] + "%")
+          print("    %d: %3.2f%%"%(i, pct[i]*100))
         print()
+
+    def _summarize_results(self, scores):
+        print(">>> Summarize results <<<")
+        m, s = np.mean(scores, axis=0), np.std(scores, axis=0)
+        for i, metric in enumerate(self.model.metrics_names):
+            print('Overall %s: %.3f%% (+/-%.3f)' % (metric, m[i], s[i]))
