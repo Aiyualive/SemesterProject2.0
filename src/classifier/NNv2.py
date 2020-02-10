@@ -145,19 +145,21 @@ class ModelMaker():
 ### NN class ###
 ################
 class NN():
-    def __init__(self, create_dir_bool = True, verbose = 2):
+    def __init__(self, epochs, batch_size, create_dir_bool = True, verbose = 2):
         print("########## Init NN ##########")
         self.metrics =  ['accuracy',
-                              tkm.TruePositives(),
-                              tkm.FalsePositives(name='fp'),
-                              tkm.TrueNegatives(name='tn'),
-                              tkm.FalseNegatives(name='fn'),
-                              #tkm.BinaryAccuracy(name='accuracy'),
-                              tkm.Precision(name='precision'),
-                              tkm.Recall(name='recall'),
-                              tkm.AUC(name='auc')]
-
-        self.verbose = verbose
+                          tkm.TruePositives(),
+                          tkm.FalsePositives(name='fp'),
+                          tkm.TrueNegatives(name='tn'),
+                          tkm.FalseNegatives(name='fn'),
+                          #tkm.BinaryAccuracy(name='accuracy'),
+                          tkm.Precision(name='precision'),
+                          tkm.Recall(name='recall'),
+                          tkm.AUC(name='auc')]
+        self.exp_desc = ""
+        self.verbose  = verbose
+        self.epochs   = epochs
+        self.batch_size = batch_size
 
         self.date = datetime.now().strftime("%d-%m_%H%M%S")
         if (create_dir_bool):
@@ -214,7 +216,7 @@ class NN():
         self.model_name = model_name
         self._set_callbacks()
 
-    def fit(self, epochs, batch_size):
+    def fit(self):
         """
         Fit the model; define callbacks
         """
@@ -224,8 +226,8 @@ class NN():
         self.history = self.model.fit(
                             self.X, self.y,
                             validation_data=(self.X_val, self.y_val),
-                            epochs=epochs,
-                            batch_size=batch_size,
+                            epochs=self.epochs,
+                            batch_size=self.batch_size,
                             class_weight=self.class_weights,
                             verbose=self.verbose,
                             shuffle=False,
@@ -265,18 +267,18 @@ class NN():
         print("########## Load Model ##########")
         self.model = load_model(model_file)
 
-    def save_model(self, optional=""):
+    def save_model(self):
         print("########## Save Model ##########")
         score = str(self.score)[:4]
-        self.model.save(self.date + "/SAVE_MODEL_" + self.model_name + "_" + optional + "_" + score + ".hdf5")
+        self.model.save(self.date + "/SAVE_MODEL_" + self.model_name + "_" + self.exp_desc + "_" + score + ".hdf5")
 
-    def save_history(self, optional=""):
+    def save_history(self):
         """
         Saves the training history into pickle file
         """
         print("########## Save History ##########")
         pickle.dump(self.history.history,
-                    open(self.date + "/SAVE_HISTORY_" + self.model_name + "_" + optional + ".pickle", "wb" ))
+                    open(self.date + "/SAVE_HISTORY_" + self.model_name + "_" + self.exp_desc + ".pickle", "wb" ))
 
     def save_prediction_to_csv(self, name):
         print("########## Save Prediction ##########")
@@ -291,9 +293,13 @@ class NN():
         filename = "" + name0 + name1 + name2 + ".csv"
         df_predict.to_csv(filename)
 
-    def plot_metrics(self, optional=""):
+    def plot_metrics(self):
         print("########## Plot Metrics ##########")
         history = self.history
+        print("evaluate")
+        print(self.model.evaluate(self.X_val, self.y_val, batch_size=self.batch_size, verbose=1))
+        print(self.model.metrics_names)
+        print(history.history)
         #fig = plt.figure(figsize=(20,5))
         for n, metric in enumerate(self.model.metrics_names):
             fig = plt.figure(figsize=(20,5))
@@ -316,7 +322,7 @@ class NN():
                 plt.ylim([0, 1])
             plt.legend()
             fig.set_size_inches(20, 5, forward=True)
-            fig.savefig(self.date + "/METRIC_" + metric + "_" + optional,  bbox_inches='tight')
+            fig.savefig(self.date + "/METRIC_" + metric + "_" + self.exp_desc,  bbox_inches='tight')
 
     def show_confusion_matrix(self,):
         print("########## Confusiion Matrix ##########")
@@ -342,7 +348,7 @@ class NN():
         plt.xlabel("Predicted Label")
         plt.show()
 
-        fig.savefig(self.date + "/CONFMAT_" + optional,  bbox_inches='tight')
+        fig.savefig(self.date + "/CONFMAT_" + self.exp_desc,  bbox_inches='tight')
 
     def test(self):
       print("########## Test ##########")
@@ -351,19 +357,21 @@ class NN():
       print(self.model.layers[0].get_weights())
       print(self.model.layers[0].weights)
 
-    def run_experiment(self, epochs, batch_size, rep=10):
+    """ Inspired by https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/"""
+    def run_experiment(self, rep=10):
         scores = []
         self.verbose = 0
         # create a folder
         for i in range(rep):
             print("******************* EXP " + str(i) + " *******************")
-            desc = "EXP " + str(i) + "_"
-            self.fit(epochs, batch_size)
+            self.exp_desc = "EXP " + str(i) + "_"
+            self.fit()
             self.predict()
-            self.save_history(optional = desc)
+            self.save_history()
             self.measure_performance(accuracy_score, print_score = False)
-            self.save_model(optional = desc)
-            self.plot_metrics(optional = desc)
+            self.save_model()
+            self.plot_metrics()
+            self.show_confusion_matrix()
             print('>#%d: %.3f' % (i+1, self.score))
             scores.append(self.score)
             print("*********************************************\n")
