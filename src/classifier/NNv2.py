@@ -20,6 +20,7 @@ import random
 import pickle
 import os
 import glob
+import re
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -139,7 +140,6 @@ class ModelMaker():
                       optimizer=Adam(learning_rate=0.01),
                       metrics=self.metrics)
         self.model = model
-
 
 ################
 ### NN class ###
@@ -296,23 +296,20 @@ class NN():
         history = self.history
         for n, metric in enumerate(self.model.metrics_names):
             fig = plt.figure(figsize=(20,5))
-            name = metric.replace("_", " ").capitalize()
+            name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
+
+            train_history = history.history[metric]
+            val_history   = history.history['val_' + metric]
+            ylim = max(train_history + val_history)
+
             plt.subplot(5, 2, n + 1)
-            plt.plot(history.epoch, history.history[metric], color=colors[0], label='Train')
-            plt.plot(history.epoch, history.history['val_' + metric],
+            plt.plot(history.epoch, train_history,
+                     color=colors[0], label='Train')
+            plt.plot(history.epoch, val_history,
                      color=colors[0], linestyle="--", label='Val')
             plt.xlabel('Epoch')
             plt.ylabel(name)
-            if metric == 'loss':
-                plt.ylim([0, 3])
-            elif ("true_positives" in metric) or ("fn" in metric) or ("fp" in metric):
-                plt.ylim([0, 10000])
-            elif ("tn" in metric):
-                plt.ylim([0, 20000])
-            elif metric == 'auc':
-                plt.ylim([0.8, 1])
-            else:
-                plt.ylim([0, 1])
+            plt.ylim([0, ylim])
             plt.legend()
             fig.set_size_inches(20, 5, forward=True)
             fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
@@ -340,7 +337,6 @@ class NN():
         plt.ylabel("True Label")
         plt.xlabel("Predicted Label")
         plt.show()
-
         fig.savefig(self.date + "/CONFMAT_%s"%(self.exp_desc),  bbox_inches='tight')
 
     def test(self):
