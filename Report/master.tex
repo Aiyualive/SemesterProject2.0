@@ -39,9 +39,9 @@ Railway companies need to continuously and sufficiently maintain the train track
 
 
 In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track
-\todo{insert picture, mention boogey?}
+\todo{insert picture?, mention boogey?}
 
-A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \todo{https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf}
+A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
 
 By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. The first step in this process consists of identification and classification, while the second step consists of future defect prediction.
 
@@ -67,7 +67,6 @@ The data has been collected and provided by SBB. Using their SDV, SBB has made t
 \todo{make a table of the equipment and sample frequencies}
 
 Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien.
-
 
 \todo{Which data was worked on, put in tables, switches, ins joints and defects}
 \todo{which track entities are we actually analysing}
@@ -119,7 +118,7 @@ The peak windows arguably forms the central feature of the defect library. Howev
 
 some can be extracted directly by the original dataframe, some needs some processing.
 
-\section{Neural network architecture}
+\section{Neural network}
 To create neural network architectures, we are using: \verb|keras| along with \verb|tensorflow|. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has consistent, a simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}.
 
 For our use case, we have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
@@ -170,7 +169,7 @@ To make a classification, we first need to select the relevant features. Then we
 \end{table}
 \todo{insert predict-classify after this?} 
 \todo{insert appendix of a description of every function?}
-
+\todo{maybe also needs to add a bit about the modelmaker}
 
 \section{Visualisation}
 Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.

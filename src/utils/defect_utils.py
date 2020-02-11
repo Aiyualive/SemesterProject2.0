@@ -1,521 +1,411 @@
-import numpy as np
+### NN imports ###
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Conv1D, Dense, Activation, Dropout, Flatten, MaxPooling1D, GlobalAveragePooling1D
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import regularizers
+import tensorflow.keras.metrics as tkm
+import tensorflow as tf
+
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import StandardScaler
+from sklearn.utils.class_weight import compute_class_weight
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+import time
+from datetime import date, datetime
+import random
+import pickle
+import os
+import glob
+import re
+import seaborn as sns
 import pandas as pd
-from scipy.signal import find_peaks
-from tqdm import tqdm
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
-class featureset():
-    """
-    Generate dataframe containing features for classification
-    """
-    def __init__(self, obj, peak_offset=1, window_offset=0.5):
-        self.peak_offset   = peak_offset
-        self.window_offset = window_offset
-        self.defects      = makeDefectDF(obj,
-                                        peak_offset=peak_offset,
-                                        window_offset=window_offset)
-        self.switches     = makeGenericDF(obj, "switches",
-                                          peak_offset=peak_offset,
-                                          window_offset=window_offset)
-        self.ins_joints   = makeGenericDF(obj, "insulationjoint",
-                                          peak_offset=peak_offset,
-                                          window_offset=window_offset)
+random.seed(2)        # Python
+np.random.seed(2)     # numpy
+tf.set_random_seed(2) # tensorflow
+#tf.random.set_seed(2)
 
-    def makeDefects(self, obj):
-        self.defect11     = makeDefectDF(obj, "AXLE_11")
-        self.defect12     = makeDefectDF(obj, "AXLE_12")
-        self.defect41     = makeDefectDF(obj, "AXLE_41")
-        self.defect42     = makeDefectDF(obj, "AXLE_42")
-        self.defects      = pd.concat([self.defect11,
-                                       self.defect12,
-                                       self.defect41,
-                                       self.defect42])
+def create_dir(folder):
+  if not os.path.exists(folder):
+    os.makedirs(folder)
 
-        return self.defects
+#############
+### ModelMaker class ###
+#############
+class ModelMaker():
+    # seq len, n classes, metrics
+    def __init__(self, seq_len, n_classes, metrics):
+        self.seq_len   = seq_len
+        self.n_classes = n_classes
+        self.metrics   = metrics
 
-    def makeSwitches(self, obj):
+    def model_chooser(self, model_name, verbose = 2):
         """
-        DEPRECATED
+        Returns the chosen model
+        params:
+            model_name: name of model
         """
-        self.switches11   = makeSwitchesDF(obj, "AXLE_11")
-        self.switches12   = makeSwitchesDF(obj, "AXLE_12")
-        self.switches41   = makeSwitchesDF(obj, "AXLE_41")
-        self.switches42   = makeSwitchesDF(obj, "AXLE_42")
-        self.switches     = pd.concat([self.switches11,
-                                       self.switches12,
-                                       self.switches41,
-                                       self.switches42])
-        return self.switches
+        # Could instead use a dictionary containing lambda funcs?
+        print("########## Make " + model_name + " ##########")
+        if model_name == "model1":
+            self._makeModel1()
+        elif model_name == "model2":
+            self._makeModel2()
+        elif model_name == "model3":
+            self._makeModel3()
+        elif model_name == "model4":
+            self._makeModel4()
+        else:
+            raise Warning("Model name does not exist")
 
-    def makeInsJoints(self, obj):
+        if verbose:
+            self.model.summary()
+
+        return self.model
+
+    def _makeModel1(self):
+        model = Sequential()
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         input_shape=(self.seq_len, 1),
+                         activation= 'relu')) #kernel_regularizer=regularizers.l2(0.002)
+        model.add(MaxPooling1D(pool_size=3))
+        model.add(Flatten())
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.3,seed=1))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.0001),
+                      metrics=self.metrics)
+        self.model = model
+
+    def _makeModel2(self):
         """
-        DEPRECATED
+        https://github.com/ni79ls/har-keras-cnn/blob/master/20180903_Keras_HAR_WISDM_CNN_v1.0_for_medium.py
+        https://blog.goodaudience.com/introduction-to-1d-convolutional-neural-networks-in-keras-for-time-sequences-3a7ff801a2cf
         """
-        self.ins_joints11 = makeInsulationJointsDF(obj, "AXLE_11")
-        self.ins_joints12 = makeInsulationJointsDF(obj, "AXLE_12")
-        self.ins_joints41 = makeInsulationJointsDF(obj, "AXLE_41")
-        self.ins_joints42 = makeInsulationJointsDF(obj, "AXLE_42")
-        self.ins_joints   = pd.concat([self.ins_joints11,
-                                       self.ins_joints12,
-                                       self.ins_joints41,
-                                       self.ins_joints42])
-        return self.ins_joints
-
-def findIndex(timestamps, start, end):
-    """
-    Given starting and ending time timestamps it returns the indexes
-    of the closest timestamps in the first arg
-    params:
-        timestamps: timestamps array to search within
-        start, end: timestamps to be within start and end
-    """
-    # Finds all indexes which satisfy the condition
-    # nonzero gets rid of the non-matching conditions
-    indexes = np.nonzero((timestamps >= start) & ( timestamps < end))[0]
-
-    return indexes
-
-def findVehicleSpeed(time, obj):
-    """
-    Gets the vehicle speed closest to the specified time.
-    params:
-        time: time at which to get the vehicle speed
-        speed_df: needs to be obj.MEAS_DYN.VEHICLE_MOVEMENT_1HZ
-    """
-    speed_df = obj.MEAS_DYN.VEHICLE_MOVEMENT_1HZ
-    speed_times = speed_df['DFZ01.POS.VEHICLE_MOVEMENT_1HZ.timestamp'].values
-    speed_values = speed_df['DFZ01.POS.VEHICLE_MOVEMENT_1HZ.SPEED.data'].values
-
-    # Minus 1 since using > and we want value before
-    bef = np.nonzero(speed_times > time)[0][0] - 1
-    aft = bef + 1
-
-    # Finds the closest timestamp
-    idx = np.argmin([abs(speed_times[bef] - time), abs(speed_times[aft] - time)])
-    closest = bef + idx # plus 0 for bef, plus 1 for after
-
-    speed = speed_values[closest]
-
-    return speed
-
-def getPeakWindow(von, bis, find_peak_offset, window_offset, acc_time, a):
-    """
-    First finds the highest peak within a peak finding window.
-    Then this highest peak is centered by defining a window offset.
-    Then we get the start and end index of this window
-    These indexes are then used to index the timestamps and acceleration for the axle
-    params:
-        von, bis: the start and end of a defect
-        find_peak_offset, window_offset:
-            the offset of which to search for peak, and the size of the actual
-            defect window
-        acc_time, a:
-            all the accelerationn times and corresponding acceleratoins
-    OBS:
-        use of np.argmax() since find_peaks() does not work consistently if duplicate heights.
-    alternative:
-        to findIndexes
-        acc_window = a_df[(aaa[time_label] >= von - find_peak_offset) &
-                          (aaa[time_label] < bis + find_peak_offset)]
-        but current method is faster
-    """
-
-    # Accounting for shift between von and bis
-    if von > bis:
-        tmp = von
-        von = bis
-        bis = tmp
-
-    # Find all indexes contained within the peak searching window
-    indexes = findIndex(acc_time,
-                         von - find_peak_offset,
-                         bis + find_peak_offset)
-
-    # Get highest peak
-    peak_idx = np.argmax(a[indexes]) + indexes[0]
-
-    # Center the peak
-    start = int(peak_idx - window_offset)
-    end   = int(peak_idx + window_offset)
-    if (start < 0) or (end > len(acc_time)):
-        raise Warning("Out of bounds for peak centering")
-
-    timestamps    = acc_time[start:end]
-    accelerations = a[start:end]
-    return timestamps, accelerations
-
-def getSeverity(severity):
-    """
-    Converts the recorded severity into integer codes
-    """
-    if 'sehr' in severity:
-        return 1
-    elif 'hoch' in severity:
-        return 2
-    elif 'mittel' in severity:
-        return 3
-    elif 'gering' in severity:
-        return 4
-    else:
-        return -1 # undefined
-
-def getDirection(obj):
-    """
-    Gets the driving direction of the vehicle for a measurement ride
-    """
-    direction_label = 'DFZ01.POS.FINAL_POSITION.POSITION.data.direction'
-    direction = np.unique(obj.MEAS_DYN.POS_FINAL_POSITION[[direction_label]])
-
-    if len(direction) == 1:
-         direction = direction[0]
-    else:
-        raise Warning("Driving direction not unique")
-    return direction
-
-def getSwitchComponent(obj):
-    """
-    Adds the vehicle direction and returns the switch DataFrame
-    """
-    component=obj.MEAS_POS.POS_TRACK[obj.MEAS_POS.POS_TRACK['TRACK.data.switchtype']==1]
-    df_postrack = component.copy()
-    df_postrack['TRACK.data.direction_vehicleref'] = df_postrack['TRACK.data.direction']
-    cond_left  = (df_postrack['TRACK.data.direction']=='left') & (df_postrack['DFZ01.POS.FINAL_POSITION.POSITION.data.kilometrage']==1)
-    cond_right = (df_postrack['TRACK.data.direction']=='right')& (df_postrack['DFZ01.POS.FINAL_POSITION.POSITION.data.kilometrage']==1)
-    df_postrack.loc[cond_left, 'TRACK.data.direction_vehicleref']  = 'right'
-    df_postrack.loc[cond_right, 'TRACK.data.direction_vehicleref'] = 'left'
-    return df_postrack
-
-def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
-    """
-    Makes the defect dataframe containing all relevant features.
-    params:
-        obj: the gdfz measurement ride
-        axle: axle for which to find defect
-        peak_offset: time in seconds for which to find the highest peak around a defect
-        window_offset: time in seconds for which to center around the highest peak
-    """
-
-    if axle == 'all':
-        axle = ['AXLE_11', 'AXLE_12', 'AXLE_41', 'AXLE_42']
-    else:
-        axle = [axle]
-
-    defect_type_names = np.unique(obj.ZMON['ZMON.Abweichung.Objekt_Attribut'])
-
-    d_df      = pd.DataFrame()
-    nanosec   = 10**9
-    samp_freq = 24000 # per sec
-    window_offset = window_offset * samp_freq
-    driving_direction = getDirection(obj)
-
-    for ax in axle:
-        dict_def_n  = dict.fromkeys(defect_type_names, 0)
-        defectToClass   = {defect_type_names[i] : (i + 2)
-                           for i in range(len(defect_type_names))}
-
-        time_label     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-        acc_label      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + ax + '_T.data'
-        acc_time = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[time_label].values
-        acc      = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc_label].values
-
-        columns = ["timestamps", "accelerations", "window_length(s)",
-                   "severity", "vehicle_speed(m/s)", "axle",
-                   "campagin_ID", "driving_direction",
-                   "defect_type", "defect_length(m)", "line, defect_ID",
-                   "class_label"]
-
-        for i, row in tqdm((obj.ZMON).iterrows(), total = len(obj.ZMON), desc="ZMON " + ax):
-            von      = row['ZMON.gDFZ.timestamp_von.' + ax[:6]]
-            bis      = row['ZMON.gDFZ.timestamp_bis.' + ax[:6]]
-
-            # For detecting point or range defect
-            interval  = abs(int(von) - int(bis))/nanosec
-            if interval == 0:
-                # Point defects
-                find_peak_offset = find_peak_offset * nanosec
-                vehicle_speed    = findVehicleSpeed(von, obj)
-            else:
-                ### Just using von and bis
-                find_peak_offset = 0
-                # Vehicle speed is found at the middle of the interval
-                midpoint         = int(( von + bis)/2 )
-                vehicle_speed    = findVehicleSpeed(midpoint, obj)
-
-            timestamps, acceleration = getPeakWindow(von, bis,
-                                                       find_peak_offset, window_offset,
-                                                       acc_time, acc)
-
-            # Each defect type number count
-            d_type             = row['ZMON.Abweichung.Objekt_Attribut']
-            n                  = dict_def_n[d_type]
-            dict_def_n[d_type] = n + 1
-
-            window_length = (timestamps[-1] - timestamps[0]) / nanosec
-            severity      = getSeverity(row['ZMON.Abweichung.Dringlichkeit'])
-            #print(d_type, row['ZMON.Abweichung.Dringlichkeit'])
-            identifier    = (row['ZMON.Abweichung.Linie_Nr'], row['ZMON.Abweichung.ID'])
-            defect_length = interval * vehicle_speed
-
-            temp_df = pd.DataFrame([[timestamps, acceleration, window_length,
-                                     severity, vehicle_speed, ax,
-                                     obj.campaign, driving_direction,
-                                     d_type, defect_length, identifier,
-                                     defectToClass[d_type]]],
-                                   index   = [d_type + "_" + str(n) + "_" + ax],
-                                   columns = columns)
-
-            d_df = pd.concat([d_df, temp_df], axis=0)
-
-    return d_df
-
-def makeGenericDF(obj, type, axle='all', peak_offset=1, window_offset=0.5):
-    if axle == 'all':
-        axle = ['AXLE_11', 'AXLE_12', 'AXLE_41', 'AXLE_42']
-    else:
-        axle = [axle]
-
-    # Offsets
-    nanosec = 10**9
-    sampling_freq = 24000
-    window_offset = window_offset * 24000
-    peak_offset = peak_offset * nanosec
-
-    # datarame
-    df = pd.DataFrame()
-    driving_direction = getDirection(obj)
-
-    for ax in axle:
-        columns = ["timestamps", "accelerations", "window_length(s)",
-                   "severity", "vehicle_speed(m/s)", "axle",
-                   "campagin_ID", "driving_direction"]
-
-        ### DEFECT ###
-        if type == 'defect':
-            raise Warning("Not yet implemented for defects")
-
-        ### INSULATION JOINT ###
-        elif type == 'insulationjoint':
-            COMPONENT  = obj.DfA.DFA_InsulationJoints
-            time_label = "DfA.gDFZ.timestamp." + ax[:-1]
-            columns.extend(["ID", "class_label"])
-
-        ### SWITCHES ###
-        elif type == 'switches':
-            COMPONENT = getSwitchComponent(obj)
-            time_label = "DFZ01.POS.FINAL_POSITION.timestamp." + ax[:-1]
-            columns.extend(["crossingpath", "track_name",
-                            "track_direction", "switch_ID", "class_label"])
-
-        # Accelerometer accelerations
-        acc_time_label = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-        acc_label  = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + ax + '_T.data'
-        acc_time   = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc_time_label].values
-        acc        = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc_label].values
-
-        count = 0
-        for i, row in tqdm(COMPONENT.iterrows(), total = len(COMPONENT), desc=type + " " + ax):
-            timestamp = row[time_label]
-
-            if np.isnan(timestamp):
-                continue
-
-            timestamps, accelerations = getPeakWindow(
-                                            timestamp, timestamp,
-                                            peak_offset, window_offset,
-                                            acc_time, acc)
-
-            window_length = (timestamps[-1] - timestamps[0]) / nanosec
-            severity = 5
-            vehicle_speed = findVehicleSpeed(timestamp, obj)
-
-            features = [timestamps, accelerations, window_length,
-                        severity, vehicle_speed, ax,
-                        obj.campaign, driving_direction]
-
-            ### INSULATION JOINT ###
-            if type == 'insulationjoint':
-                ID            = row["DfA.IPID"]
-                class_label   = 0
-                features.extend([ID, class_label])
-
-            elif type == 'switches':
-                # timestamp is start_time
-                # end_time   = row[ax_time_label] + row[end_time_label] - row[timestamp_label]
-                switch_id  = row['TRACK.data.gtgid']
-                track_name = row['TRACK.data.name']
-                track_direction = row['TRACK.data.direction_vehicleref']
-                crossingpath = str(row["crossingpath"])
-                class_label = 1
-                features.extend([crossingpath, track_name,
-                                track_direction, switch_id, class_label])
-
-            temp_df = pd.DataFrame([features],
-                                   index   = [type + "_" + str(count) + "_" + ax],
-                                   columns = columns)
-
-            df = pd.concat([df, temp_df], axis=0)
-            count += 1
-
-    return df
-
-def savePickle(campaign_objects, identifier, path="AiyuDocs/pickles/"):
-    """
-    campaign_objects: list of objects
-
-    """
-    defects    = pd.DataFrame()
-    ins_joints = pd.DataFrame()
-    switches   = pd.DataFrame()
-
-    for o in campaign_objects:
-        defects = pd.concat([defects, o.defects])
-        ins_joints = pd.concat([ins_joints, o.ins_joints])
-        switches = pd.concat([switches, o.switches])
-
-    defects.to_pickle(path + identifier + "_defects_df.pickle")
-    switches.to_pickle(path + identifier + "_switches_df.pickle")
-    ins_joints.to_pickle(path + identifier + "_ins_joints_df.pickle")
-
-##################
-### DEPRECATED ###
-##################
-
-def makeSwitchesDF(obj, axle):
-    """
-    DEPRECATED
-    Makes a dataframe of ordinary switches and
-    params:
-        axle: the desired axle channel to work with
-    """
-    switches = obj.MEAS_POS.POS_TRACK[obj.MEAS_POS.POS_TRACK['TRACK.data.switchtype']==1]
-
-    # The start time of my switch with respect to axle1:
-    ax_time_label = 'DFZ01.POS.FINAL_POSITION.timestamp.' + axle[:-1]
-    timestamp_label = 'DFZ01.POS.FINAL_POSITION.timestamp'
-    end_time_label = 'DFZ01.POS.FINAL_POSITION.timestamp_end'
-
-    time     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-    acc      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + axle + '_T.data'
-    acc_time = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[time].values
-    a        = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc].values
-
-    normal_df = pd.DataFrame()
-    switches = obj.MEAS_POS.POS_TRACK[obj.MEAS_POS.POS_TRACK['TRACK.data.switchtype']==1]
-    switches_time_label  = "DFZ01.POS.FINAL_POSITION.timestamp." + axle[:-1]
-
-    nanosec = 10**9
-    find_peak_offset = 1 * nanosec
-    window_offset = 12000
-
-    columns = ["timestamps",
-               "accelerations",
-               "window_length(s)",
-               "severity",
-               "vehicle_speed(m/s)",
-               "crossingpath",
-               "driving_direction",
-               "axle",
-               "class_label"]
-
-    driving_direction = getDirection(obj)
-
-    count = 0
-    for i, row in tqdm(switches.iterrows(), total = len(switches), desc="Switches " + axle):
-
-        start_time = row[ax_time_label]
-        end_time   = row[ax_time_label] + row[end_time_label] - row[timestamp_label]
-
-        switches_time = row[switches_time_label]
-
-        if np.isnan(switches_time):
-            continue
-
-        timestamps, accelerations = getPeakWindow(switches_time, switches_time,
-                                     find_peak_offset, window_offset,
-                                     acc_time, a)
-
-        severity = 5
-        vehicle_speed = findVehicleSpeed(switches_time, obj)
-        actual_window_length = (timestamps[-1] - timestamps[0]) / nanosec
-        crossingpath = str(row["crossingpath"])
-        class_label = 1
-
-        temp_df = pd.DataFrame([[timestamps,
-                                 accelerations,
-                                 actual_window_length,
-                                 severity,
-                                 vehicle_speed,
-                                 crossingpath,
-                                 driving_direction,
-                                 axle,
-                                 class_label]],
-                            index = ["Switches" + "_" + str(count)],
-                            columns = columns)
-
-        normal_df = pd.concat([normal_df, temp_df], axis=0)
-        count += 1
-
-    return normal_df
-
-def makeInsulationJointsDF(obj, axle, find_peak_offset=1, window_offset=0.5):
-    """
-    DEPRECATED
-    Makes the defect dataframe containing all relevant features.
-    params:
-        axle: axle for which to find defect
-        peak_height: this height determines the peak classification
-    """
-    time     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-    acc      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + axle + '_T.data'
-    acc_time = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[time].values
-    a        = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc].values
-
-    normal_df = pd.DataFrame()
-    dfa       = obj.DfA.DFA_InsulationJoints
-    insulation_time_label  = "DfA.gDFZ.timestamp." + axle[:-1]
-
-    nanosec = 10**9
-    sampling_freq = 24000
-    window_offset = window_offset * 24000
-    find_peak_offset = find_peak_offset * nanosec
-
-    columns = ["timestamps",
-               "accelerations",
-               "window_length(s)",
-               "severity",
-               "vehicle_speed(m/s)",
-               "ID",
-               "axle",
-               "class_label"]
-
-    driving_direction = getDirection(obj)
-
-    count = 0
-    for i, row in tqdm(dfa.iterrows(), total = len(dfa), desc="Insulation Joints " + axle):
-        insulation_time = row[insulation_time_label]
-
-        timestamps, accelerations = getPeakWindow(insulation_time, insulation_time,
-                                     find_peak_offset, window_offset,
-                                     acc_time, a)
-
-        actual_window_length = (timestamps[-1] - timestamps[0]) / nanosec
-        severity = 5
-        vehicle_speed = findVehicleSpeed(insulation_time, obj)
-        ID            = row["DfA.IPID"]
-        class_label   = 0
-
-        temp_df = pd.DataFrame([[timestamps,
-                                 accelerations,
-                                 actual_window_length,
-                                 severity,
-                                 vehicle_speed,
-                                 ID,
-                                 driving_direction,
-                                 axle,
-                                 class_label]],
-                            index = ["InsulationJoint" + "_" + str(count)],
-                            columns = columns)
-
-        normal_df = pd.concat([normal_df, temp_df], axis=0)
-        count += 1
-
-    return normal_df
+        model = Sequential()
+        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
+        model.add(Conv1D(30, 10, activation='relu'))
+        model.add(MaxPooling1D(3))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(GlobalAveragePooling1D())
+        model.add(Dropout(rate=0.5, seed=2))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.summary()
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.001),
+                      metrics=self.metrics)
+        self.model = model
+
+    def _makeModel3(self):
+        model = Sequential()
+        model.add(Conv1D(30, 10, activation='relu', input_shape=(self.seq_len, 1)))
+        model.add(Conv1D(60, 10, activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.4, seed=2))
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.4, seed=2))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.001),
+                      metrics=self.metrics)
+        self.model = model
+
+    def _makeModel4(self):
+        model = Sequential()
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         input_shape=(self.seq_len, 1),
+                         activation= 'relu'))
+        model.add(MaxPooling1D(pool_size=3))
+        model.add(Conv1D(filters=20,
+                         kernel_size=10,
+                         activation= 'relu'))
+        model.add(MaxPooling1D(pool_size=3))
+        model.add(Flatten())
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(rate=0.3,seed=1))
+        model.add(Dense(self.n_classes, activation='softmax'))
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(learning_rate=0.01),
+                      metrics=self.metrics)
+        self.model = model
+
+################
+### NN class ###
+################
+class NN():
+    def __init__(self, epochs, batch_size, create_dir_bool = True, verbose = 2):
+        print("########## Init NN ##########")
+        self.metrics =  ['accuracy',
+                          tkm.TruePositives(),
+                          tkm.FalsePositives(name='fp'),
+                          tkm.TrueNegatives(name='tn'),
+                          tkm.FalseNegatives(name='fn'),
+                          #tkm.BinaryAccuracy(name='accuracy'),
+                          tkm.Precision(name='precision'),
+                          tkm.Recall(name='recall'),
+                          tkm.AUC(name='auc')]
+        self.exp_desc = ""
+        self.verbose  = verbose
+        self.epochs   = epochs
+        self.batch_size = batch_size
+
+        self.date = datetime.now().strftime("%d-%m_%H%M%S")
+        if (create_dir_bool):
+            create_dir(self.date)
+
+    def prepare_data(self, X, y, oversampling = False):
+        """
+        Prepare data; normalisation, validation split
+        """
+        print("########## Prepare Data ##########")
+        self.n_features = len(X.columns)
+        self.n_classes  = len(np.unique(y))
+
+        tmp_X = np.vstack([v for v in X.accelerations])
+        tmp_y = to_categorical(y.values, num_classes=self.n_classes)
+
+        if oversampling:
+            print("    *Oversampling*")
+            smote = SMOTE('all', k_neighbors=3,random_state=2)
+            tmp_X, tmp_y = smote.fit_sample(tmp_X, y.values)
+
+        print("    *Normalisation*")
+        scaler = StandardScaler()
+        tmp_X = scaler.fit_transform(tmp_X)
+
+        self.seq_len = tmp_X.shape[1]
+        self.X, self.X_val, self.y, self.y_val = train_test_split(tmp_X, tmp_y,
+                                                                 test_size=0.15,
+                                                                 random_state=2,
+                                                                 shuffle=True)
+
+        self.true_y_val    = self._convertFromCategorical(self.y_val)
+        self.true_y        = self._convertFromCategorical(self.y)
+        self._printClassDist(self.true_y, "Train set class distribution")
+        self._printClassDist(self.true_y_val, "Validation set class distribution")
+
+        self.class_weights = compute_class_weight('balanced',
+                                                 np.unique(self.true_y),
+                                                 self.true_y)
+
+        # Need to expand dim in order for conv1D to work
+        self.X     = np.expand_dims(self.X, axis=2)
+        self.X_val = np.expand_dims(self.X_val, axis=2)
+
+    def make_model(self, model_name):
+        """
+        Makes a specified model from, using ModelMaker class
+        params:
+            model: the model to be made
+        """
+        model_maker = ModelMaker(self.seq_len, self.n_classes, self.metrics)
+        self.model = model_maker.model_chooser(model_name, self.verbose)
+        self.model_name = model_name
+        self._set_callbacks() #self.verbose not set in here
+
+    def fit(self):
+        """
+        Fit the model; define callbacks
+        """
+        print("########## Fit Model ##########")
+        start = time.time()
+        self.history = self.model.fit(
+                            self.X, self.y,
+                            validation_data=(self.X_val, self.y_val),
+                            epochs=self.epochs,
+                            batch_size=self.batch_size,
+                            class_weight=self.class_weights,
+                            verbose=self.verbose,
+                            shuffle=False,
+                            callbacks=self.callbacks)
+        end = time.time()
+        print("Running time: ", (end - start)/60)
+
+    def classify(self):
+        """
+        Computes predictions for the validation set
+        """
+        print("########## Make Prediction ##########")
+        tmp_prediction = self.model.predict(self.X_val)
+        self.prediction = self._convertFromCategorical(tmp_prediction)
+
+    def measure_performance(self):
+        """
+        Evaluate model on validation set.
+        """
+        print("########## Measure Performance ##########")
+        self.results = self.model.evaluate(self.X_val, self.y_val,
+                                           batch_size=self.batch_size,
+                                           verbose=self.verbose)
+
+    def load_weights(self, weights_file):
+        """
+        Loads weights into the same model that the weights was created from.
+        So the prevous steps of creating the correct model has to be performed
+        """
+        print("########## Load Model ##########")
+        self.model.load_weights(weights_file)
+
+    def load_model_(self, model_file):
+        """
+        Model_file has to be generated with save_model; have not tested.
+        """
+        print("########## Load Model ##########")
+        self.model = load_model(model_file)
+
+    def save_model(self):
+        print("########## Save Model ##########")
+        self.model.save(self.date + "/SAVE_MODEL_%s_%s_%3.2f.hdf5"%(self.model_name, self.exp_desc, self.results[1]))
+
+    def save_history(self):
+        """
+        Saves the training history into pickle file
+        """
+        print("########## Save History ##########")
+        pickle.dump(self.history.history,
+                    open(self.date + "/SAVE_HISTORY_%s_%s.pickle"%(self.model_name, self.exp_desc), "wb" ))
+
+    def save_classification_to_csv(self, name):
+        print("########## Save Prediction ##########")
+        df_predict = pd.DataFrame(columns=['id', 'y'])
+
+        df_predict['id'] = np.arange(len(self.prediction))
+        df_predict['y']  = self.prediction
+
+        name0 = "CNN"
+        name1 = name
+        name2 = ""
+        filename = "" + name0 + name1 + name2 + ".csv"
+        df_predict.to_csv(filename)
+
+    def plot_metrics(self):
+        print("########## Plot Metrics ##########")
+        history = self.history
+        for n, metric in enumerate(self.model.metrics_names):
+            fig = plt.figure(figsize=(20,5))
+            name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
+
+            train_history = history.history[metric]
+            val_history   = history.history['val_' + metric]
+            ylim0 = min(train_history + val_history)
+            ylim1 = max(train_history + val_history)
+
+
+            plt.subplot(5, 2, n + 1)
+            plt.plot(history.epoch, train_history,
+                     color=colors[0], label='Train')
+            plt.plot(history.epoch, val_history,
+                     color=colors[0], linestyle="--", label='Val')
+            plt.xlabel('Epoch')
+            plt.ylabel(name)
+            plt.ylim([ylim0, ylim1])
+            plt.legend()
+            fig.set_size_inches(20, 5, forward=True)
+            fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
+
+    def show_confusion_matrix(self,):
+        print("########## Confusiion Matrix ##########")
+        matrix = confusion_matrix(self.true_y_val,
+                                  self.prediction,
+                                  labels=np.arange(self.n_classes))
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot()
+
+        heatmap = sns.heatmap(matrix,
+                    cmap="coolwarm",
+                    linecolor='white',
+                    linewidths=1,
+                    xticklabels=np.arange(self.n_classes),
+                    yticklabels=np.arange(self.n_classes),
+                    annot=True,
+                    fmt="d", ax=ax)
+        bottom, top = ax.get_ylim()
+        ax.set_ylim(bottom + 0.5, top - 0.5)
+
+        plt.title("Confusion Matrix")
+        plt.ylabel("True Label")
+        plt.xlabel("Predicted Label")
+        plt.show()
+        fig.savefig(self.date + "/CONFMAT_%s"%(self.exp_desc),  bbox_inches='tight')
+
+    def test(self):
+      print("########## Test ##########")
+      print(self.model.layers[0].get_config())
+      print(self.model.layers[0].output)
+      print(self.model.layers[0].get_weights())
+      print(self.model.layers[0].weights)
+
+    """ Inspired by https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/"""
+    def run_experiment(self, rep=10):
+        scores = []
+        self.verbose = 0
+        for i in range(rep):
+            print("******************* EXP " + str(i) + " *******************")
+            self.exp_desc = "EXP" + str(i)
+            self.fit()
+            self.predict()
+            self.save_history()
+            self.measure_performance()
+            self.save_model()
+            self.plot_metrics()
+            self.show_confusion_matrix()
+            for n, metric in enumerate(self.model.metrics_names):
+                print(">%d %s: %3.2f"%(i, metric, self.results[n]))
+            scores.append(self.results)
+            print("*********************************************\n")
+        self._summarize_results(scores)
+
+    def _set_callbacks(self):
+        checkpoint     = ModelCheckpoint(self.date + "/w_ckp_%s.hdf5"%(self.model_name),
+                                        monitor='val_loss',
+                                        verbose=0,
+                                        save_best_only=True,
+                                        mode='min')
+
+        early_stopping = EarlyStopping(monitor='val_loss',
+                                        verbose=1,
+                                        patience=6,
+                                        mode='min',
+                                        restore_best_weights=True)
+
+        reduce_lr      = ReduceLROnPlateau(monitor='val_loss',
+                                        factor=0.8,
+                                        patience=4,
+                                        #min_delta = 1e-04,
+                                        verbose=2,
+                                        mode='min')
+
+        self.callbacks      = [early_stopping, checkpoint]
+
+    def _convertFromCategorical(self, arr):
+        """
+        Convert array from categorical to ordinary class integers
+        """
+        return np.asarray(list(map(np.argmax, arr)))
+
+    def _printClassDist(self, arr, desc):
+        cnt = np.bincount(arr)
+        pct = cnt/sum(cnt)
+        cl   = np.nonzero(pct)[0]
+        print(desc)
+        for i in cl:
+          print("    %d: %3.2f%%"%(i, pct[i]*100))
+        print()
+
+    def _summarize_results(self, scores):
+        print(">>> Summarize results <<<")
+        m, s = np.mean(scores, axis=0), np.std(scores, axis=0)
+        for i, metric in enumerate(self.model.metrics_names):
+            print('Overall %s: %.3f%% (+/-%.3f)' % (metric, m[i], s[i]))
