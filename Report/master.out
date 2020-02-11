@@ -12,13 +12,14 @@
 \BOOKMARK [2][-]{subsection.2.4.2}{ModelMaker class}{section.2.4}% 12
 \BOOKMARK [1][-]{section.2.5}{Visualisation}{chapter.2}% 13
 \BOOKMARK [0][-]{chapter.3}{Evaluation}{}% 14
-\BOOKMARK [1][-]{section.3.1}{Model}{chapter.3}% 15
-\BOOKMARK [1][-]{section.3.2}{Classification results}{chapter.3}% 16
-\BOOKMARK [1][-]{section.3.3}{Visualisation results}{chapter.3}% 17
+\BOOKMARK [1][-]{section.3.1}{Models}{chapter.3}% 15
+\BOOKMARK [1][-]{section.3.2}{Model evaluation}{chapter.3}% 16
+\BOOKMARK [1][-]{section.3.3}{Visualisation of class clustering}{chapter.3}% 17
 \BOOKMARK [1][-]{section.3.4}{Discussion}{chapter.3}% 18
 \BOOKMARK [0][-]{chapter.4}{Conclusion and future work}{}% 19
 \BOOKMARK [1][-]{section.4.1}{Conclusion}{chapter.4}% 20
 \BOOKMARK [1][-]{section.4.2}{Future work}{chapter.4}% 21
 \BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 22
-\BOOKMARK [0][-]{appendix.A}{Implementation}{}% 23
-\BOOKMARK [0][-]{appendix.B}{Results}{}% 24
+\BOOKMARK [0][-]{appendix.A}{Introduction}{}% 23
+\BOOKMARK [0][-]{appendix.B}{Implementation}{}% 24
+\BOOKMARK [0][-]{appendix.C}{Results}{}% 25

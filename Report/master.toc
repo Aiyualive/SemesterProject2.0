@@ -12,13 +12,14 @@
 \contentsline {subsection}{\numberline {2.4.2}ModelMaker class}{11}{subsection.2.4.2}
 \contentsline {section}{\numberline {2.5}Visualisation}{11}{section.2.5}
 \contentsline {chapter}{\numberline {3}Evaluation}{13}{chapter.3}
-\contentsline {section}{\numberline {3.1}Model}{13}{section.3.1}
-\contentsline {section}{\numberline {3.2}Classification results}{13}{section.3.2}
-\contentsline {section}{\numberline {3.3}Visualisation results}{14}{section.3.3}
+\contentsline {section}{\numberline {3.1}Models}{13}{section.3.1}
+\contentsline {section}{\numberline {3.2}Model evaluation}{13}{section.3.2}
+\contentsline {section}{\numberline {3.3}Visualisation of class clustering}{14}{section.3.3}
 \contentsline {section}{\numberline {3.4}Discussion}{14}{section.3.4}
 \contentsline {chapter}{\numberline {4}Conclusion and future work}{15}{chapter.4}
 \contentsline {section}{\numberline {4.1}Conclusion}{15}{section.4.1}
 \contentsline {section}{\numberline {4.2}Future work}{15}{section.4.2}
 \contentsline {section}{\numberline {4.3}TODO}{16}{section.4.3}
-\contentsline {chapter}{\numberline {A}Implementation}{19}{appendix.A}
-\contentsline {chapter}{\numberline {B}Results}{21}{appendix.B}
+\contentsline {chapter}{\numberline {A}Introduction}{19}{appendix.A}
+\contentsline {chapter}{\numberline {B}Implementation}{21}{appendix.B}
+\contentsline {chapter}{\numberline {C}Results}{23}{appendix.C}

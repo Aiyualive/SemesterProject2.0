@@ -38,7 +38,7 @@
 Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current system is expensive, time consuming and ineffective. That is, maintenance agents need to walk along tracks and check them for defects. For visualisation purposes, there is roughly 5200 km of rails in Switzerland which needs to be inspected by 40 experienced inspectors.
 
 
-In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track
+In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track.
 \todo{insert picture?, mention boogey?}
 
 A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
@@ -50,17 +50,19 @@ As the title implies, the objective of this project is to identify and classify 
 Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. Here is a few examples: \todo{insert pictures}
 
 
-Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths -- e.g. \todo{insert example of range vs point}.
+Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths.
 
-For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. \todo{show signal responses?}. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
+comment on the inserted pictures about which is point vs range
+
+For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
 
 \todo{See list of defect types in appendix?}
 
 
 \section{Data}
-The data has been collected and provided by SBB. Using their SDV, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After getting the data from SBB, it then goes through a processing pipeline (designed by Cyprien), after which the data can be manipulated with \verb|python| dataframes (from \verb|pd.DataFrame|). The accelerometer captures the accelerations at the XYZ-axes (along with the timestamps at each recording), of which we are only concerned with the Y-axis for the vertical pertubations.
+The data has been collected and provided by SBB. Using their SDV, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After getting the data from SBB, it then goes through a processing pipeline (designed by Cyprien), after which the data can be manipulated with \verb|python| dataframes (from \verb|pd.DataFrame|). The accelerometer captures the accelerations at the XYZ-axes (along with the timestamps at each recording), of which we are only concerned with the Y-axis for the vertical pertubations for the accelerometer at the axle. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the SDV.
 
-\todo{make a table of the equipment and sample frequencies}
+%\todo{make a table of the equipment and sample frequencies}
 
 Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien.
 
@@ -70,8 +72,14 @@ Furhtermore, the locations of the defects have to be retrieved from SBB's databa
 We need to define terminlogy of these: defects, ins joints, switches. In the following we will use entities as an umbrella term for the aforementioned track phenomenons.
 
 \section{Code}
-The code is written purely in python. The code can be found on github: \\
-\url{https://github.com/Aiyualive/SemesterProject2.0}.
+The code is written purely in python. To create neural network architectures, we are using: \verb|keras| along with \verb|tensorflow|. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has consistent, a simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}. The models were trained in \verb|Google Colab|, which is a web application provided by Google that enables users to run python code in the web browser with access to GPUs\footnote{\url{https://colab.research.google.com/notebooks/intro.ipynb}}. It is very similar to \verb|Anaconda's| \verb|Jupyter Notebooks|, except that \verb|Colab| runs in the browser, is collaborative and provides free usage of GPUs (meaning model training goes faster).\\
+
+
+\noindent All the code can be found on github: \\
+\url{https://github.com/Aiyualive/SemesterProject2.0}.\\
+
+\noindent The specific model execution workflow can be found \verb|Colab|:\\
+\url{https://colab.research.google.com/drive/12VBz_KrJxeyR_pjpkC87fewv5aMSEI5_}
 
 %mainly uses pandas and stuff
 
@@ -94,7 +102,7 @@ For the process of defect classification we designed the pipeline in \ref{fig:pi
 
 
 \section{Shift of GPS timestamps}
-The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers, we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
+The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers (20kHz vs 24kHz respectively), we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
 
 Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body.
 
@@ -116,12 +124,12 @@ some can be extracted directly by the original dataframe, some needs some proces
 
 talk about only analysing point defects
 
-show a few entity signals and their features, appendix for more signals?
+show a few entity signals and their features, appendix for more signals? 
+
+refer to the defects presented in introduction
 
 \section{Classification}
-To create neural network architectures, we are using: \verb|keras| along with \verb|tensorflow|. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has consistent, a simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}.
-
-For our use case, we have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
+We have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
 
 \subsection{NN class}
 To make a classification, we first need to select the relevant features. Then we simply feed the features into an \verb|NN| object, where the API of the \verb|NN| class can be called for classification. The usage of the \verb|NN| class is demonstrated below in \ref{tab:nnclass}.
@@ -165,7 +173,7 @@ To make a classification, we first need to select the relevant features. Then we
 		\verb|save_classification_to_csv()| & \\ \hline
 		\noalign{\global\arrayrulewidth=0.3mm}
 		\hline \hline
-		\verb|run_experiment()|          & evaluates the given model for a number of times\\ 
+		\verb|run_experiment()|          & evaluates the given model for a number of repetitions\\ 
 		\noalign{\global\arrayrulewidth=0.3mm}
 		\hline
 	\end{tabular}
@@ -190,7 +198,7 @@ Finally, after evaluating the results (results can be seen in the next section) 
 Here we will present the results and discuss the findings herein.
 
 
-\section{Model}
+\section{Models}
 \begin{table}[H]
 	\centering
 	\captionof{table}{Table Title} \label{tab:title2} 
@@ -205,12 +213,15 @@ Here we will present the results and discuss the findings herein.
 
 \url{http://alexlenail.me/NN-SVG/AlexNet.html}
 
-\section{Classification results}
+\section{Model evaluation}
+In this section we evaluate our model with regard to a variety of metrics: loss, true
+
+Insert explanation of each metric
 \begin{table}[H]
 	\centering
 \begin{tabular}{|lcccc|}
 	\hline
-	\backslashbox{run \#}{Model}
+	\backslashbox{run \#}{Metrics}
 &{Model1}&{ClaveVectors}&{MNIST-bin-digits}&{MNIST-all-digits} \\\hline\hline
 	1 &  & 61.355 & 3212.497 & 2454.585 \\ \hline
 	2 & 16.568 & 62.396 & 3346.047 & 2782.271 \\ \hline
@@ -223,16 +234,31 @@ Here we will present the results and discuss the findings herein.
 	9 & 11.433 & 61.892 & 3127.583 & 2528.202 \\ \hline
 	10 & 11.63 & 60.925 & 3018.402 & 2746.729 \\ \hline
 \end{tabular}
-	\caption{Architecture of model number}
+	\caption{Experiment result}
 \end{table}
-\todo{insert the different defect types and class distributions, appendix for each result?}
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|} \hline
+		\textbf{Defect Type} & $2$ \\ \hline
+	\end{tabular}
+	\caption{Entity distribution, different defect types and class distributions}
+\end{table}
+
 \todo{just do one model at a time and show their metrics}
 
-\section{Visualisation results}
-insert the plots
+\section{Visualisation of class clustering}
+insert the pca plots
 
 \section{Discussion}
-I tried to increase the outliers, but this was a hugely naive approach
+Data amount
+
+should have done visualisation first, if we have clear cluster separation, applying a neural network would be a bit exaggerated. And in that case, we could opt for a simple multi class support vector machine from the \verb|sklearn| library. However, using \verb|tensorflow| was the plan from the get-go as it is more industrially-applicable, so we disregarded simpler methods.
+
+
+
+%I tried to increase the outliers, but this was a hugely naive approach
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Conclusion and future work
@@ -240,7 +266,7 @@ I tried to increase the outliers, but this was a hugely naive approach
 \chapter{Conclusion and future work}
 
 \section{Conclusion}
-
+Results were quite mediocre, but has a lot of room for improvement. I am sure that given more time I would be able to explore and evaluate the results further.
 \section{Future work}
 
 \begin{itemize}
@@ -272,7 +298,9 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item try only with defects and no ins and switches
 	\item separate all the axle channels and train on them
 	\item try to use low pass filter
-	\item mention google colab?
+	\item get better results
+	\item we dont need non-defects for defect classification, we could just input something else and make sure that it is not a defect
+	\item a specifc defect type vs ins joint vs switch
 \end{itemize}
 
 \bibliography{master}
@@ -281,6 +309,23 @@ I tried to increase the outliers, but this was a hugely naive approach
 \newpage
 \cleardoublepage
 \appendix
+\chapter{Introduction}
+\label{figs:veh}
+%
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.58\textwidth]{imgs/veh0}
+	\label{fig:veh0}
+	
+	\includegraphics[width = 0.58\textwidth]{imgs/veh1}
+	\label{fig:veh1}
+	
+	\includegraphics[width = 0.58\textwidth]{imgs/veh2}
+	\caption{These figures have been provided by Cyprien's folder of SBB documents. They show the accelerometer placements. For this project we have only considered axle number 4 in the third figure.}
+	\label{fig:veh2}
+\end{figure}
+
+
 % A chapter for each section
 \chapter{Implementation}
 \begin{table}[H]
