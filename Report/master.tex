@@ -33,13 +33,11 @@
 %%% Intro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-%%%%%%%%%%% PARSER %%%%%%%%%%%
 %\section{Problem description and motivation} \todo{maybe remove this section}
 Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current system is expensive, time consuming and ineffective. That is, maintenance agents need to walk along tracks and check them for defects. For visualisation purposes, there is roughly 5200 km of rails in Switzerland which needs to be inspected by 40 experienced inspectors.
 
 
-In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, two accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track.
-\todo{insert picture?, mention boogey?}
+In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, accelerometers have been installed at the front and back of the vehicle to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
 
 A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
 
@@ -47,16 +45,44 @@ A defect in train tracks can be seen as a discontinuity. As a train passes over 
 As the title implies, the objective of this project is to identify and classify rail surface defects. To do this, we aim to build an effective pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. The first step in this development consists of identification and classification, while the second step ultimately consists of future defect prediction.
 
 \section{Defects}
-Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. Here is a few examples: \todo{insert pictures}
+Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. See appendix \ref{app:report} for an example as to how this is done.
+%Gleis	149.849086	(400, A-184063)	
+%chienenzwischenlage	4.989620	(400, A-146358)	
+%Bankett	1169.510537	(400, A-103213)
 
+%Schwelle	0.000000	(400, A-103206)	
+%Schwelle	0.000000	(400, A-118152)	
+%Vignolschiene	0.000000	(400, A-231400)	
+%Fahrbahn	0.000000	(400, A-233599)	
 
 Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths.
-
-comment on the inserted pictures about which is point vs range
-
-For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
-
-\todo{See list of defect types in appendix?}
+\begin{figure}[H]
+	\centering
+	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
+	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
+	\includegraphics[width = 0.2\textwidth]{imgs/defs/p(400,A-118152)0}
+	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-231400)0}
+	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-233599)0}
+	\caption{Left, middle, right: Schwelle (A-$118152$), Fahrbahn (A-$233599$), Vignolschiene (A-$231400$). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. Parenthesis signifies defect ID and all pictures comes from SBB defect report set ID: $400$}
+\end{figure}
+%\vspace*{-1cm}
+\begin{figure}[H]
+	\centering
+	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
+	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
+	\includegraphics[width = 0.35\textwidth]{imgs/defs/r(400,A-184063)0}
+	\includegraphics[width = 0.35\textwidth]{imgs/defs/r(400,A-184063)1}
+	
+	\includegraphics[width = 0.35\textwidth]{imgs/defs/r(400,A-146358)0}
+	\includegraphics[width = 0.35\textwidth]{imgs/defs/r(400,A-146358)1}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.35\textwidth]{imgs/defs/r(400,A-103213)0}
+	\caption{Top, middle, bottom: Gleis-$149.8 m$ (A-$184063$), Schienenzwischenlage-$5.0 m$ (A-$146358$), Bankett-$1169.5 m$ (A-$231400$). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Parenthesis signifies defect ID and all pictures comes from SBB defect report set ID: $400$. Most of these range defects have two pictures likely to give more detail}
+\end{figure}
+\raggedbottom % to get of unnecessary vertical spacing
+For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. \todo{See list of defect types in appendix?}
 
 
 \section{Data}
@@ -64,10 +90,7 @@ The data has been collected and provided by SBB. Using their SDV, SBB has made t
 
 %\todo{make a table of the equipment and sample frequencies}
 
-Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien.
-
-\todo{Which data was worked on, put in tables, switches, ins joints and defects}
-\todo{which track entities are we actually analysing}
+Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien. \todo{Which data was worked on, put in tables, switches, ins joints and defects}
 
 We need to define terminlogy of these: defects, ins joints, switches. In the following we will use entities as an umbrella term for the aforementioned track phenomenons.
 
@@ -104,18 +127,14 @@ For the process of defect classification we designed the pipeline in \ref{fig:pi
 \section{Shift of GPS timestamps}
 The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers (20kHz vs 24kHz respectively), we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
 
-Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body.
-
-\todo{insert drawing of how it is calculated?}
+Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body. \todo{insert drawing of how it is calculated?}
 
 \section{Peak windows}
 Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length -- wherein Within the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
 
 Since we are assuming that each track entity is identified by a well-formed peak, we first need to find this peak within a reasonable offset from the defect location, after which we center around that within another reasonable offset. 
 
-In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
-
-\todo{insert a drawing of how this works?}
+In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side). \todo{insert a drawing of how this works?}
 
 \section{Entity library}
 The peak windows arguably forms the central feature of the defect library. However, from domain knowledge, other features like speed also needs to be considered for our neural network. Apart from the peak windows, we have also extracted a variety of relevant features that might be useful for classifcation. These include \todo{list, and how was it implemented}.
@@ -180,16 +199,16 @@ To make a classification, we first need to select the relevant features. Then we
 	\caption{f}
 \end{table}
 \raggedbottom % To get rid of weird spacing
-\todo{insert into appendix?}
+%\todo{insert into appendix?}
 
 \subsection{ModelMaker class}
-See example of this in next chapter.
+See example of this in next chapter. \todo{todo}
 
 Explain each layer?
 
 
 \section{Visualisation}
-Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.
+Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.\todo{todo}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Evaluation
@@ -214,9 +233,19 @@ Here we will present the results and discuss the findings herein.
 \url{http://alexlenail.me/NN-SVG/AlexNet.html}
 
 \section{Model evaluation}
-In this section we evaluate our model with regard to a variety of metrics: loss, true
-
-Insert explanation of each metric
+In this section we evaluate our model with regard to a variety of metrics: 
+\begin{itemize}
+	\item loss
+	\item accuracy
+	\item true positives
+	\item false positives
+	\item true negatives
+	\item false negatives
+	\item precision
+	\item recall
+	\item auc
+\end{itemize}
+Insert explanation of each metric\todo{just do one model at a time and show their metrics}
 \begin{table}[H]
 	\centering
 \begin{tabular}{|lcccc|}
@@ -246,15 +275,16 @@ Insert explanation of each metric
 	\caption{Entity distribution, different defect types and class distributions}
 \end{table}
 
-\todo{just do one model at a time and show their metrics}
+
 
 \section{Visualisation of class clustering}
 insert the pca plots
 
 \section{Discussion}
-Data amount
+Data amount, could self-engineer data. 
 
 should have done visualisation first, if we have clear cluster separation, applying a neural network would be a bit exaggerated. And in that case, we could opt for a simple multi class support vector machine from the \verb|sklearn| library. However, using \verb|tensorflow| was the plan from the get-go as it is more industrially-applicable, so we disregarded simpler methods.
+
 
 
 
@@ -267,6 +297,8 @@ should have done visualisation first, if we have clear cluster separation, apply
 
 \section{Conclusion}
 Results were quite mediocre, but has a lot of room for improvement. I am sure that given more time I would be able to explore and evaluate the results further.
+
+how good is the foundation to move onwards with further research
 \section{Future work}
 
 \begin{itemize}
@@ -301,6 +333,8 @@ Results were quite mediocre, but has a lot of room for improvement. I am sure th
 	\item get better results
 	\item we dont need non-defects for defect classification, we could just input something else and make sure that it is not a defect
 	\item a specifc defect type vs ins joint vs switch
+	\item we did not consider severity
+	\item which track entities are we actually analysing
 \end{itemize}
 
 \bibliography{master}
@@ -309,9 +343,13 @@ Results were quite mediocre, but has a lot of room for improvement. I am sure th
 \newpage
 \cleardoublepage
 \appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Appendix introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
+
+\section{Vehicle and accelerometer placements}
 \label{figs:veh}
-%
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.58\textwidth]{imgs/veh0}
@@ -325,8 +363,21 @@ Results were quite mediocre, but has a lot of room for improvement. I am sure th
 	\label{fig:veh2}
 \end{figure}
 
+\section{SBB defect report example}
+\label{app:report}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.9\textwidth]{imgs/defs/rep0}
+	\caption{}
+	\includegraphics[width = 0.9\textwidth]{imgs/defs/rep1}
+	\caption{A typical report for an arbitrary defect usually contains one description page followed by its picture(s)}
+	\label{fig:veh2}
+\end{figure}
 
-% A chapter for each section
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Appendix implementation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
 \begin{table}[H]
 	\centering

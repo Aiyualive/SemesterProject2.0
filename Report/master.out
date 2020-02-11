@@ -21,5 +21,7 @@
 \BOOKMARK [1][-]{section.4.2}{Future work}{chapter.4}% 21
 \BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 22
 \BOOKMARK [0][-]{appendix.A}{Introduction}{}% 23
-\BOOKMARK [0][-]{appendix.B}{Implementation}{}% 24
-\BOOKMARK [0][-]{appendix.C}{Results}{}% 25
+\BOOKMARK [1][-]{section.A.1}{Vehicle and accelerometer placements}{appendix.A}% 24
+\BOOKMARK [1][-]{section.A.2}{SBB defect report example}{appendix.A}% 25
+\BOOKMARK [0][-]{appendix.B}{Implementation}{}% 26
+\BOOKMARK [0][-]{appendix.C}{Results}{}% 27
