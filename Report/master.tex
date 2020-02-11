@@ -43,12 +43,8 @@ In order to cope with this issue, Swiss Federal Railways (SBB) has specifically 
 
 A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
 
-By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. The first step in this process consists of identification and classification, while the second step consists of future defect prediction.
-
 \section{Objective}
-As the title implies, the objective of this project is to identify and classify rail surface defects. 
-
-apply machine learning techniques on the problem
+As the title implies, the objective of this project is to identify and classify rail surface defects. To do this, we aim to build an effective pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. The first step in this development consists of identification and classification, while the second step ultimately consists of future defect prediction.
 
 \section{Defects}
 Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has self-constructed a database for the individual defect definitions \todo{is this a recognized system?}. Here is a few examples: \todo{insert pictures}
@@ -56,7 +52,7 @@ Evidently, a defect can be seen as a deviation from the standard train track. Fo
 
 Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths -- e.g. \todo{insert example of range vs point}.
 
-For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. \todo{show signal types?}. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
+For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. \todo{show signal responses?}. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
 
 \todo{See list of defect types in appendix?}
 
@@ -71,8 +67,7 @@ Furhtermore, the locations of the defects have to be retrieved from SBB's databa
 \todo{Which data was worked on, put in tables, switches, ins joints and defects}
 \todo{which track entities are we actually analysing}
 
-We need to define terminlogy of these: defects, ins joints = 
-in the following we will use defect as an umbrella term for these entities.
+We need to define terminlogy of these: defects, ins joints, switches. In the following we will use entities as an umbrella term for the aforementioned track phenomenons.
 
 \section{Code}
 The code is written purely in python. The code can be found on github: \\
@@ -86,15 +81,16 @@ The code is written purely in python. The code can be found on github: \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and Implementation}
 
-For the process of defect classification we employed the following pipeline:
-\todo{insert pipeline picture}
+For the process of defect classification we designed the pipeline in \ref{fig:pipeline}. In the next sections, I would like to give an overview of how each step was implemented.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{imgs/pipeline}
+	\caption{Primary pipeline}
+	\label{fig:pipeline}
+\end{figure}
 
-In the following, I would like to give an overview of how these was implemented
 
-%\verb|signal --> shift GPS timestamps --> localise defects --> create a library of peak windows --> feed to convolutional NN --> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
-
-
-\todo{show a few entity signals and their features, appendix for more signals?}
+%--> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
 
 
 \section{Shift of GPS timestamps}
@@ -118,11 +114,16 @@ The peak windows arguably forms the central feature of the defect library. Howev
 
 some can be extracted directly by the original dataframe, some needs some processing.
 
-\section{Neural network}
+talk about only analysing point defects
+
+show a few entity signals and their features, appendix for more signals?
+
+\section{Classification}
 To create neural network architectures, we are using: \verb|keras| along with \verb|tensorflow|. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has consistent, a simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}.
 
 For our use case, we have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
 
+\subsection{NN class}
 To make a classification, we first need to select the relevant features. Then we simply feed the features into an \verb|NN| object, where the API of the \verb|NN| class can be called for classification. The usage of the \verb|NN| class is demonstrated below in \ref{tab:nnclass}.
 
 
@@ -131,14 +132,15 @@ To make a classification, we first need to select the relevant features. Then we
 	\small
 	\begin{tabular}{l p{0.7\linewidth}}\noalign{\global\arrayrulewidth=0.3mm} 
 	\hline 
-	\multicolumn{2}{c}{\textbf{Workflow of NN class}}
+	\multicolumn{2}{c}{\textbf{API of NN class}}
 		\\ \hline  
 		\noalign{\global\arrayrulewidth=0.05mm}
 		\verb|__init__()|                  & initialises a \verb|NN| object\\ \hline
 		\verb|prepare_data()|            & pre-process data, this includes standardisation of data\\ \hline
 		\verb|make_model()|              & uses \verb|ModelMaker| class to select a model \\ \hline
 		
-		\verb|fit()|			         & trains the model\\ 
+		\verb|fit()|			         & trains the model\\ \hline
+		\verb|classify()|			     & trains the model\\ 
 		\noalign{\global\arrayrulewidth=0.3mm}
 		\hline
 	\end{tabular}
@@ -150,15 +152,17 @@ To make a classification, we first need to select the relevant features. Then we
 	\centering
 	\small
 	\begin{tabular}{l p{0.6\linewidth}}\noalign{\global\arrayrulewidth=0.3mm} \hline
-	\multicolumn{2}{c}{\textbf{Other useful functions}}
+	\multicolumn{2}{c}{\textbf{Other useful API functions}}
 		\\ \hline 
 		\noalign{\global\arrayrulewidth=0.05mm}
-		\verb|predict()|                 & used to classify a testing set in the future \\ \hline
 		\verb|measure_performance()|     & currently only done on validation data \\ \hline
 		\verb|plot_metrics()|            & plots the metrics \\ \hline
 		\verb|plot_confusion_matrix()|   & plots the confusion matrix\\ \hline
+		\verb|load_weights()|            & \\ \hline
+		\verb|load_model_()|            & \\ \hline
 		\verb|save_history()|            & \\ \hline
-		\verb|save_model()|              & \\ 
+		\verb|save_model()|              & \\ \hline
+		\verb|save_classification_to_csv()| & \\ \hline
 		\noalign{\global\arrayrulewidth=0.3mm}
 		\hline \hline
 		\verb|run_experiment()|          & evaluates the given model for a number of times\\ 
@@ -167,9 +171,14 @@ To make a classification, we first need to select the relevant features. Then we
 	\end{tabular}
 	\caption{f}
 \end{table}
-\todo{insert predict-classify after this?} 
-\todo{insert appendix of a description of every function?}
-\todo{maybe also needs to add a bit about the modelmaker}
+\raggedbottom % To get rid of weird spacing
+\todo{insert into appendix?}
+
+\subsection{ModelMaker class}
+See example of this in next chapter.
+
+Explain each layer?
+
 
 \section{Visualisation}
 Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.
@@ -179,6 +188,7 @@ Finally, after evaluating the results (results can be seen in the next section) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
 Here we will present the results and discuss the findings herein.
+
 
 \section{Model}
 \begin{table}[H]
@@ -216,8 +226,7 @@ Here we will present the results and discuss the findings herein.
 	\caption{Architecture of model number}
 \end{table}
 \todo{insert the different defect types and class distributions, appendix for each result?}
-\todo{just do one model at a time and show their metrics
-}
+\todo{just do one model at a time and show their metrics}
 
 \section{Visualisation results}
 insert the plots
@@ -241,8 +250,8 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item track entity dependent/specific window offsets
 	\item we must not set the findpeakoffset too high
 	\item Questions, what if you want to use multiple features with 1 CNN
-	
-	
+	\item I have participated in ETH Hatchery (ref), where our team build a prototype with a model train. We let the model train drive on the track with self-engineered defects.
+
 \end{itemize}
 
 \newpage
@@ -258,12 +267,12 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\item visualise what the network is doing using Harry's code
 	\item use speed as a feature also
 	\item be consistent with function naming and variable names: function names with underscore and variable names with camelcase
-	\item save confusion matrix, and metrics (modify the plotting of this) \item citation \cite{benchmark}
 	\item Which type of defects are we actually working with, we can see that it does good at the switches and ins joints, but no chance with the defects
 	\item we should instead call it an entity library -- make up your mind
-	\item plot confusion matrix instead, and classify instead of predict
-	\item do objective, and entity thingy
-	
+	\item try only with defects and no ins and switches
+	\item separate all the axle channels and train on them
+	\item try to use low pass filter
+	\item mention google colab?
 \end{itemize}
 
 \bibliography{master}
@@ -283,9 +292,6 @@ I tried to increase the outliers, but this was a hugely naive approach
 	\end{tabular}
 \end{table}
 \chapter{Results}
-
-
-
 
 \begin{table}[H]
 	\centering

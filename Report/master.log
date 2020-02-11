@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  11 FEB 2020 10:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.3.6)  11 FEB 2020 14:10
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1603,7 +1603,7 @@ ick labels; missing features). Consider writing \pgfplotsset{compat=1.13} into
 your preamble.
  on input line 13.
 
-<logo/eth.png, id=95, 1284.8pt x 213.79875pt>
+<logo/eth.png, id=103, 1284.8pt x 213.79875pt>
 File: logo/eth.png Graphic file (type png)
  <use logo/eth.png>
 Package pdftex.def Info: logo/eth.png used on input line 15.
@@ -1650,42 +1650,42 @@ LaTeX Warning: Marginpar on page 7 moved.
 LaTeX Warning: Marginpar on page 8 moved.
 
 
-Overfull \hbox (0.56233pt too wide) in paragraph at lines 71--71
+Overfull \hbox (0.56233pt too wide) in paragraph at lines 67--67
 \OT1/cmr/m/n/12 switches, 
  []
 
 
-Overfull \hbox (0.56233pt too wide) in paragraph at lines 71--71
+Overfull \hbox (0.56233pt too wide) in paragraph at lines 67--67
 \OT1/cmr/m/n/12 switches, 
  []
 
 
-Overfull \hbox (0.56233pt too wide) in paragraph at lines 71--71
+Overfull \hbox (0.56233pt too wide) in paragraph at lines 67--67
 \OT1/cmr/m/n/12 switches, 
  []
 
 
-Overfull \hbox (0.56233pt too wide) in paragraph at lines 71--71
+Overfull \hbox (0.56233pt too wide) in paragraph at lines 67--67
 \OT1/cmr/m/n/12 switches, 
  []
 
 
-Overfull \hbox (3.10814pt too wide) in paragraph at lines 72--72
+Overfull \hbox (3.10814pt too wide) in paragraph at lines 68--68
 \OT1/cmr/m/n/12 analysing  
  []
 
 
-Overfull \hbox (3.10814pt too wide) in paragraph at lines 72--72
+Overfull \hbox (3.10814pt too wide) in paragraph at lines 68--68
 \OT1/cmr/m/n/12 analysing  
  []
 
 
-Overfull \hbox (3.10814pt too wide) in paragraph at lines 72--72
+Overfull \hbox (3.10814pt too wide) in paragraph at lines 68--68
 \OT1/cmr/m/n/12 analysing  
  []
 
 
-Overfull \hbox (3.10814pt too wide) in paragraph at lines 72--72
+Overfull \hbox (3.10814pt too wide) in paragraph at lines 68--68
 \OT1/cmr/m/n/12 analysing  
  []
 
@@ -1697,20 +1697,18 @@ LaTeX Warning: Marginpar on page 8 moved.
 
 [8]
 Chapter 2.
+<imgs/pipeline.png, id=184, 1277.77374pt x 245.91875pt>
+File: imgs/pipeline.png Graphic file (type png)
 
-LaTeX Warning: Marginpar on page 9 moved.
+<use imgs/pipeline.png>
+Package pdftex.def Info: imgs/pipeline.png used on input line 87.
+(pdftex.def)             Requested size: 449.55322pt x 86.51938pt.
+ [9
 
-[9
-
-]
-
-LaTeX Warning: Marginpar on page 10 moved.
-
-
-LaTeX Warning: Marginpar on page 10 moved.
-
-
-LaTeX Warning: Marginpar on page 10 moved.
+ <./imgs/pipeline.png>]
+Overfull \hbox (5.14471pt too wide) in paragraph at lines 154--172
+ [][] 
+ []
 
 [10] [11] [12
 
@@ -1721,19 +1719,16 @@ LaTeX Warning: Marginpar on page 13 moved.
 
 [13] [14]
 Chapter 4.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 238.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 247.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 238.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 247.
  [15
 
 ]
-
-LaTeX Warning: Citation `benchmark' on page 16 undefined on input line 261.
-
 (./master.bbl [16]
 Underfull \hbox (badness 5105) in paragraph at lines 4--8
 []\OT1/cmr/m/n/12 Introduction to 1d con-vo-lu-tional neu-ral net-works in kera
@@ -1753,30 +1748,26 @@ Appendix A.
 ]
 Appendix B.
 [21]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 315.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 315.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 321.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 321.
  (./master.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 315.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 315.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 321.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 321.
 Package rerunfilecheck Info: File `master.out' has not changed.
-(rerunfilecheck)             Checksum: EF6792F832A32119605037E446DCEBEF;1238.
-
-
-LaTeX Warning: There were undefined references.
-
+(rerunfilecheck)             Checksum: A6BFC3C24838DA778A7989521CE7E955;1370.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 1061 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 51142 strings out of 493014
- 1187426 string characters out of 6133352
- 1591107 words of memory out of 5000000
- 53818 multiletter control sequences out of 15000+600000
+ 51119 strings out of 493014
+ 1186862 string characters out of 6133352
+ 1584107 words of memory out of 5000000
+ 53794 multiletter control sequences out of 15000+600000
  15976 words of font info for 59 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,16n,92p,10436b,36053s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 63i,16n,92p,10436b,36003s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmbx10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmbx12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/c
@@ -1789,10 +1780,10 @@ pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.p
 fb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pf
 b></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb
 >
-Output written on master.pdf (21 pages, 177540 bytes).
+Output written on master.pdf (21 pages, 445705 bytes).
 PDF statistics:
- 314 PDF objects out of 1000 (max. 8388607)
- 275 compressed objects within 3 object streams
- 74 named destinations out of 1000 (max. 500000)
- 194 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 325 PDF objects out of 1000 (max. 8388607)
+ 284 compressed objects within 3 object streams
+ 73 named destinations out of 1000 (max. 500000)
+ 215 words of extra memory for PDF output out of 10000 (max. 10000000)
 
