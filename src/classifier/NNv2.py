@@ -76,13 +76,13 @@ class ModelMaker():
                          kernel_size=10,
                          input_shape=(self.seq_len, 1),
                          activation= 'relu')) #kernel_regularizer=regularizers.l2(0.002)
-        model.add(MaxPooling1D(pool_size=2))
+        model.add(MaxPooling1D(pool_size=3))
         model.add(Flatten())
         model.add(Dense(16, activation='relu'))
         model.add(Dropout(rate=0.3,seed=1))
         model.add(Dense(self.n_classes, activation='softmax'))
         model.compile(loss='categorical_crossentropy',
-                      optimizer=Adam(learning_rate=0.00001),
+                      optimizer=Adam(learning_rate=0.0001),
                       metrics=self.metrics)
         self.model = model
 
@@ -220,7 +220,6 @@ class NN():
         Fit the model; define callbacks
         """
         print("########## Fit Model ##########")
-
         start = time.time()
         self.history = self.model.fit(
                             self.X, self.y,
@@ -234,7 +233,7 @@ class NN():
         end = time.time()
         print("Running time: ", (end - start)/60)
 
-    def predict(self):
+    def classify(self):
         """
         Computes predictions for the validation set
         """
@@ -278,7 +277,7 @@ class NN():
         pickle.dump(self.history.history,
                     open(self.date + "/SAVE_HISTORY_%s_%s.pickle"%(self.model_name, self.exp_desc), "wb" ))
 
-    def save_prediction_to_csv(self, name):
+    def save_to_csv(self, name):
         print("########## Save Prediction ##########")
         df_predict = pd.DataFrame(columns=['id', 'y'])
 
@@ -300,7 +299,9 @@ class NN():
 
             train_history = history.history[metric]
             val_history   = history.history['val_' + metric]
-            ylim = max(train_history + val_history)
+            ylim0 = min(train_history + val_history)
+            ylim1 = max(train_history + val_history)
+
 
             plt.subplot(5, 2, n + 1)
             plt.plot(history.epoch, train_history,
@@ -309,7 +310,7 @@ class NN():
                      color=colors[0], linestyle="--", label='Val')
             plt.xlabel('Epoch')
             plt.ylabel(name)
-            plt.ylim([0, ylim])
+            plt.ylim([ylim0, ylim1])
             plt.legend()
             fig.set_size_inches(20, 5, forward=True)
             fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
@@ -369,7 +370,7 @@ class NN():
     def _set_callbacks(self):
         checkpoint     = ModelCheckpoint(self.date + "/w_ckp_%s.hdf5"%(self.model_name),
                                         monitor='val_loss',
-                                        verbose=self.verbose,
+                                        verbose=0,
                                         save_best_only=True,
                                         mode='min')
 

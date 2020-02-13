@@ -1,27 +1,28 @@
 \contentsline {chapter}{\numberline {1}Introduction}{7}{chapter.1}
 \contentsline {section}{\numberline {1.1}Objective}{7}{section.1.1}
 \contentsline {section}{\numberline {1.2}Defects}{7}{section.1.2}
-\contentsline {section}{\numberline {1.3}Data}{9}{section.1.3}
-\contentsline {section}{\numberline {1.4}Code}{10}{section.1.4}
-\contentsline {chapter}{\numberline {2}Design and Implementation}{11}{chapter.2}
-\contentsline {section}{\numberline {2.1}Shift of GPS timestamps}{11}{section.2.1}
-\contentsline {section}{\numberline {2.2}Peak windows}{11}{section.2.2}
-\contentsline {section}{\numberline {2.3}Entity library}{12}{section.2.3}
-\contentsline {section}{\numberline {2.4}Classification}{12}{section.2.4}
-\contentsline {subsection}{\numberline {2.4.1}NN class}{12}{subsection.2.4.1}
-\contentsline {subsection}{\numberline {2.4.2}ModelMaker class}{13}{subsection.2.4.2}
-\contentsline {section}{\numberline {2.5}Visualisation}{13}{section.2.5}
-\contentsline {chapter}{\numberline {3}Evaluation}{15}{chapter.3}
-\contentsline {section}{\numberline {3.1}Models}{15}{section.3.1}
-\contentsline {section}{\numberline {3.2}Model evaluation}{15}{section.3.2}
-\contentsline {section}{\numberline {3.3}Visualisation of class clustering}{16}{section.3.3}
-\contentsline {section}{\numberline {3.4}Discussion}{16}{section.3.4}
-\contentsline {chapter}{\numberline {4}Conclusion and future work}{17}{chapter.4}
-\contentsline {section}{\numberline {4.1}Conclusion}{17}{section.4.1}
-\contentsline {section}{\numberline {4.2}Future work}{17}{section.4.2}
-\contentsline {section}{\numberline {4.3}TODO}{18}{section.4.3}
-\contentsline {chapter}{\numberline {A}Introduction}{21}{appendix.A}
-\contentsline {section}{\numberline {A.1}Vehicle and accelerometer placements}{22}{section.A.1}
-\contentsline {section}{\numberline {A.2}SBB defect report example}{23}{section.A.2}
-\contentsline {chapter}{\numberline {B}Implementation}{25}{appendix.B}
-\contentsline {chapter}{\numberline {C}Results}{27}{appendix.C}
+\contentsline {section}{\numberline {1.3}Switches and insulation joints}{9}{section.1.3}
+\contentsline {section}{\numberline {1.4}Data}{10}{section.1.4}
+\contentsline {section}{\numberline {1.5}Code}{11}{section.1.5}
+\contentsline {chapter}{\numberline {2}Design and Implementation}{13}{chapter.2}
+\contentsline {section}{\numberline {2.1}Shift of GPS timestamps}{13}{section.2.1}
+\contentsline {section}{\numberline {2.2}Peak windows}{13}{section.2.2}
+\contentsline {section}{\numberline {2.3}Entity library}{14}{section.2.3}
+\contentsline {section}{\numberline {2.4}Classification}{14}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}NN class}{15}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}ModelMaker class}{15}{subsection.2.4.2}
+\contentsline {section}{\numberline {2.5}Visualisation}{15}{section.2.5}
+\contentsline {chapter}{\numberline {3}Evaluation}{17}{chapter.3}
+\contentsline {section}{\numberline {3.1}Models}{17}{section.3.1}
+\contentsline {section}{\numberline {3.2}Model evaluations}{17}{section.3.2}
+\contentsline {section}{\numberline {3.3}Visualisation of class clustering}{18}{section.3.3}
+\contentsline {section}{\numberline {3.4}Discussion}{18}{section.3.4}
+\contentsline {chapter}{\numberline {4}Conclusion and future work}{19}{chapter.4}
+\contentsline {section}{\numberline {4.1}Conclusion}{19}{section.4.1}
+\contentsline {section}{\numberline {4.2}Future work}{19}{section.4.2}
+\contentsline {section}{\numberline {4.3}TODO}{20}{section.4.3}
+\contentsline {chapter}{\numberline {A}Introduction}{23}{appendix.A}
+\contentsline {section}{\numberline {A.1}List of defect categories}{23}{section.A.1}
+\contentsline {section}{\numberline {A.2}Vehicle and accelerometer placements}{24}{section.A.2}
+\contentsline {section}{\numberline {A.3}SBB defect report example}{25}{section.A.3}
+\contentsline {chapter}{\numberline {B}Evaluation}{27}{appendix.B}
