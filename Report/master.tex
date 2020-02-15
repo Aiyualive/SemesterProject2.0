@@ -37,23 +37,26 @@
 Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current system is expensive, time consuming and ineffective. That is, maintenance agents need to walk along tracks and check them for defects. For visualisation purposes, there is roughly 5200 km of rails in Switzerland which needs to be inspected by 40 experienced inspectors.
 
 
-In order to cope with this issue, Swiss Federal Railways (SBB) has specifically built two new special diagnostic vehicles (SDV) designed for defect identification among other purposes. For this, accelerometers have been installed at the front and back of the SDV to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
+"The condition assessment is evolving from a manual labour based approach to an industrialized assessment. This paradigm shift,.... (don't mention 40 inspectors, their job will in the future still be very important but at the office, checking false positives.)
+
+In order to cope with this issue, \textit{Swiss Federal Railways} (SBB) has specifically built one special \textit{Diagnostic Vehicle} (Diagnosefahrzeug - DFZ) designed for defect detection and identification among other purposes. For this, accelerometers have been installed at the front and back of the DFZ to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
 
 A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
 
 \section{Objective}
-As the title implies, the objective of this project is to identify and classify rail surface defects. To do this, we aim to build an effective pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. In this development, the first step consists of identification and classification, while the second step ultimately consists of future defect prediction. 
+The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. In this development, the first step consists of identification and classification, while the second step ultimately consists of future defect prediction. 
 
+toward a predictive maintenance which will result in a more reliable network [cite article about predictive maintenance]
 \section{Defects}
-Evidently, a defect can be seen as a deviation from the standard train track. For the exact defect type, SBB has a database for the individual defect definitions. See appendix \ref{app:report} for an example as to how this is done.
-%Gleis	149.849086	(400, A-184063)	
+A defect can be seen as a deviation from a standard train track; and can be further sub-categorized based on official defect documentation \cite{rail:online} provided by \textit{International Union of Railways} (UIC). Upon inspection of defective tracks, SBB inspectors reports defects with reference to the UIC-based, defect report document by SBB. An example of this can be seen in \ref{app:report}.
+%Gleis	149.849086	(400, A-184063)	                  
 %chienenzwischenlage	4.989620	(400, A-146358)	
 %Bankett	1169.510537	(400, A-103213)
-
 %Schwelle	0.000000	(400, A-103206)	
 %Schwelle	0.000000	(400, A-118152)	
 %Vignolschiene	0.000000	(400, A-231400)	
 %Fahrbahn	0.000000	(400, A-233599)	
+%First column is track types (object)
 
 Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. 
 \begin{figure}[H]
@@ -63,23 +66,23 @@ Generally, a defect is separated into two overarching types: range- and point-de
 	\includegraphics[width = 0.2\textwidth]{imgs/defs/p(400,A-118152)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-231400)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-233599)0}
-	\caption{Left, middle, right: Schwelle (A-$118152$), Fahrbahn (A-$233599$), Vignolschiene (A-$231400$). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. Parenthesis signifies defect ID and all pictures comes from SBB defect report set ID: $400$}
+	\caption{Left, middle, right: Schwelle (A-$118152$), Fahrbahn (A-$233599$), Vignolschiene (A-$231400$). The format is: track component (defect ID). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. (Source of pictures: SBB's defect report document)}
 \end{figure}
-%\vspace*{-1cm}
+\raggedbottom
 \begin{figure}[H]
 	\centering
 	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
 	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
-	\includegraphics[width = 0.33\textwidth]{imgs/defs/r(400,A-184063)0}
-	\includegraphics[width = 0.33\textwidth]{imgs/defs/r(400,A-184063)1}
+	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)0}
+	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)1}
 	
-	\includegraphics[width = 0.33\textwidth]{imgs/defs/r(400,A-146358)0}
-	\includegraphics[width = 0.33\textwidth]{imgs/defs/r(400,A-146358)1}
+	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-146358)0}
+	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-146358)1}
 \end{figure}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 0.33\textwidth]{imgs/defs/r(400,A-103213)0}
-	\caption{Top, middle, bottom: Gleis-$149.8 m$ (A-$184063$), Schienenzwischenlage-$5.0 m$ (A-$146358$), Bankett-$1169.5 m$ (A-$231400$). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Parenthesis signifies defect ID and all pictures comes from SBB defect report set ID: $400$. Most of these range defects have two pictures likely to give more detail}
+	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-103213)0}
+	\caption{Top, middle, bottom: Gleis-$149.8 m$ (A-$184063$), Schienenzwischenlage-$5.0 m$ (A-$146358$), Bankett-$1169.5 m$ (A-$231400$). The format is: track component-length (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
 \end{figure}
 \raggedbottom % to get of unnecessary vertical spacing
 For this project, we have solely focused on the point defects for analysis, as this simplifies the problem statement. We thus disregard range-defects such that we do not have to deal with the extra, associated factors. 
@@ -89,28 +92,25 @@ For this project, we have solely focused on the point defects for analysis, as t
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.49\textwidth]{imgs/switch0}
-	\label{fig:veh0}
 	\includegraphics[width = 0.49\textwidth]{imgs/switch1}
-	\label{fig:veh1}
-	\caption{Right: \url{thesprucecrafts.com/model-train-switches-2382606}, 
-	Left: 	\url{https://www.indiamart.com/proddetail/railroad-switches-3879200755.html}}
-	\label{fig:veh2}
+	\caption{(Picture sources from right to left: \cite{swi0:online}, \cite{swi1:online})}
 \end{figure}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.49\textwidth]{imgs/ins_joint0}
-	\label{fig:veh0}
 	\includegraphics[width = 0.49\textwidth]{imgs/ins_joint1}
-	\label{fig:veh1}
-	\caption{Right: \url{http://www.railroad-fasteners.com/news/Insulated-Rail-Joint.html}, Left: \url{http://www.railroadpart.com/rail-joints/insulated-rail-joints.html}}
-	\label{fig:veh2}
+	\caption{(Picture sources from right to left: \cite{ins0:online}, \cite{ins1:online})}
 \end{figure}
 
-insert text \todo{}
-\section{Data}
-The data has been collected and provided by SBB. Using their SDV, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After getting the data from SBB, it then goes through a processing pipeline (designed by Cyprien), after which the data can be manipulated with \verb|python| dataframes (from \verb|pd.DataFrame|). The accelerometer captures the accelerations at the XYZ-axes (along with the timestamps at each recording), of which we are only concerned with the Y-axis for the vertical pertubations for the accelerometer at the axle. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the SDV. 
+In this report, we will use the word 'entity' as an umbrella term for the different track entities: switch, insulation joint and defect.
 
-These are the measurement rides that we are dealing with
+\section{Data}
+The data has been collected and provided by SBB. Using their DFZ, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After the data collection, the data is imported into a Python-VR object, which is composed of \verb|pandas| \verb|DataFrames|. \verb|Python| objects with pandas \verb|DataFrames| were chosen for their functional flexibility in terms of data storage and data accessibility.
+
+The accelerometers capture the accelerations at the vertical (Y) and transversal (Z) axes (along with the timestamps at each recording), of which, only the Z axis was considered, as it is assumed to be the most responsive to vertical perturbations. These accelerometers are installed on both leading (axle 1) and trailing axles (axle 4) of the measurement coach. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the DFZ. 
+
+In this work, we are using the DFZ measurement rides in table \ref{tab:rides} for classification.
+
 %new_filenames = ['__new_gDFZ_2019-05-27T08_55_55_819Z_DFZ01', # s - 819Z_DFZ01
 %                 '__new_gDFZ_2019-05-27T10_03_59_077Z_DFZ01', # t - 077Z_DFZ01
 %                 '__new_gDFZ_2019-05-27T13_05_53_330Z_DFZ01', # u - 330Z_DFZ01
@@ -125,14 +125,11 @@ These are the measurement rides that we are dealing with
 		- & - &  \verb|2019-05-27T14_10_51| & \verb|425Z DFZ01| \\ \hline 
 
 	\end{tabular}
-	\caption{Measurement rides}
-	\label{datasets}
+	\caption{Measurement rides for classification}
+	\label{tab:rides}
 \end{table}
 
-Furhtermore, the locations of the defects have to be retrieved from SBB's database. which were retrieved by Cyprien. 
-
-In this report, we will use the word 'entity' as an umbrella term for the different track entities: switch, insulation joint and defect.
-
+Lastly, defect attributes and locations were retrieved from SBB's database and synchronized with the measurement data.
 
 \section{Code}
 \label{int:sec:code}
@@ -153,7 +150,8 @@ The code is written purely in python. To create neural network architectures, we
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and Implementation}
 
-For the process of defect classification we designed the pipeline in \ref{fig:pipeline}. In the next sections, I would like to give an overview of how each step was implemented.
+%an overview will be given. or "the implementation will be ..."
+For the process of defect classification we designed the pipeline in \ref{fig:pipeline}. In the next sections, an overview will be given of how each step was implemented.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = \textwidth]{imgs/pipeline}
@@ -164,36 +162,52 @@ For the process of defect classification we designed the pipeline in \ref{fig:pi
 
 %--> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
 
+2.0 Localization of the vehicle:
+
+The vehicle is localized using the combination of multiple data streams: track transponders (Eurobalise) GPS signals, Odometers and Switch detection systems. The reported localization error has been determined to be quite small.
 
 \section{Shift of GPS timestamps}
-The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers (every $25$ cm vs $24$ kHz respectively), we first need to get the corresponding positions for each accelerometer sample. This is done by interpolation using the timestamps of the accelerometers and GPS. 
+The location is reported with respect to the GPS Antenna of the vehicle which is close to the pantograph. The location is reported along with a timestamp corresponding to the location of the vehicle at that time at the locatio nof the antenna. \todo{todo}
 
-Depending on the direction of the vehicle we then subtract/add the offset between the accelerometers and the GPS sensor with regard to the position of these sensors on the vehicle body. \todo{insert drawing of how it is calculated?}
+The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers (every $25$ cm vs $24$ kHz respectively), we first need to get the corresponding positions for each accelerometer sample. This is done by linear interpolation using the timestamps of the accelerometers and GPS. 
+
+Depending on the direction of the vehicle, the offset between the accelerometers and the GPS sensor positions on the vehicle body is added/subtracted.\todo{todo}
 
 \section{Peak windows}
 Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length -- wherein Within the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
 
 Since we are assuming that each track entity is identified by a well-formed peak, we first need to find this peak within a reasonable offset from the defect location, after which we center around that within another reasonable offset. 
 
-In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side). \todo{insert a drawing of how this works?}
+In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
+
+the window offset can be very small (as small as possible without losing the peaks). Otherwise you will merge too many peaks using the peakfinder. 0.5 of even 0.1 should be ok. \todo{todo}
 
 \section{Entity library}
-The peak windows arguably forms the central feature of the defect library. However, based on domain knowledge, other features like speed also needs to be considered for our neural network. So apart from the peak windows, we have also extracted other of relevant features that might be useful for classifcation:
+The peak windows arguably forms the central feature of the defect library. However, based on domain knowledge, other features like vehicle speed also needs to be considered for our neural network. Apart from the peak windows, we have likewise extracted other relevant features that might be useful for classifcation:
 %timestamps	accelerations	window_length(s)	severity	vehicle_speed(m/s)	axle	campagin_ID	driving_direction	ID	class_labe
 %timestamps	accelerations	window_length(s)	severity	vehicle_speed(m/s)	axle	campagin_ID	driving_direction	defect_type	defect_length(m)	line, defect_ID	class_label
 \begin{itemize}
 	\item \textbf{Timestamps:} timestamps for the sampled acceleration
 	\item \textbf{Acceleration:} sampled acceleration at axle box.
 	\item \textbf{Vehicle speed (m/s):} vehicle speed at the closest timestamp
-	\item \textbf{Severity:} Severity of entity; defects have an integer label from $1-4$ whereas both insulation joints and switches have the label $5$
+	\item \textbf{Severity:} Urgency of the entity; defects have an urgency label signifying how much time is left before acting; labels $1,2,3,4$, where urgency decreases in ascending order. Insulation joints and switches have been self-engineered with label $5$ -- all entities need to have the same feature column for training.
 \end{itemize}
 Additional information about each entity has been retrieved as well, such as: driving direction and corresponding entity IDs. For each entity, we crucially set a true, class label such that we are able to do supervised learning.
 
-Given a specific measurement ride object (handled by Cyprien), we either retrieve each feature directly from the corresponding \verb|dataframe| or with the use of designated helper functions for those requring extra processing. Currently, we have have a 2-level nested \verb|for loop|, looping for each axle outerly, and looping for each entity entry innerly.
+Given a specific measurement ride object, we either retrieve each feature directly from the corresponding \verb|dataframe| or with the use of designated helper functions for those requring extra processing. Currently, we have have a 2-level nested \verb|for loop|, looping for each axle outerly, and looping for each entity entry innerly.
 
 The implementation of this could have made more elegant by operating directly on the dataframe, which might also increase speed of the implementation as the \verb|pandas| library has optimised their dataframe operations. However, speed and efficency was not a major concern in this project.
 
 show a few entity signals and their features, refer to the defects presented in introduction,  appendix for more signals? \todo{}
+
+%yes. put a couple of examples, and possibly more in the appendix.
+
+
+%Or operating on both channels at the same time.
+%
+%AX11 and AX12 as one defect crossing sample with two signatures seen from different location. This would help in cases where the defect is only on one side of the track.
+%
+%Add this, and keep this in mind as a limitation of the current approach
 
 \section{Classification}
 We have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
@@ -218,7 +232,7 @@ To make a classification, we first need to select the relevant features. Then we
 		\verb|classify()|			     & classifies on an eventual test set\\ 
 		\noalign{\global\arrayrulewidth=0.3mm} \hline 
 		
-		
+%		I'm not an expert on neural networks. If anything uncertain here. I'd ask Harry.
 		\vspace*{0.25cm}\\
 		\hline
 		\multicolumn{2}{c}{ \textbf{Other utility API functions} }	
@@ -246,10 +260,10 @@ To make a classification, we first need to select the relevant features. Then we
 \subsection{ModelMaker class}
 As mentioned in the introduction \ref{int:sec:code}, this is where we make use of \verb|keras|.
 
-See example of this in next chapter. \todo{todo, explan each layer?}
+See example of this in next chapter. 
 
 \section{Visualisation}
-Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.\todo{todo}
+Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Evaluation
@@ -276,12 +290,12 @@ Draw models \url{http://alexlenail.me/NN-SVG/AlexNet.html} \todo{do one model at
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c|} \hline
-		\textbf{Defect Type} & $2$ & $ \%$\\ \hline
+		\textbf{Defect} & $2$ & $ \%$\\ \hline
 	\end{tabular}
 	\caption{Entity distribution, class distributions}
 \end{table}
 
-In this section we evaluate our model with regard to a variety of metrics: loss (\textbf{L}), accuracy (\textbf{ACC}), true positives (\textbf{TP}), false positives (\textbf{FP}), true negatives (\textbf{TN}), false negatives (\textbf{FN}), precision (\textbf{P}), recall (\textbf{R}), area under the curve (\textbf{AUC}). Insert explanation of each metric\todo{?}
+In this section we evaluate our model with regard to a variety of metrics: loss (\textbf{L}), accuracy (\textbf{ACC}), true positives (\textbf{TP}), false positives (\textbf{FP}), true negatives (\textbf{TN}), false negatives (\textbf{FN}), precision (\textbf{P}), recall (\textbf{R}), area under the curve (\textbf{AUC}).
 %&{L}&{ACC}&{TP}&{TN}&{FP}&{FN}&{P}&{R}&{AUC}
 \begin{table}[H]
 		\centering 
@@ -292,8 +306,8 @@ In this section we evaluate our model with regard to a variety of metrics: loss 
 			L   & $-$ & $-$ & $-$ & $-$ \\ \hline
 			ACC & $-$ & $-$ & $-$ & $-$ \\ \hline
 			TP  & $-$ & $-$ & $-$ & $-$ \\ \hline
-			TN  & $-$ & $-$ & $-$ & $-$ \\ \hline
 			FP  & $-$ & $-$ & $-$ & $-$ \\ \hline
+			TN  & $-$ & $-$ & $-$ & $-$ \\ \hline
 			FN  & $-$ & $-$ & $-$ & $-$ \\ \hline
 			P   & $-$ & $-$ & $-$ & $-$ \\ \hline
 			R   & $-$ & $-$ & $-$ & $-$ \\ \hline
@@ -305,9 +319,41 @@ In this section we evaluate our model with regard to a variety of metrics: loss 
 		\label{tab:resBenchmark}
 \end{table} 
 
-average epoch plot?
+%yes!! Very important.
+%
+%And also be aware that even if the model performs badly it is ok. However no cheating allowed to get good numbers ;)  
+%
+%60-70% Auc would be ok.
+%I'll test your code on the new samples. We'll do like the machine learning class, where the baseline result will be the accuracy delivered by a simple regression or decision tree ;););)
 
+average epoch plot?\\
 
+\textbf{intermediate results}
+\begin{verbatim}
+Results model 1, only defects, new dataset
+>>> Summarize results <<<
+Overall loss: 2.969% (+/-0.009)
+Overall acc: 0.074% (+/-0.014)
+Overall true_positives_10: 0.300% (+/-0.458)
+Overall fp: 0.600% (+/-0.917)
+Overall tn: 3609.400% (+/-0.917)
+Overall fn: 189.700% (+/-0.458)
+Overall precision: 0.175% (+/-0.317)
+Overall recall: 0.002% (+/-0.002)
+Overall auc: 0.568% (+/-0.007)
+
+Results model 1, only ins joints and switches, new dataset
+>>> Summarize results <<<
+Overall loss: 0.691% (+/-0.001)
+Overall acc: 0.587% (+/-0.000)
+Overall true_positives_11: 155.000% (+/-0.000)
+Overall fp: 109.000% (+/-0.000)
+Overall tn: 155.000% (+/-0.000)
+Overall fn: 109.000% (+/-0.000)
+Overall precision: 0.587% (+/-0.000)
+Overall recall: 0.587% (+/-0.000)
+Overall auc: 0.572% (+/-0.031)
+\end{verbatim}
 \section{Visualisation of class clustering}
 insert the pca plots
 
@@ -336,44 +382,66 @@ how good is the foundation to move onwards with further research
 
 \begin{itemize}
 	\item Might be interesting to also consider the XZ-axes.
+	%	no X. But sensor fusion 
+	%X+Y * 4 = 8 Channels
+	%
+	%Also Y will be very clearly different at Switches (lots of sideway hits, accelerations).
+	%
+	%Or additional sensors higher up in the vehicle! Bogie(Z,Y), Body (Y)
 	\item range defects
 	\item tune the peak finding parameters
 	\item track entity dependent/specific window offsets
 	\item we must not set the findpeakoffset too high
-	\item Questions, what if you want to use multiple features with 1 CNN
-	\item I have participated in ETH Hatchery (ref), where our team build a prototype with a model train. We let the model train drive on the track with self-engineered defects.
-
+	%To better identify infrastructure components and damages (entities), the order and distance between entities should be considered, as well as the uncertainty in the reported location of the entities themselves (databases are not always mm accurate) as well as the uncertainty in the reported location of the vehicle).
+	%Expected from layout: "...I....S,I,....Weld,....I,..............I,...S,..W,.."
+	%Measured hits: "...I..S,...I,...Weld,...I,......I...,...S,..W,.."
+	
+	\item I have participated in ETH Hatchery (ref), where our team build a prototype with a model train. We let the model train drive on the track with self-engineered defects. 
 \end{itemize}
+
+
+
+%Would be cool to continue on this, or meetup every now and then in Europe or Singapore (once T-Virus epidemy is over)
 
 \newpage
 \section{TODO}
 \begin{itemize}
-	\item get percentage of each class in the validation set
-	\item create an average of the model ie run model for more times
 	\item add speed as a feature
-	\item what does each filter do? what is kernel size?
+%	\item what does each filter do? what is kernel size?
 	\item very fast speed, overlap between switch and ins, old vs new rail, ax1 arrow 2 arrow 3 arrow 4
 	\item 3D plots?
 	\item change the defect library to use pandas instead?
-	\item visualise what the network is doing using Harry's code
-	\item use speed as a feature also
-	\item be consistent with function naming and variable names: function names with underscore and variable names with camelcase
-	\item Which type of defects are we actually working with, we can see that it does good at the switches and ins joints, but no chance with the defects
-	\item we should instead call it an entity library -- make up your mind
-	\item try only with defects and no ins and switches
-	\item separate all the axle channels and train on them
-	\item try to use low pass filter
+%	\item visualise what the network is doing using Harry's code
+%	\item be consistent with function naming and variable names: function names with underscore and variable names with camelcase
+	\item Which type of defects are we actually working with, we can see that it does okay at the switches and ins joints, but no chance with the defects
+%	\item we should instead call it an entity library -- make up your mind
+	\item concat all the axle channels and train on them
+	\item try to use low pass filter - (would make everything faster)
 	\item get better results
 	\item we dont need non-defects for defect classification, we could just input something else and make sure that it is not a defect
-	\item a specifc defect type vs ins joint vs switch
-	\item we did not consider severity
-	\item which track entities are we actually analysing
-	\item save the class distribution as a text file
+%	\item a specifc defect type vs ins joint vs switch
+	\item account for severity
+%	\item which track entities are we actually analysing
 	\item unique bincount of each defect severity
-	\item insert signal plots, uniform axes. dont do peakfinding
+	\item insert signal plots, uniform axes. dont show peaks
 	\item better epoch plots
+	\item You can put more citations, for example about some articles focusing on recognizing speech/sound, signals which have also very similar signatures
+	\item Look more into defect types, its specifics
+	\item (drawings)
+	\item too many self in classifier?
 \end{itemize}
+Normal. You are on tracks which are "brand new- built in 2006-2018".  so the defects are all minor. The new measurement data we recently got would work much much better since they drove on pretty bad bad bad stuff :)
 
+numpy array is faster for operating on data.
+Pandas s more convenient for storing the data
+
+%here there are many points that you can mention that can be done and that the library code is built in an extentible form
+
+%more would be good. and not only blogposts. 
+%--> Machine Learning and Pattern Recognition book (the one that is probably also used inthe Deep learning class that you took).
+%--> Railway-vehicle dynamics by Knothe,
+%--> UIC defect catalog which SBB uses as a base for classifying the defects
+%--> Some scientific articles on sound recognition/voice
 \bibliography{master}
 %\todo{New paper with train}
 
@@ -393,6 +461,7 @@ etc
 
 maybe just retrieve from the SBB reports
 
+yupp, just SBB reports, or the SBB defect catalog (should be in the first files I gave you)
 
 \section{Vehicle and accelerometer placements}
 \label{figs:veh}
@@ -405,7 +474,7 @@ maybe just retrieve from the SBB reports
 	\label{fig:veh1}
 	
 	\includegraphics[width = 0.58\textwidth]{imgs/veh2}
-	\caption{These figures have been provided by Cyprien's folder of SBB documents. They show the accelerometer placements. For this project we have only considered axle number 4 in the third figure.}
+	\caption{Illustrations of the accelerometer placements on the DFZ. For this project we have only considered axle number 4 in the third figure. (Source of picture: SBB documents)}
 	\label{fig:veh2}
 \end{figure}
 

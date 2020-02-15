@@ -11,13 +11,13 @@ class featureset():
         self.peak_offset   = peak_offset
         self.window_offset = window_offset
         self.defects      = makeDefectDF(obj,
-                                        peak_offset=peak_offset,
+                                        find_peak_offset=peak_offset,
                                         window_offset=window_offset)
         self.switches     = makeGenericDF(obj, "switches",
-                                          peak_offset=peak_offset,
+                                          find_peak_offset=peak_offset,
                                           window_offset=window_offset)
         self.ins_joints   = makeGenericDF(obj, "insulationjoint",
-                                          peak_offset=peak_offset,
+                                          find_peak_offset=peak_offset,
                                           window_offset=window_offset)
 
     def makeDefects(self, obj):
@@ -231,17 +231,17 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
             interval  = abs(int(von) - int(bis))/nanosec
             if interval == 0:
                 # Point defects
-                find_peak_offset = find_peak_offset * nanosec
-                vehicle_speed    = findVehicleSpeed(von, obj)
+                find_peak_offset_ = find_peak_offset * nanosec
+                vehicle_speed     = findVehicleSpeed(von, obj)
             else:
                 ### Just using von and bis
-                find_peak_offset = 0
+                find_peak_offset_ = 0
                 # Vehicle speed is found at the middle of the interval
-                midpoint         = int(( von + bis)/2 )
-                vehicle_speed    = findVehicleSpeed(midpoint, obj)
+                midpoint          = int(( von + bis)/2 )
+                vehicle_speed     = findVehicleSpeed(midpoint, obj)
 
             timestamps, acceleration = getPeakWindow(von, bis,
-                                                       find_peak_offset, window_offset,
+                                                       find_peak_offset_, window_offset,
                                                        acc_time, acc)
 
             # Each defect type number count
@@ -267,7 +267,7 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
 
     return d_df
 
-def makeGenericDF(obj, type, axle='all', peak_offset=1, window_offset=0.5):
+def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
     if axle == 'all':
         axle = ['AXLE_11', 'AXLE_12', 'AXLE_41', 'AXLE_42']
     else:
@@ -277,7 +277,7 @@ def makeGenericDF(obj, type, axle='all', peak_offset=1, window_offset=0.5):
     nanosec = 10**9
     sampling_freq = 24000
     window_offset = window_offset * 24000
-    peak_offset = peak_offset * nanosec
+    find_peak_offset = find_peak_offset * nanosec
 
     # datarame
     df = pd.DataFrame()
@@ -320,7 +320,7 @@ def makeGenericDF(obj, type, axle='all', peak_offset=1, window_offset=0.5):
 
             timestamps, accelerations = getPeakWindow(
                                             timestamp, timestamp,
-                                            peak_offset, window_offset,
+                                            find_peak_offset, window_offset,
                                             acc_time, acc)
 
             window_length = (timestamps[-1] - timestamps[0]) / nanosec
@@ -374,148 +374,3 @@ def savePickle(campaign_objects, identifier, path="AiyuDocs/pickles/"):
     defects.to_pickle(path + identifier + "_defects_df.pickle")
     switches.to_pickle(path + identifier + "_switches_df.pickle")
     ins_joints.to_pickle(path + identifier + "_ins_joints_df.pickle")
-
-##################
-### DEPRECATED ###
-##################
-
-def makeSwitchesDF(obj, axle):
-    """
-    DEPRECATED
-    Makes a dataframe of ordinary switches and
-    params:
-        axle: the desired axle channel to work with
-    """
-    switches = obj.MEAS_POS.POS_TRACK[obj.MEAS_POS.POS_TRACK['TRACK.data.switchtype']==1]
-
-    # The start time of my switch with respect to axle1:
-    ax_time_label = 'DFZ01.POS.FINAL_POSITION.timestamp.' + axle[:-1]
-    timestamp_label = 'DFZ01.POS.FINAL_POSITION.timestamp'
-    end_time_label = 'DFZ01.POS.FINAL_POSITION.timestamp_end'
-
-    time     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-    acc      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + axle + '_T.data'
-    acc_time = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[time].values
-    a        = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc].values
-
-    normal_df = pd.DataFrame()
-    switches = obj.MEAS_POS.POS_TRACK[obj.MEAS_POS.POS_TRACK['TRACK.data.switchtype']==1]
-    switches_time_label  = "DFZ01.POS.FINAL_POSITION.timestamp." + axle[:-1]
-
-    nanosec = 10**9
-    find_peak_offset = 1 * nanosec
-    window_offset = 12000
-
-    columns = ["timestamps",
-               "accelerations",
-               "window_length(s)",
-               "severity",
-               "vehicle_speed(m/s)",
-               "crossingpath",
-               "driving_direction",
-               "axle",
-               "class_label"]
-
-    driving_direction = getDirection(obj)
-
-    count = 0
-    for i, row in tqdm(switches.iterrows(), total = len(switches), desc="Switches " + axle):
-
-        start_time = row[ax_time_label]
-        end_time   = row[ax_time_label] + row[end_time_label] - row[timestamp_label]
-
-        switches_time = row[switches_time_label]
-
-        if np.isnan(switches_time):
-            continue
-
-        timestamps, accelerations = getPeakWindow(switches_time, switches_time,
-                                     find_peak_offset, window_offset,
-                                     acc_time, a)
-
-        severity = 5
-        vehicle_speed = findVehicleSpeed(switches_time, obj)
-        actual_window_length = (timestamps[-1] - timestamps[0]) / nanosec
-        crossingpath = str(row["crossingpath"])
-        class_label = 1
-
-        temp_df = pd.DataFrame([[timestamps,
-                                 accelerations,
-                                 actual_window_length,
-                                 severity,
-                                 vehicle_speed,
-                                 crossingpath,
-                                 driving_direction,
-                                 axle,
-                                 class_label]],
-                            index = ["Switches" + "_" + str(count)],
-                            columns = columns)
-
-        normal_df = pd.concat([normal_df, temp_df], axis=0)
-        count += 1
-
-    return normal_df
-
-def makeInsulationJointsDF(obj, axle, find_peak_offset=1, window_offset=0.5):
-    """
-    DEPRECATED
-    Makes the defect dataframe containing all relevant features.
-    params:
-        axle: axle for which to find defect
-        peak_height: this height determines the peak classification
-    """
-    time     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
-    acc      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + axle + '_T.data'
-    acc_time = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[time].values
-    a        = obj.MEAS_DYN.DFZ01_DYN_ACCEL_AXLE_T[acc].values
-
-    normal_df = pd.DataFrame()
-    dfa       = obj.DfA.DFA_InsulationJoints
-    insulation_time_label  = "DfA.gDFZ.timestamp." + axle[:-1]
-
-    nanosec = 10**9
-    sampling_freq = 24000
-    window_offset = window_offset * 24000
-    find_peak_offset = find_peak_offset * nanosec
-
-    columns = ["timestamps",
-               "accelerations",
-               "window_length(s)",
-               "severity",
-               "vehicle_speed(m/s)",
-               "ID",
-               "axle",
-               "class_label"]
-
-    driving_direction = getDirection(obj)
-
-    count = 0
-    for i, row in tqdm(dfa.iterrows(), total = len(dfa), desc="Insulation Joints " + axle):
-        insulation_time = row[insulation_time_label]
-
-        timestamps, accelerations = getPeakWindow(insulation_time, insulation_time,
-                                     find_peak_offset, window_offset,
-                                     acc_time, a)
-
-        actual_window_length = (timestamps[-1] - timestamps[0]) / nanosec
-        severity = 5
-        vehicle_speed = findVehicleSpeed(insulation_time, obj)
-        ID            = row["DfA.IPID"]
-        class_label   = 0
-
-        temp_df = pd.DataFrame([[timestamps,
-                                 accelerations,
-                                 actual_window_length,
-                                 severity,
-                                 vehicle_speed,
-                                 ID,
-                                 driving_direction,
-                                 axle,
-                                 class_label]],
-                            index = ["InsulationJoint" + "_" + str(count)],
-                            columns = columns)
-
-        normal_df = pd.concat([normal_df, temp_df], axis=0)
-        count += 1
-
-    return normal_df
