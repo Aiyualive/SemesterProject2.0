@@ -10,19 +10,24 @@
 \contentsline {section}{\numberline {2.3}Entity library}{14}{section.2.3}
 \contentsline {section}{\numberline {2.4}Classification}{15}{section.2.4}
 \contentsline {subsection}{\numberline {2.4.1}NN class}{15}{subsection.2.4.1}
-\contentsline {subsection}{\numberline {2.4.2}ModelMaker class}{15}{subsection.2.4.2}
-\contentsline {section}{\numberline {2.5}Visualisation}{15}{section.2.5}
-\contentsline {chapter}{\numberline {3}Evaluation}{17}{chapter.3}
-\contentsline {section}{\numberline {3.1}Models}{17}{section.3.1}
-\contentsline {section}{\numberline {3.2}Model evaluations}{17}{section.3.2}
-\contentsline {section}{\numberline {3.3}Visualisation of class clustering}{18}{section.3.3}
-\contentsline {section}{\numberline {3.4}Discussion}{19}{section.3.4}
-\contentsline {chapter}{\numberline {4}Conclusion and future work}{21}{chapter.4}
-\contentsline {section}{\numberline {4.1}Conclusion}{21}{section.4.1}
-\contentsline {section}{\numberline {4.2}Future work}{21}{section.4.2}
-\contentsline {section}{\numberline {4.3}TODO}{22}{section.4.3}
-\contentsline {chapter}{\numberline {A}Introduction}{25}{appendix.A}
-\contentsline {section}{\numberline {A.1}List of defect categories}{25}{section.A.1}
-\contentsline {section}{\numberline {A.2}Vehicle and accelerometer placements}{26}{section.A.2}
-\contentsline {section}{\numberline {A.3}SBB defect report example}{27}{section.A.3}
-\contentsline {chapter}{\numberline {B}Evaluation}{29}{appendix.B}
+\contentsline {subsection}{\numberline {2.4.2}ModelMaker class}{16}{subsection.2.4.2}
+\contentsline {section}{\numberline {2.5}Visualisation}{16}{section.2.5}
+\contentsline {chapter}{\numberline {3}Evaluation}{19}{chapter.3}
+\contentsline {section}{\numberline {3.1}Models}{19}{section.3.1}
+\contentsline {section}{\numberline {3.2}Model evaluations}{19}{section.3.2}
+\contentsline {section}{\numberline {3.3}Visualisation of class clustering}{20}{section.3.3}
+\contentsline {section}{\numberline {3.4}Discussion}{21}{section.3.4}
+\contentsline {chapter}{\numberline {4}Conclusion and future work}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}Conclusion}{23}{section.4.1}
+\contentsline {section}{\numberline {4.2}Future work}{23}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Channels}{23}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Peak windows}{23}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Identification of infrastructure}{24}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Real-world simulated defects}{24}{subsection.4.2.4}
+\contentsline {section}{\numberline {4.3}TODO}{25}{section.4.3}
+\contentsline {chapter}{\numberline {A}Introduction}{29}{appendix.A}
+\contentsline {section}{\numberline {A.1}List of defect categories}{29}{section.A.1}
+\contentsline {section}{\numberline {A.2}Vehicle and accelerometer placements}{30}{section.A.2}
+\contentsline {section}{\numberline {A.3}SBB defect report example}{31}{section.A.3}
+\contentsline {section}{\numberline {A.4}Implementation}{32}{section.A.4}
+\contentsline {chapter}{\numberline {B}Evaluation}{33}{appendix.B}

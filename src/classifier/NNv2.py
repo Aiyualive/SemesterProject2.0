@@ -26,6 +26,7 @@ import pandas as pd
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.ticker import StrMethodFormatter
 
 random.seed(2)        # Python
 np.random.seed(2)     # numpy
@@ -147,15 +148,16 @@ class ModelMaker():
 class NN():
     def __init__(self, epochs, batch_size, create_dir_bool = True, verbose = 2):
         print("########## Init NN ##########")
-        self.metrics =  ['accuracy',
-                          tkm.TruePositives(),
-                          tkm.FalsePositives(name='fp'),
-                          tkm.TrueNegatives(name='tn'),
-                          tkm.FalseNegatives(name='fn'),
-                          #tkm.BinaryAccuracy(name='accuracy'),
-                          tkm.Precision(name='precision'),
-                          tkm.Recall(name='recall'),
-                          tkm.AUC(name='auc')]
+        self.metrics = [tkm.CategoricalAccuracy(name='ACC'),
+                        #'accuracy',
+                        tkm.TruePositives(name='TP'),
+                        tkm.FalsePositives(name='FP'),
+                        tkm.TrueNegatives(name='TN'),
+                        tkm.FalseNegatives(name='FN'),
+                        tkm.Precision(name='Precision'),
+                        tkm.Recall(name='Recall'),
+                        tkm.AUC(name='AUC')]
+
         self.exp_desc = ""
         self.verbose  = verbose
         self.epochs   = epochs
@@ -174,7 +176,8 @@ class NN():
         self.n_classes  = len(np.unique(y))
 
         tmp_X = np.vstack([v for v in X.accelerations])
-        tmp_y = to_categorical(y.values, num_classes=self.n_classes)
+        # Maybe dont need flatten, minus 2 since labels start from 2
+        tmp_y = to_categorical(y.values.flatten(), num_classes=self.n_classes)
 
         if oversampling:
             print("    *Oversampling*")
@@ -193,8 +196,7 @@ class NN():
 
         self.true_y_val    = self._convertFromCategorical(self.y_val)
         self.true_y        = self._convertFromCategorical(self.y)
-        self._printClassDist(self.true_y, "Train set class distribution")
-        self._printClassDist(self.true_y_val, "Validation set class distribution")
+        self._printClassDist() # Could be done depending on verbose
 
         self.class_weights = compute_class_weight('balanced',
                                                  np.unique(self.true_y),
@@ -223,7 +225,7 @@ class NN():
         start = time.time()
         self.history = self.model.fit(
                             self.X, self.y,
-                            validation_data=(self.X_val, self.y_val),
+                            validation_data=(self.X_val, self.y_val), # categorical
                             epochs=self.epochs,
                             batch_size=self.batch_size,
                             class_weight=self.class_weights,
@@ -277,7 +279,7 @@ class NN():
         pickle.dump(self.history.history,
                     open(self.date + "/SAVE_HISTORY_%s_%s.pickle"%(self.model_name, self.exp_desc), "wb" ))
 
-    def save_to_csv(self, name):
+    def save_classification_to_csv(self, name):
         print("########## Save Prediction ##########")
         df_predict = pd.DataFrame(columns=['id', 'y'])
 
@@ -294,14 +296,20 @@ class NN():
         print("########## Plot Metrics ##########")
         history = self.history
         for n, metric in enumerate(self.model.metrics_names):
-            fig = plt.figure(figsize=(20,5))
-            name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
+            fig = plt.figure(figsize=(20,25))
+            #name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
+            name = re.sub(r"\d+", "", metric.replace("true_positives_", "Tp").upper())
 
             train_history = history.history[metric]
             val_history   = history.history['val_' + metric]
             ylim0 = min(train_history + val_history)
             ylim1 = max(train_history + val_history)
 
+            #print("lims")
+            #print(ylim0, ylim1)
+
+            #plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}')) # No decimal places
+            plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}')) # 2 decimal places
 
             plt.subplot(5, 2, n + 1)
             plt.plot(history.epoch, train_history,
@@ -312,10 +320,10 @@ class NN():
             plt.ylabel(name)
             plt.ylim([ylim0, ylim1])
             plt.legend()
-            fig.set_size_inches(20, 5, forward=True)
-            fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
+            fig.set_size_inches(20, 25, forward=True)
+            #fig.savefig(self.date + "/METRIC_%s_%s"%(metric, self.exp_desc),  bbox_inches='tight')
 
-    def show_confusion_matrix(self,):
+    def plot_confusion_matrix(self,):
         print("########## Confusiion Matrix ##########")
         matrix = confusion_matrix(self.true_y_val,
                                   self.prediction,
@@ -347,25 +355,28 @@ class NN():
       print(self.model.layers[0].get_weights())
       print(self.model.layers[0].weights)
 
-    """ Inspired by https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/"""
-    def run_experiment(self, rep=10):
+    """Inspired by https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/"""
+    def run_experiment(self, repetitions=10):
         scores = []
+        experiment_history = []
         self.verbose = 0
-        for i in range(rep):
+        for i in range(repetitions):
             print("******************* EXP " + str(i) + " *******************")
             self.exp_desc = "EXP" + str(i)
             self.fit()
-            self.predict()
+            self.classify()
             self.save_history()
             self.measure_performance()
             self.save_model()
-            self.plot_metrics()
-            self.show_confusion_matrix()
+            #self.plot_metrics()
+            #self.plot_confusion_matrix()
             for n, metric in enumerate(self.model.metrics_names):
                 print(">%d %s: %3.2f"%(i, metric, self.results[n]))
             scores.append(self.results)
+            experiment_history.append(self.history)
             print("*********************************************\n")
         self._summarize_results(scores)
+        self._summarize_plots(experiment_history)
 
     def _set_callbacks(self):
         checkpoint     = ModelCheckpoint(self.date + "/w_ckp_%s.hdf5"%(self.model_name),
@@ -395,17 +406,100 @@ class NN():
         """
         return np.asarray(list(map(np.argmax, arr)))
 
-    def _printClassDist(self, arr, desc):
-        cnt = np.bincount(arr)
-        pct = cnt/sum(cnt)
-        cl   = np.nonzero(pct)[0]
-        print(desc)
-        for i in cl:
-          print("    %d: %3.2f%%"%(i, pct[i]*100))
-        print()
+    def _printClassDist(self):
+        true_cnt = np.bincount(self.true_y)
+        true_pct = true_cnt/sum(true_cnt)
+        true_cl  = np.nonzero(true_pct)[0]
+
+        val_cnt = np.bincount(self.true_y_val)
+        val_pct = val_cnt/sum(val_cnt)
+        val_cl  = np.nonzero(val_pct)[0]
+
+        dist_file = self.date + "/class_dist.txt"
+        with open(dist_file, "w") as f:
+            print("Traning set class distribution")
+            f.write("Traning set class distribution")
+            for i in true_cl:
+                f.write("    %d: %d, %3.2f%%"%(i, true_cnt[i], true_pct[i]*100))
+                print("    %d: %d, %3.2f%%"%(i, true_cnt[i], true_pct[i]*100))
+            print()
+
+            print("Validation set class distribution")
+            f.write("Validation set class distribution")
+            for i in val_cl:
+                f.write("    %d: %d, %3.2f%%"%(i, val_cnt[i], val_pct[i]*100))
+                print("    %d: %d, %3.2f%%"%(i, val_cnt[i], val_pct[i]*100))
+            print()
 
     def _summarize_results(self, scores):
         print(">>> Summarize results <<<")
         m, s = np.mean(scores, axis=0), np.std(scores, axis=0)
+        print(scores)
         for i, metric in enumerate(self.model.metrics_names):
             print('Overall %s: %.3f%% (+/-%.3f)' % (metric, m[i], s[i]))
+        print()
+
+
+    def _summarize_plots(self, history):
+        print(">>> Summarized training plots <<<")
+        # exp: metric for each experiment
+        train_metrics = { i: [] for i in self.model.metrics_names} # for getting the ylimits
+        val_metrics   = { 'val_' + i: [] for i in self.model.metrics_names}
+
+        # Convert into metric: experiments[epochs[]]
+        repetitions = len(history)
+        for n, metric in enumerate(self.model.metrics_names):
+            val_metric = 'val_' + metric
+            for i in range(repetitions):
+                train_vals = history[i].history[metric]
+                val_vals   = history[i].history[val_metric]
+                train_metrics[metric].append(train_vals)
+                val_metrics[val_metric].append(val_vals)
+
+        # metric: std/average for each epochs
+        #print(train_metrics)
+        #list(map(lambda x: (float(5)/9)*(x-32), fahrenheit.values()))
+        train_avg = { key: np.mean(list(train_metrics[key]), axis=0) for key in train_metrics}
+
+        train_std = { key: np.std(list(val), axis=0) for key, val in train_metrics.items()}
+
+        val_avg = { key: np.mean(list(val), axis=0) for key, val in val_metrics.items()}
+        val_std = { key: np.std(list(val), axis=0) for key, val in val_metrics.items()}
+
+
+        # Average metric plot
+        print(">>> Average metric plot")
+        for n, metric in enumerate(self.model.metrics_names):
+            val_metric = 'val_' + metric
+            fig = plt.figure(figsize=(10,6))
+            plt.errorbar(np.arange(self.epochs), train_avg[metric], train_std[metric],
+                         marker = '.', linestyle='none', capsize=3, label = 'Train')
+            plt.errorbar(np.arange(self.epochs)+0.01, val_avg[val_metric], val_std[val_metric],
+                         marker = '.', linestyle='none', capsize=3, label = 'Val')
+            plt.title('Average ' + metric)
+            plt.xlabel('Epoch')
+            plt.ylabel(metric)
+            plt.legend(loc = 1)
+            plt.show()
+
+        # Metric plot for each experiment
+        print(">>> Metric plot for each experiment")
+        flatten = lambda l: [item for sublist in l for item in sublist]
+        for i in range(repetitions):
+            print(">>> Exp " + str(i))
+            for n, metric in enumerate(self.model.metrics_names):
+                val_metric = 'val_' + metric
+                t = train_metrics[metric]
+                v = val_metrics[val_metric]
+                flat = flatten(t) + flatten(v)
+                ybot, ytop = (min(flat), max(flat))
+
+                fig = plt.figure(figsize=(10,6))
+                plt.plot(np.arange(self.epochs), t[i], label='Train')
+                plt.plot(np.arange(self.epochs), v[i], linestyle="--", label='Val')
+                plt.title("Exp" + str(i) + ": " + metric)
+                plt.xlabel('Epoch')
+                plt.ylabel(metric)
+                plt.ylim([ybot, ytop])
+                plt.legend(loc = 1)
+                plt.show()

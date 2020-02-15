@@ -20,9 +20,14 @@
 \BOOKMARK [0][-]{chapter.4}{Conclusion and future work}{}% 20
 \BOOKMARK [1][-]{section.4.1}{Conclusion}{chapter.4}% 21
 \BOOKMARK [1][-]{section.4.2}{Future work}{chapter.4}% 22
-\BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 23
-\BOOKMARK [0][-]{appendix.A}{Introduction}{}% 24
-\BOOKMARK [1][-]{section.A.1}{List of defect categories}{appendix.A}% 25
-\BOOKMARK [1][-]{section.A.2}{Vehicle and accelerometer placements}{appendix.A}% 26
-\BOOKMARK [1][-]{section.A.3}{SBB defect report example}{appendix.A}% 27
-\BOOKMARK [0][-]{appendix.B}{Evaluation}{}% 28
+\BOOKMARK [2][-]{subsection.4.2.1}{Channels}{section.4.2}% 23
+\BOOKMARK [2][-]{subsection.4.2.2}{Peak windows}{section.4.2}% 24
+\BOOKMARK [2][-]{subsection.4.2.3}{Identification of infrastructure}{section.4.2}% 25
+\BOOKMARK [2][-]{subsection.4.2.4}{Real-world simulated defects}{section.4.2}% 26
+\BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 27
+\BOOKMARK [0][-]{appendix.A}{Introduction}{}% 28
+\BOOKMARK [1][-]{section.A.1}{List of defect categories}{appendix.A}% 29
+\BOOKMARK [1][-]{section.A.2}{Vehicle and accelerometer placements}{appendix.A}% 30
+\BOOKMARK [1][-]{section.A.3}{SBB defect report example}{appendix.A}% 31
+\BOOKMARK [1][-]{section.A.4}{Implementation}{appendix.A}% 32
+\BOOKMARK [0][-]{appendix.B}{Evaluation}{}% 33
