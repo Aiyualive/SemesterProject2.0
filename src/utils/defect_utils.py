@@ -171,8 +171,6 @@ def make_defect(obj, axle='all', find_peak_offset=1, window_offset=0.5):
 
     for ax in axle:
         dict_def_n  = dict.fromkeys(defect_type_names, 0)
-        defectToClass   = {defect_type_names[i] : (i + 2)
-                           for i in range(len(defect_type_names))}
 
         time_label     = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
         acc_label      = 'DFZ01.DYN.ACCEL_AXLE_T.Z_' + ax + '_T.data'
@@ -182,8 +180,7 @@ def make_defect(obj, axle='all', find_peak_offset=1, window_offset=0.5):
         columns = ["timestamps", "accelerations", "window_length(s)",
                    "severity", "vehicle_speed(m/s)", "axle",
                    "campagin_ID", "driving_direction",
-                   "defect_component", "defect_length(m)", "line, defect_ID", "entity_type",
-                   "class_label"]
+                   "defect_component", "defect_length(m)", "line, defect_ID", "entity_type"]
 
         for i, row in tqdm((obj.ZMON).iterrows(), total = len(obj.ZMON), desc="ZMON " + ax):
             von      = row['ZMON.gDFZ.timestamp_von.' + ax[:6]]
@@ -220,8 +217,7 @@ def make_defect(obj, axle='all', find_peak_offset=1, window_offset=0.5):
             temp_df = pd.DataFrame([[timestamps, acceleration, window_length,
                                      severity, vehicle_speed, ax,
                                      obj.campaign, driving_direction,
-                                     d_type, defect_length, identifier, "defect",
-                                     defectToClass[d_type]]],
+                                     d_type, defect_length, identifier, "defect"]],
                                    index   = ["%s_%d_%s_%s"%(d_type, n, ax, obj.campaign)],
                                    columns = columns)
 
@@ -259,14 +255,14 @@ def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
         elif type == 'insulationjoint':
             COMPONENT  = obj.DfA.DFA_InsulationJoints
             time_label = "DfA.gDFZ.timestamp." + ax[:-1]
-            columns.extend(["ID", "class_label"])
+            columns.extend(["ID"])
 
         ### SWITCHES ###
         elif type == 'switches':
             COMPONENT = get_switch_component(obj)
             time_label = "DFZ01.POS.FINAL_POSITION.timestamp." + ax[:-1]
             columns.extend(["crossingpath", "track_name",
-                            "track_direction", "switch_ID", "class_label"])
+                            "track_direction", "switch_ID"])
 
         # Accelerometer accelerations
         acc_time_label = 'DFZ01.DYN.ACCEL_AXLE_T.timestamp'
@@ -297,19 +293,15 @@ def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
             ### INSULATION JOINT ###
             if type == 'insulationjoint':
                 ID            = row["DfA.IPID"]
-                class_label   = 0
-                features.extend([ID, class_label])
+                features.extend([ID])
 
             elif type == 'switches':
-                # timestamp is start_time
-                # end_time   = row[ax_time_label] + row[end_time_label] - row[timestamp_label]
                 switch_id  = row['TRACK.data.gtgid']
                 track_name = row['TRACK.data.name']
                 track_direction = row['TRACK.data.direction_vehicleref']
                 crossingpath = str(row["crossingpath"])
-                class_label = 1
                 features.extend([crossingpath, track_name,
-                                track_direction, switch_id, class_label])
+                                track_direction, switch_id])
 
             temp_df = pd.DataFrame([features],
                                    index   = ["%s_%d_%s_%s"%(type, count, ax, obj.campaign)],

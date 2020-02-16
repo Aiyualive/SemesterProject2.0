@@ -45,11 +45,11 @@ A defect in train tracks can be seen as a discontinuity. As a train passes over 
 The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further toward a predictive maintenance which will result in a more reliable network \cite{unknown}.
 
 \section{Defects}
+\label{sec:defects}
 A defect can be seen as a deviation from a standard train track; and can be further sub-categorized based on official defect documentation \cite{rail:online} provided by \textit{International Union of Railways} (UIC). Upon inspection of defective tracks, SBB inspectors reports defects with reference to the UIC-based, defect report document by SBB. An example of this can be seen in \ref{app:report}.
 %Gleis	149.849086	(400, A-184063)	                  
 %chienenzwischenlage	4.989620	(400, A-146358)	
 %Bankett	1169.510537	(400, A-103213)
-%Schwelle	0.000000	(400, A-103206)	
 %Schwelle	0.000000	(400, A-118152)	
 %Vignolschiene	0.000000	(400, A-231400)	
 %Fahrbahn	0.000000	(400, A-233599)	
@@ -70,16 +70,16 @@ Generally, a defect is separated into two overarching types: range- and point-de
 	\centering
 	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
 	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)0}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)1}
+	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-184063)0}
+	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-184063)1}
 	
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-146358)0}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-146358)1}
+	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-146358)0}
+	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-146358)1}
 \end{figure}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-103213)0}
-	\caption{Top, middle, bottom:\\ Gleis-$149.8 m$: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-$184063$),\\ Schienenzwischenlage-$5.0 m$: \textit{Weiterer Abweichungstyp} (A-$146358$), Bankett-$1169.5 m$: \textit{Ungenügendes Schotterprofil} (A-$103213$).\\ The format is: track component-length: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
+	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-103213)0}
+	\caption{Top, middle, bottom:\\ Gleis-$149.8 m$: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-$184063$),\\ Schienenzwischenlage-$5.0 m$: \textit{Weiterer Abweichungstyp} (A-$146358$),\\ Bankett-$1169.5 m$: \textit{Ungenügendes Schotterprofil} (A-$103213$).\\ The format is: track component-length: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
 \end{figure}
 \raggedbottom % to get of unnecessary vertical spacing
 Furthermore, each defect is associated with a variety of attributes such as: associated component, defect component location, defect type etc. For this work, the focus has been on the defect component/category. That is, the track component with which the defect was identified on (see appendix \ref{app:defcomp}). This is, however, only a rough classification, as this attribute exists at a 'higher level', seeing that the lowest level of defect sub-division is the actual defect type (see appendix \ref{app:deftyp} for a list of defect types).
@@ -194,6 +194,7 @@ Given a specific measurement ride object, we either retrieve each feature direct
 
 The implementation of this could have made more elegant by operating directly on the dataframe, which might also increase speed of the implementation as the \verb|pandas| library has optimised their dataframe operations. The However, speed and efficency was not a major concern in this project. 
 
+The resulting plots for each entity can be seen in figures \ref{fig:insjoint}, \ref{fig:switches}, \ref{fig:defects}; for the defects seen in the the introduction, refer to appendix \ref{app:introdefects}.
 %refer to the defects presented in introduction?,  appendix for more signals?
 \begin{figure}[H]
 	\centering
@@ -203,6 +204,7 @@ The implementation of this could have made more elegant by operating directly on
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_41_077Z_DFZ01}
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_42_077Z_DFZ01}
 	\caption{Insulation Joint}
+	\label{fig:insjoint}
 \end{figure}
 
 \begin{figure}[H]
@@ -213,6 +215,7 @@ The implementation of this could have made more elegant by operating directly on
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_41_425Z_DFZ01}
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_42_425Z_DFZ01}
 	\caption{Switches}
+	\label{fig:switches}
 \end{figure}
 
 \begin{figure}[H]
@@ -223,6 +226,7 @@ The implementation of this could have made more elegant by operating directly on
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_41_819Z_DFZ01}
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_42_819Z_DFZ01}
 	\caption{Defect: vignolschiene}
+	\label{fig:defects}
 \end{figure}
 
 
@@ -300,14 +304,16 @@ learning rate
 
 activation functions
 
-shape
+input shape
 
 See example of this in next chapter. 
 
 callbacks - when training
 
+metrics can be used for logging
 \section{Visualisation}
 Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.
+
 
 using PCA
 
@@ -358,8 +364,6 @@ In this section we evaluate our model with regard to a variety of metrics: loss 
 			P   & $-$ & $-$ & $-$ & $-$ \\ \hline
 			R   & $-$ & $-$ & $-$ & $-$ \\ \hline
 			AUC & $-$ & $-$ & $-$ & $-$ \\ \hline
-			\Xhline{3\arrayrulewidth} 
-			Relative diff? & $-$ & $-$ & $-$ & $-$ \\ \hline 
 		\end{tabular}
 		\captionof{table}{Average metrics times and their standard deviations in parenthesis - rel diff?}
 		\label{tab:resBenchmark}
@@ -367,31 +371,7 @@ In this section we evaluate our model with regard to a variety of metrics: loss 
 
 
 \textbf{intermediate results}
-\begin{verbatim}
-Results model 1, only defects, new dataset
->>> Summarize results <<<
-Overall loss: 2.969% (+/-0.009)
-Overall acc: 0.074% (+/-0.014)
-Overall true_positives_10: 0.300% (+/-0.458)
-Overall fp: 0.600% (+/-0.917)
-Overall tn: 3609.400% (+/-0.917)
-Overall fn: 189.700% (+/-0.458)
-Overall precision: 0.175% (+/-0.317)
-Overall recall: 0.002% (+/-0.002)
-Overall auc: 0.568% (+/-0.007)
 
-Results model 1, only ins joints and switches, new dataset
->>> Summarize results <<<
-Overall loss: 0.691% (+/-0.001)
-Overall acc: 0.587% (+/-0.000)
-Overall true_positives_11: 155.000% (+/-0.000)
-Overall fp: 109.000% (+/-0.000)
-Overall tn: 155.000% (+/-0.000)
-Overall fn: 109.000% (+/-0.000)
-Overall precision: 0.587% (+/-0.000)
-Overall recall: 0.587% (+/-0.000)
-Overall auc: 0.572% (+/-0.031)
-\end{verbatim}
 
 average plots
 
@@ -411,8 +391,9 @@ Look more into defect types, its specifics
 
 Sometimes the defect can only be detected from one side of the track -- AX11 and AX12 as one defect crossing sample with two signatures seen from different location. This would help in cases where the defect is only on one side of the track.
 
-Many a times the validation set is used as the test set, but it is not good practice. The test set is generally well curated. It contains carefully sampled data that spans the various classes that the model would face, when used in the real world.
+%Many a times the validation set is used as the test set, but it is not good practice. The test set is generally well curated. It contains carefully sampled data that spans the various classes that the model would face, when used in the real world.
 
+You are on tracks which are "brand new- built in 2006-2018".  so the defects are all minor. The new measurement data we recently got would work much much better since they drove on pretty bad bad bad stuff :)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Conclusion and future work
@@ -429,14 +410,13 @@ library code is built in an extensible form
 
 overlap between switch and insulation joints
 
-You are on tracks which are "brand new- built in 2006-2018".  so the defects are all minor. The new measurement data we recently got would work much much better since they drove on pretty bad bad bad stuff :)
 
 %%% FUTURE WORK
 \section{Future work}
 There is still a lot of work that needs to be done in this project. These are summarised in the next sub-sections -- in no particular order. 
 
 \subsection{Channels}
-It might be interesting to consider sensor fusion of the ZY axes and the axle channels (8 total channels). The transverse axis, Y, would especially be valuable for switches as this channel can pick up sideways hits in the case of switches. These switch signals are clearly different from that of the other entities and may thus be easily separable.
+It might be interesting to consider sensor fusion of the ZY axes and the axle channels (8 total channels). The transverse axis, Y, would especially be valuable for switches as this channel can pick up sideways hits in the case of switches. These switch signals are clearly different from that of the other entities and may thus be more easily separable.
 	
 In this project, only the accelerometer accelerations at the axle-boxes were considered. However, the other accelerometer sensors higher up in the vehicle: bogie(Z, Y) and body (Y) (see appendix \ref{figs:veh}), will also be worth analyzing.
 
@@ -461,13 +441,17 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 \newpage
 \section{TODO}
 \begin{itemize}
+	\item F1 weighted (this already has info about true positive values) \verb|sklearn.metrics.f1_score|
+	\item AUC
+	\item tune models
+	\item do acceleration channels
 	\item PCA plots and get better results
 	\item add speed as a feature
-	\item visualise what the network is doing using Harry's code
+%	\item visualise what the network is doing using Harry's code
 	\item concat all the axle channels and train on them
 	\item try to use low pass filter - (would make everything faster)
 	\item account for severity
-	\item get rid of we
+	\item get rid of 'we'
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -487,36 +471,67 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix introduction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%0 Bankett
+%1 Befestigung
+%2 Dienstweg
+%3 EKW / DKW
+%4 Einfache und symmetrische Weiche
+%5 Entwässerungsgraben
+%6 Fahrbahn
+%7 Gleis
+%8 Gleisbettung
+%9 Halbe Zungenvorrichtung
+%10 Herzstück
+%11 Herzstückspitze
+%12 Kleber
+%13 Rippenplatte
+%14 Schiene
+%15 Schienenklemme
+%16 Schienenzwischenlage
+%17 Schotter
+%18 Schweissverbindung
+%19 Schwelle
+%20 Stockschiene
+%21 Vignolschiene
+%22 Weiche
+%23 Zungenschiene
+%24 insulationjoint
+%25 switches
 \chapter{Introduction}
 \section{List of defect components}
 \label{app:defcomp}
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|l|c|} \hline
-		\textbf{Insulation Joint} & $1$ \\ \hline
-		\textbf{Switches} & $2$ \\ \hline 
-	\end{tabular}
-	\hspace*{0.5cm}	
-	\begin{tabular}{|l|c|} \hline
-		\textbf{Bankett} & 2 \\ \hline 
-		\textbf{Befestigung} & 3\\ \hline
-		\textbf{Dienstweg} & 4\\ \hline
+		\textbf{Bankett} & 0 \\ \hline 
+		\textbf{Befestigung} & 1\\ \hline
+		\textbf{Dienstweg} & 2\\ \hline
+		\textbf{EKW / DKW} & 3\\ \hline
+		\textbf{Einfache und symmetrische Weiche} & 4\\ \hline
 		\textbf{Entwässerungsgraben} & 5\\ \hline
 		\textbf{Fahrbahn} & 6\\ \hline
 		\textbf{Gleis} & 7\\ \hline
 		\textbf{Gleisbettung} & 8\\ \hline
-		\textbf{Herzstück} & 9\\ \hline
-		\textbf{Herzstückspitze} & 10\\ \hline
-		\textbf{Kleber} & 11\\ \hline
-		\textbf{Schiene} & 12\\ \hline
-		\textbf{Schienenzwischenlage} & 13\\ \hline
-		\textbf{Schotter} & 14\\ \hline
-		\textbf{Schweissverbindung} & 15\\ \hline
-		\textbf{Schwelle} & 16\\ \hline
-		\textbf{Stockschiene} & 17\\ \hline
-		\textbf{Vignolschiene} & 18\\ \hline
-		\textbf{Weiche} & 19\\ \hline
-		\textbf{Zungenschiene} & 20\\ \hline
+		\textbf{Halbe Zungenvorrichtung} & 9\\ \hline
+		\textbf{Herzstück} & 10\\ \hline
+		\textbf{Herzstückspitze} & 11\\ \hline
+		\textbf{Kleber} & 12\\ \hline
+		\textbf{Rippenplatte} & 13\\ \hline
+		\textbf{Schiene} & 14\\ \hline
+		\textbf{Schienenklemme} & 15\\ \hline
+		\textbf{Schienenzwischenlage} & 16\\ \hline
+		\textbf{Schotter} & 17\\ \hline
+		\textbf{Schweissverbindung} & 18\\ \hline
+		\textbf{Schwelle} & 19\\ \hline
+		\textbf{Stockschiene} & 20\\ \hline
+		\textbf{Vignolschiene} & 21\\ \hline
+		\textbf{Weiche} & 22\\ \hline
+		\textbf{Zungenschiene} & 23\\ \hline
+	\end{tabular}
+	\hspace*{0.5cm}	
+	\begin{tabular}{|l|c|} \hline
+		\textbf{Insulation Joint} & 24 \\ \hline
+		\textbf{Switches} & 25 \\ \hline 
 	\end{tabular}
 	\caption{Defect components along with class labels}
 \end{table}
@@ -535,14 +550,16 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 		\textbf{Grundparameter}\\ \hline
 		\textbf{Gleisgeometrie, Spurweite} \\ \hline
 		\textbf{Gleisgeometrie, Standardabweichungen}\\ \hline
-		\textbf{Head-Checking:  Periodische Rissbildung / Ausbrechungen an der Fahrkante} \\ \hline 
+		\textbf{Head-Checking:  Periodische Rissbildung} \\
+		\textbf{/ Ausbrechungen an der Fahrkante} \\ \hline 
 		\textbf{Isolierstoss mit Überwalzung}\\ \hline
 		\textbf{Kilometer-, Hektometer- oder Metertafeln} \\ \hline
 		\textbf{Lose/fehlende Schienenbefestigung}\\ \hline
 		\textbf{Lose/fehlende Schwellenbefestigung}\\ \hline
 		\textbf{Mitten in der Schienenlänge: Oberflächenfehler}\\ \hline
 		\textbf{Mitten in der Schienenlänge: Schleuderstellen oder Schnellbremsspuren}\\ \hline
-		\textbf{Mitten in der Schienenlänge: Squat / Rissbildung und örtliche Einsenkung der Lauffläche}\\ \hline
+		\textbf{Mitten in der Schienenlänge: Squat} \\
+		\textbf{/ Rissbildung und örtliche Einsenkung der Lauffläche}\\ \hline
 		\textbf{Oberflächlicher Fehler (Flügelschiene oder Herz)}\\ \hline
 		\textbf{Schienenende: Sprödbruch}\\ \hline
 		\textbf{Schienenende: Verquetschung}\\ \hline
@@ -582,14 +599,75 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 	\label{fig:veh2}
 \end{figure}
 
+\section{Defects in Introduction}
+\label{app:introdefects}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_2_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_2_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_2_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_2_AXLE_42_819Z_DFZ01}
+	\caption{Schwelle: \textit{Beschadigte Betonschwellen} (A-118152)}
+\end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_42_819Z_DFZ01}
+	\caption{Fahrbahn: \textit{Verletzungen} (A-233599)}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_12_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_12_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_12_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_12_AXLE_42_819Z_DFZ01}
+	\caption{Vignolschiene: \textit{Verletzungen} (A-231400)}
+\end{figure}
+
+%range
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_0_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_0_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_0_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_0_AXLE_42_819Z_DFZ01}
+	\caption{Gleis-149.8m: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-184063)}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_2_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_2_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_2_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_2_AXLE_42_819Z_DFZ01}
+	\caption{Schienenzwischenlage-5.0m: \textit{Weiterer Abweichungstyp} (A-146358)}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_1_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_1_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_1_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_1_AXLE_42_819Z_DFZ01}
+	\caption{Bankett-1169.5m: \textit{Ungenugendes Schotterprofil} (A-103213)}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix Implementation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
 %%%%% Switches
-\begin{comment}
+%\begin{comment}
 \subsection{Switches}
 \begin{figure}[H]
 	\centering
@@ -846,7 +924,7 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Zungenschiene_0_AXLE_42_425Z_DFZ01}
 	\caption{Zungenschiene}
 \end{figure}
-\end{comment}
+%\end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix Evaluation

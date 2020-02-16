@@ -7,6 +7,8 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import regularizers
 import tensorflow.keras.metrics as tkm
 import tensorflow as tf
+import tensorflow_addons as tfa
+
 
 from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import StandardScaler
@@ -30,8 +32,8 @@ from matplotlib.ticker import StrMethodFormatter
 
 random.seed(2)        # Python
 np.random.seed(2)     # numpy
-tf.set_random_seed(2) # tensorflow
-#tf.random.set_seed(2)
+#tf.set_random_seed(2) # tensorflow
+tf.random.set_seed(2)
 
 def create_dir(folder):
   if not os.path.exists(folder):
@@ -146,18 +148,11 @@ class ModelMaker():
 ### NN class ###
 ################
 class NN():
-    def __init__(self, epochs, batch_size, create_dir_bool = True, verbose = 2):
+    def __init__(self, epochs, batch_size, n_classes, create_dir_bool = True, verbose = 2):
         print("########## Init NN ##########")
-        self.metrics = [tkm.CategoricalAccuracy(name='ACC'),
-                        #'accuracy',
-                        tkm.TruePositives(name='TP'),
-                        tkm.FalsePositives(name='FP'),
-                        tkm.TrueNegatives(name='TN'),
-                        tkm.FalseNegatives(name='FN'),
-                        tkm.Precision(name='Precision'),
-                        tkm.Recall(name='Recall'),
-                        tkm.AUC(name='AUC')]
+        self.metrics = [tkm.CategoricalAccuracy(name='ACC')]
 
+        self.n_classes = n_classes
         self.exp_desc = ""
         self.verbose  = verbose
         self.epochs   = epochs
@@ -173,16 +168,15 @@ class NN():
         """
         print("########## Prepare Data ##########")
         self.n_features = len(X.columns)
-        self.n_classes  = len(np.unique(y))
 
         tmp_X = np.vstack([v for v in X.accelerations])
         # Maybe dont need flatten, minus 2 since labels start from 2
-        tmp_y = to_categorical(y.values.flatten(), num_classes=self.n_classes)
+        tmp_y = to_categorical(y, num_classes=self.n_classes)
 
         if oversampling:
             print("    *Oversampling*")
             smote = SMOTE('all', k_neighbors=3,random_state=2)
-            tmp_X, tmp_y = smote.fit_sample(tmp_X, y.values)
+            tmp_X, tmp_y = smote.fit_sample(tmp_X, y)
 
         print("    *Normalisation*")
         scaler = StandardScaler()
@@ -248,6 +242,7 @@ class NN():
         Evaluate model on validation set.
         """
         print("########## Measure Performance ##########")
+        print(self.results)
         self.results = self.model.evaluate(self.X_val, self.y_val,
                                            batch_size=self.batch_size,
                                            verbose=self.verbose)
@@ -297,18 +292,13 @@ class NN():
         history = self.history
         for n, metric in enumerate(self.model.metrics_names):
             fig = plt.figure(figsize=(20,25))
-            #name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
-            name = re.sub(r"\d+", "", metric.replace("true_positives_", "Tp").upper())
+            name = re.sub(r"\d+", "", metric.replace("_", " ").capitalize())
 
             train_history = history.history[metric]
             val_history   = history.history['val_' + metric]
             ylim0 = min(train_history + val_history)
             ylim1 = max(train_history + val_history)
 
-            #print("lims")
-            #print(ylim0, ylim1)
-
-            #plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}')) # No decimal places
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}')) # 2 decimal places
 
             plt.subplot(5, 2, n + 1)
@@ -328,6 +318,7 @@ class NN():
         matrix = confusion_matrix(self.true_y_val,
                                   self.prediction,
                                   labels=np.arange(self.n_classes))
+
         fig = plt.figure(figsize=(12, 10))
         ax = fig.add_subplot()
 
@@ -341,10 +332,11 @@ class NN():
                     fmt="d", ax=ax)
         bottom, top = ax.get_ylim()
         ax.set_ylim(bottom + 0.5, top - 0.5)
+        ax.xaxis.tick_top()
+        ax.xaxis.set_label_position('top')
 
-        plt.title("Confusion Matrix")
-        plt.ylabel("True Label")
-        plt.xlabel("Predicted Label")
+        plt.ylabel("True Label", fontsize=16)
+        plt.xlabel("Predicted Label", fontsize=16)
         plt.show()
         fig.savefig(self.date + "/CONFMAT_%s"%(self.exp_desc),  bbox_inches='tight')
 
@@ -362,14 +354,15 @@ class NN():
         self.verbose = 0
         for i in range(repetitions):
             print("******************* EXP " + str(i) + " *******************")
-            self.exp_desc = "EXP" + str(i)
+            self.exp_desc = "EXP " + str(i)
+            self.make_model("model1")
             self.fit()
             self.classify()
             self.save_history()
             self.measure_performance()
             self.save_model()
             #self.plot_metrics()
-            #self.plot_confusion_matrix()
+            self.plot_confusion_matrix()
             for n, metric in enumerate(self.model.metrics_names):
                 print(">%d %s: %3.2f"%(i, metric, self.results[n]))
             scores.append(self.results)
@@ -398,7 +391,7 @@ class NN():
                                         verbose=2,
                                         mode='min')
 
-        self.callbacks      = [early_stopping, checkpoint]
+        self.callbacks      = [checkpoint]
 
     def _convertFromCategorical(self, arr):
         """
@@ -434,11 +427,9 @@ class NN():
     def _summarize_results(self, scores):
         print(">>> Summarize results <<<")
         m, s = np.mean(scores, axis=0), np.std(scores, axis=0)
-        print(scores)
         for i, metric in enumerate(self.model.metrics_names):
             print('Overall %s: %.3f%% (+/-%.3f)' % (metric, m[i], s[i]))
         print()
-
 
     def _summarize_plots(self, history):
         print(">>> Summarized training plots <<<")
@@ -457,15 +448,20 @@ class NN():
                 val_metrics[val_metric].append(val_vals)
 
         # metric: std/average for each epochs
-        #print(train_metrics)
-        #list(map(lambda x: (float(5)/9)*(x-32), fahrenheit.values()))
-        train_avg = { key: np.mean(list(train_metrics[key]), axis=0) for key in train_metrics}
-
-        train_std = { key: np.std(list(val), axis=0) for key, val in train_metrics.items()}
-
-        val_avg = { key: np.mean(list(val), axis=0) for key, val in val_metrics.items()}
-        val_std = { key: np.std(list(val), axis=0) for key, val in val_metrics.items()}
-
+        # This can be done way better, but I was debugging:
+        #   Each metric has to be a square matrix, no early stopping to keep epochs equal
+        train_avg = {i: [] for i in self.model.metrics_names}
+        train_std = {i: [] for i in self.model.metrics_names}
+        val_avg = {i: [] for i in self.model.metrics_names}
+        val_std = {i: [] for i in self.model.metrics_names}
+        for n, metric in enumerate(self.model.metrics_names):
+            val_metric = 'val_' + metric
+            v = list(val_metrics[val_metric])
+            t = list(train_metrics[metric])
+            train_avg[metric] = np.mean(t, axis=0)
+            train_std[metric] = np.std(t, axis=0)
+            val_avg[val_metric] = np.mean(v, axis=0)
+            val_std[val_metric] = np.std(v, axis=0)
 
         # Average metric plot
         print(">>> Average metric plot")
@@ -477,6 +473,7 @@ class NN():
             plt.errorbar(np.arange(self.epochs)+0.01, val_avg[val_metric], val_std[val_metric],
                          marker = '.', linestyle='none', capsize=3, label = 'Val')
             plt.title('Average ' + metric)
+            plt.xticks(range(self.epochs))
             plt.xlabel('Epoch')
             plt.ylabel(metric)
             plt.legend(loc = 1)
@@ -497,7 +494,8 @@ class NN():
                 fig = plt.figure(figsize=(10,6))
                 plt.plot(np.arange(self.epochs), t[i], label='Train')
                 plt.plot(np.arange(self.epochs), v[i], linestyle="--", label='Val')
-                plt.title("Exp" + str(i) + ": " + metric)
+                plt.title("Exp " + str(i) + ": " + metric)
+                plt.xticks(range(self.epochs))
                 plt.xlabel('Epoch')
                 plt.ylabel(metric)
                 plt.ylim([ybot, ytop])
