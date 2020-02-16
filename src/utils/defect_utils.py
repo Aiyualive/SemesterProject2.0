@@ -3,64 +3,25 @@ import pandas as pd
 from scipy.signal import find_peaks
 from tqdm import tqdm
 
-class featureset():
+class Featureset():
     """
     Generate dataframe containing features for classification
+        obs: can extend to individual axes
     """
     def __init__(self, obj, peak_offset=1, window_offset=0.5):
         self.peak_offset   = peak_offset
         self.window_offset = window_offset
-        self.defects      = makeDefectDF(obj,
+        self.defects      = make_defect(obj,
                                         find_peak_offset=peak_offset,
                                         window_offset=window_offset)
-        self.switches     = makeGenericDF(obj, "switches",
+        self.switches     = make_entity(obj, "switches",
                                           find_peak_offset=peak_offset,
                                           window_offset=window_offset)
-        self.ins_joints   = makeGenericDF(obj, "insulationjoint",
+        self.ins_joints   = make_entity(obj, "insulationjoint",
                                           find_peak_offset=peak_offset,
                                           window_offset=window_offset)
 
-    def makeDefects(self, obj):
-        self.defect11     = makeDefectDF(obj, "AXLE_11")
-        self.defect12     = makeDefectDF(obj, "AXLE_12")
-        self.defect41     = makeDefectDF(obj, "AXLE_41")
-        self.defect42     = makeDefectDF(obj, "AXLE_42")
-        self.defects      = pd.concat([self.defect11,
-                                       self.defect12,
-                                       self.defect41,
-                                       self.defect42])
-
-        return self.defects
-
-    def makeSwitches(self, obj):
-        """
-        DEPRECATED
-        """
-        self.switches11   = makeSwitchesDF(obj, "AXLE_11")
-        self.switches12   = makeSwitchesDF(obj, "AXLE_12")
-        self.switches41   = makeSwitchesDF(obj, "AXLE_41")
-        self.switches42   = makeSwitchesDF(obj, "AXLE_42")
-        self.switches     = pd.concat([self.switches11,
-                                       self.switches12,
-                                       self.switches41,
-                                       self.switches42])
-        return self.switches
-
-    def makeInsJoints(self, obj):
-        """
-        DEPRECATED
-        """
-        self.ins_joints11 = makeInsulationJointsDF(obj, "AXLE_11")
-        self.ins_joints12 = makeInsulationJointsDF(obj, "AXLE_12")
-        self.ins_joints41 = makeInsulationJointsDF(obj, "AXLE_41")
-        self.ins_joints42 = makeInsulationJointsDF(obj, "AXLE_42")
-        self.ins_joints   = pd.concat([self.ins_joints11,
-                                       self.ins_joints12,
-                                       self.ins_joints41,
-                                       self.ins_joints42])
-        return self.ins_joints
-
-def findIndex(timestamps, start, end):
+def find_index(timestamps, start, end):
     """
     Given starting and ending time timestamps it returns the indexes
     of the closest timestamps in the first arg
@@ -74,7 +35,7 @@ def findIndex(timestamps, start, end):
 
     return indexes
 
-def findVehicleSpeed(time, obj):
+def find_vehicle_speed(time, obj):
     """
     Gets the vehicle speed closest to the specified time.
     params:
@@ -97,7 +58,7 @@ def findVehicleSpeed(time, obj):
 
     return speed
 
-def getPeakWindow(von, bis, find_peak_offset, window_offset, acc_time, a):
+def get_peak_window(von, bis, find_peak_offset, window_offset, acc_time, a):
     """
     First finds the highest peak within a peak finding window.
     Then this highest peak is centered by defining a window offset.
@@ -113,7 +74,7 @@ def getPeakWindow(von, bis, find_peak_offset, window_offset, acc_time, a):
     OBS:
         use of np.argmax() since find_peaks() does not work consistently if duplicate heights.
     alternative:
-        to findIndexes
+        to find_indexes
         acc_window = a_df[(aaa[time_label] >= von - find_peak_offset) &
                           (aaa[time_label] < bis + find_peak_offset)]
         but current method is faster
@@ -126,12 +87,13 @@ def getPeakWindow(von, bis, find_peak_offset, window_offset, acc_time, a):
         bis = tmp
 
     # Find all indexes contained within the peak searching window
-    indexes = findIndex(acc_time,
+    indexes = find_index(acc_time,
                          von - find_peak_offset,
                          bis + find_peak_offset)
 
     # Get highest peak
-    peak_idx = np.argmax(a[indexes]) + indexes[0]
+    # Abs to account for negative amplitude values
+    peak_idx = np.argmax(abs(a[indexes])) + indexes[0]
 
     # Center the peak
     start = int(peak_idx - window_offset)
@@ -143,7 +105,7 @@ def getPeakWindow(von, bis, find_peak_offset, window_offset, acc_time, a):
     accelerations = a[start:end]
     return timestamps, accelerations
 
-def getSeverity(severity):
+def get_severity(severity):
     """
     Converts the recorded severity into integer codes
     """
@@ -158,7 +120,7 @@ def getSeverity(severity):
     else:
         return -1 # undefined
 
-def getDirection(obj):
+def get_direction(obj):
     """
     Gets the driving direction of the vehicle for a measurement ride
     """
@@ -171,7 +133,7 @@ def getDirection(obj):
         raise Warning("Driving direction not unique")
     return direction
 
-def getSwitchComponent(obj):
+def get_switch_component(obj):
     """
     Adds the vehicle direction and returns the switch DataFrame
     """
@@ -184,7 +146,7 @@ def getSwitchComponent(obj):
     df_postrack.loc[cond_right, 'TRACK.data.direction_vehicleref'] = 'left'
     return df_postrack
 
-def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
+def make_defect(obj, axle='all', find_peak_offset=1, window_offset=0.5):
     """
     Makes the defect dataframe containing all relevant features.
     params:
@@ -205,7 +167,7 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
     nanosec   = 10**9
     samp_freq = 24000 # per sec
     window_offset = window_offset * samp_freq
-    driving_direction = getDirection(obj)
+    driving_direction = get_direction(obj)
 
     for ax in axle:
         dict_def_n  = dict.fromkeys(defect_type_names, 0)
@@ -220,7 +182,7 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
         columns = ["timestamps", "accelerations", "window_length(s)",
                    "severity", "vehicle_speed(m/s)", "axle",
                    "campagin_ID", "driving_direction",
-                   "defect_type", "defect_length(m)", "line, defect_ID",
+                   "defect_component", "defect_length(m)", "line, defect_ID", "entity_type",
                    "class_label"]
 
         for i, row in tqdm((obj.ZMON).iterrows(), total = len(obj.ZMON), desc="ZMON " + ax):
@@ -232,15 +194,15 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
             if interval == 0:
                 # Point defects
                 find_peak_offset_ = find_peak_offset * nanosec
-                vehicle_speed     = findVehicleSpeed(von, obj)
+                vehicle_speed     = find_vehicle_speed(von, obj)
             else:
                 ### Just using von and bis
                 find_peak_offset_ = 0
                 # Vehicle speed is found at the middle of the interval
                 midpoint          = int(( von + bis)/2 )
-                vehicle_speed     = findVehicleSpeed(midpoint, obj)
+                vehicle_speed     = find_vehicle_speed(midpoint, obj)
 
-            timestamps, acceleration = getPeakWindow(von, bis,
+            timestamps, acceleration = get_peak_window(von, bis,
                                                        find_peak_offset_, window_offset,
                                                        acc_time, acc)
 
@@ -250,7 +212,7 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
             dict_def_n[d_type] = n + 1
 
             window_length = (timestamps[-1] - timestamps[0]) / nanosec
-            severity      = getSeverity(row['ZMON.Abweichung.Dringlichkeit'])
+            severity      = get_severity(row['ZMON.Abweichung.Dringlichkeit'])
             #print(d_type, row['ZMON.Abweichung.Dringlichkeit'])
             identifier    = (row['ZMON.Abweichung.Linie_Nr'], row['ZMON.Abweichung.ID'])
             defect_length = interval * vehicle_speed
@@ -258,16 +220,16 @@ def makeDefectDF(obj, axle='all', find_peak_offset=1, window_offset=0.5):
             temp_df = pd.DataFrame([[timestamps, acceleration, window_length,
                                      severity, vehicle_speed, ax,
                                      obj.campaign, driving_direction,
-                                     d_type, defect_length, identifier,
+                                     d_type, defect_length, identifier, "defect",
                                      defectToClass[d_type]]],
-                                   index   = [d_type + "_" + str(n) + "_" + ax],
+                                   index   = ["%s_%d_%s_%s"%(d_type, n, ax, obj.campaign)],
                                    columns = columns)
 
             d_df = pd.concat([d_df, temp_df], axis=0)
 
     return d_df
 
-def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
+def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
     if axle == 'all':
         axle = ['AXLE_11', 'AXLE_12', 'AXLE_41', 'AXLE_42']
     else:
@@ -281,15 +243,16 @@ def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
 
     # datarame
     df = pd.DataFrame()
-    driving_direction = getDirection(obj)
+    driving_direction = get_direction(obj)
 
     for ax in axle:
         columns = ["timestamps", "accelerations", "window_length(s)",
                    "severity", "vehicle_speed(m/s)", "axle",
-                   "campagin_ID", "driving_direction"]
+                   "campagin_ID", "driving_direction", "entity_type"]
 
         ### DEFECT ###
         if type == 'defect':
+            # I could just return the features from the make_defect
             raise Warning("Not yet implemented for defects")
 
         ### INSULATION JOINT ###
@@ -300,7 +263,7 @@ def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
 
         ### SWITCHES ###
         elif type == 'switches':
-            COMPONENT = getSwitchComponent(obj)
+            COMPONENT = get_switch_component(obj)
             time_label = "DFZ01.POS.FINAL_POSITION.timestamp." + ax[:-1]
             columns.extend(["crossingpath", "track_name",
                             "track_direction", "switch_ID", "class_label"])
@@ -318,18 +281,18 @@ def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
             if np.isnan(timestamp):
                 continue
 
-            timestamps, accelerations = getPeakWindow(
+            timestamps, accelerations = get_peak_window(
                                             timestamp, timestamp,
                                             find_peak_offset, window_offset,
                                             acc_time, acc)
 
             window_length = (timestamps[-1] - timestamps[0]) / nanosec
             severity = 5
-            vehicle_speed = findVehicleSpeed(timestamp, obj)
+            vehicle_speed = find_vehicle_speed(timestamp, obj)
 
             features = [timestamps, accelerations, window_length,
                         severity, vehicle_speed, ax,
-                        obj.campaign, driving_direction]
+                        obj.campaign, driving_direction, type]
 
             ### INSULATION JOINT ###
             if type == 'insulationjoint':
@@ -349,7 +312,7 @@ def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
                                 track_direction, switch_id, class_label])
 
             temp_df = pd.DataFrame([features],
-                                   index   = [type + "_" + str(count) + "_" + ax],
+                                   index   = ["%s_%d_%s_%s"%(type, count, ax, obj.campaign)],
                                    columns = columns)
 
             df = pd.concat([df, temp_df], axis=0)
@@ -357,7 +320,7 @@ def makeGenericDF(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
 
     return df
 
-def savePickle(campaign_objects, identifier, path="AiyuDocs/pickles/"):
+def save_pickle(campaign_objects, identifier, path="AiyuDocs/pickles/"):
     """
     campaign_objects: list of objects
 

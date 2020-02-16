@@ -33,19 +33,17 @@
 %%% Intro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current system is expensive, time consuming and ineffective. That is, maintenance agents need to walk along tracks and check them for defects. For visualisation purposes, there is roughly 5200 km of rails in Switzerland which needs to be inspected by 40 experienced inspectors.
+Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current track-condition assessment system is expensive, time consuming and ineffective, primarily involving manual inspection. 
 
+This condition assessment is evolving from a manual-labor based approach to a data-driven focused industrialized assessment. This paradigm shift from manual to data-driven approach is taking place at this current point in time, as more railway companies are making this transition and funding research within this area as seen in \cite{Sharma2018DatadrivenOO}, \cite{modeltrain}, \cite{Deutsche21:online}, \cite{Howdigit41:online}.
 
-"The condition assessment is evolving from a manual labour based approach to an industrialized assessment. This paradigm shift,.... (don't mention 40 inspectors, their job will in the future still be very important but at the office, checking false positives.)
+Switzerland's \textit{Swiss Federal Railways} (SBB), is one of those companies being a part of this paradigm shift. SBB has specifically built one special \textit{Diagnostic Vehicle} (Diagnosefahrzeug - DFZ) designed for defect detection and identification among other purposes. For this, accelerometers have been installed at the front and back of the DFZ to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
 
-In order to cope with this issue, \textit{Swiss Federal Railways} (SBB) has specifically built one special \textit{Diagnostic Vehicle} (Diagnosefahrzeug - DFZ) designed for defect detection and identification among other purposes. For this, accelerometers have been installed at the front and back of the DFZ to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
-
-A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online} about human activity recognition.
+A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online}, \cite{pmid28590422} about human activity recognition.
 
 \section{Objective}
-The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further towards reducing delays and making trains more punctual and reliable. In this development, the first step consists of identification and classification, while the second step ultimately consists of future defect prediction. 
+The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further toward a predictive maintenance which will result in a more reliable network \cite{unknown}.
 
-toward a predictive maintenance which will result in a more reliable network [cite article about predictive maintenance]
 \section{Defects}
 A defect can be seen as a deviation from a standard train track; and can be further sub-categorized based on official defect documentation \cite{rail:online} provided by \textit{International Union of Railways} (UIC). Upon inspection of defective tracks, SBB inspectors reports defects with reference to the UIC-based, defect report document by SBB. An example of this can be seen in \ref{app:report}.
 %Gleis	149.849086	(400, A-184063)	                  
@@ -65,7 +63,7 @@ Generally, a defect is separated into two overarching types: range- and point-de
 	\includegraphics[width = 0.2\textwidth]{imgs/defs/p(400,A-118152)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-231400)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-233599)0}
-	\caption{Left, middle, right: Schwelle (A-$118152$), Fahrbahn (A-$233599$), Vignolschiene (A-$231400$). The format is: track component (defect ID). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. (Source of pictures: SBB's defect report document)}
+	\caption{Left, middle, right: \\Schwelle: \textit{Beschädigte Betonschwellen} (A-$118152$), \\Fahrbahn: \textit{Verletzungen} (A-$233599$), \\Vignolschiene: \textit{Verletzungen} (A-$231400$). \\The format is: track component: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. (Source of pictures: SBB's defect report document)}
 \end{figure}
 \raggedbottom
 \begin{figure}[H]
@@ -81,50 +79,52 @@ Generally, a defect is separated into two overarching types: range- and point-de
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-103213)0}
-	\caption{Top, middle, bottom: Gleis-$149.8 m$ (A-$184063$), Schienenzwischenlage-$5.0 m$ (A-$146358$), Bankett-$1169.5 m$ (A-$231400$). The format is: track component-length (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
+	\caption{Top, middle, bottom:\\ Gleis-$149.8 m$: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-$184063$),\\ Schienenzwischenlage-$5.0 m$: \textit{Weiterer Abweichungstyp} (A-$146358$), Bankett-$1169.5 m$: \textit{Ungenügendes Schotterprofil} (A-$103213$).\\ The format is: track component-length: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
 \end{figure}
 \raggedbottom % to get of unnecessary vertical spacing
+Furthermore, each defect is associated with a variety of attributes such as: associated component, defect component location, defect type etc. For this work, the focus has been on the defect component/category. That is, the track component with which the defect was identified on (see appendix \ref{app:defcomp}). This is, however, only a rough classification, as this attribute exists at a 'higher level', seeing that the lowest level of defect sub-division is the actual defect type (see appendix \ref{app:deftyp} for a list of defect types).
 
-For this project, only the point defects are subject to analysis, as this simplifies the problem statement; range-defects and its associated factors are thus disregarded. In the future, range defects naturally also need to be taken into account.
+The defect attribute for analysis is not a trivial choice, as the signal responses likely depend on the defect type its associated component, its location on the component. In the future, it will be important to account for other attributes. Albeit, this work only considers the defect components. In the following, 'defect' will thus refer to these defect components.
+
+Finally, only the point defects are subject to analysis, as this simplifies the problem statement; range-defects and its associated factors are thus disregarded. In the future, range defects naturally also need to be taken into account.
 
 \section{Switches and insulation joints}
+To distinguish between defects and non-defects, this work also considers \textit{switches} and \textit{insulation joints}' seen in the figures \ref{fig:swi} and \ref{fig:ins}. The defect signals can vary a lot depending on the component. In addition, these sample amounts are far less compared to that of switches and insulation joints. With the incorporation of these non-defects,  we can thus have access to more samples, where these samples are suspected to have clearer signatures -- easier to classify.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.49\textwidth]{imgs/switch0}
 	\includegraphics[width = 0.49\textwidth]{imgs/switch1}
 	\caption{(Picture sources from right to left: \cite{swi0:online}, \cite{swi1:online})}
+	\label{fig:swi}
 \end{figure}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.49\textwidth]{imgs/ins_joint0}
 	\includegraphics[width = 0.49\textwidth]{imgs/ins_joint1}
 	\caption{(Picture sources from right to left: \cite{ins0:online}, \cite{ins1:online})}
+	\label{fig:ins}
 \end{figure}
 
-In this report, we will use the word 'entity' as an umbrella term for the different track entities: switch, insulation joint and defect.
+In this report, the word 'entity' will be used as an umbrella term for the different track entities: switch, insulation joint and defect.
 
 \section{Data}
 The data has been collected and provided by SBB. Using their DFZ, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After the data collection, the data is imported into a Python-VR object, which is composed of \verb|pandas| \verb|DataFrames|. \verb|Python| objects with pandas \verb|DataFrames| were chosen for their functional flexibility in terms of data storage and data accessibility.
 
 The accelerometers capture the accelerations at the vertical (Z) and transversal (Y) axes (along with the timestamps at each recording), of which, only the Z axis was considered, as it is assumed to be the most responsive to vertical perturbations. These accelerometers are installed on both leading (axle 1) and trailing axles (axle 4) of the measurement coach. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the DFZ. 
 
-In this work, we are using the DFZ measurement rides in table \ref{tab:rides} for classification.
+In this work, the following DFZ measurement rides in table \ref{tab:rides} are used for classification.
 
-%new_filenames = ['__new_gDFZ_2019-05-27T08_55_55_819Z_DFZ01', # s - 819Z_DFZ01
-%                 '__new_gDFZ_2019-05-27T10_03_59_077Z_DFZ01', # t - 077Z_DFZ01
-%                 '__new_gDFZ_2019-05-27T13_05_53_330Z_DFZ01', # u - 330Z_DFZ01
-%                 '__new_gDFZ_2019-05-27T14_10_51_425Z_DFZ01'] # v - 425Z_DFZ01
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c|c|} \hline
 		\textbf{From} & \textbf{To} & \textbf{Date} & \textbf{Campaign ID}\\ \hline \hline 
-		- & - &  \verb|2019-05-27T08_55_55| & \verb|819Z DFZ01| \\ \hline 
-		- & - &  \verb|2019-05-27T10_03_59| & \verb|077Z DFZ01| \\ \hline 
-		- & - &  \verb|2019-05-27T13_05_53| & \verb|330Z DFZ01| \\ \hline 
-		- & - &  \verb|2019-05-27T14_10_51| & \verb|425Z DFZ01| \\ \hline 
+		Bern & Olten &  \verb|2019-05-27T08_55_55| & \verb|819Z DFZ01| \\ \hline 
+		Olten & Bern &  \verb|2019-05-27T10_03_59| & \verb|077Z DFZ01| \\ \hline 
+		Bern & Olten &  \verb|2019-05-27T13_05_53| & \verb|330Z DFZ01| \\ \hline 
+		Olten & Bern &  \verb|2019-05-27T14_10_51| & \verb|425Z DFZ01| \\ \hline 
 	\end{tabular}
-	\caption{Measurement rides for classification}
+	\caption{Measurement rides for classification. ('From' and 'To' are cities in Switzerland)}
 	\label{tab:rides}
 \end{table}
 
@@ -132,7 +132,7 @@ Lastly, defect attributes and locations were retrieved from SBB's database and s
 
 \section{Code}
 \label{int:sec:code}
-The code is written purely in python. To create neural network architectures, we are using: \verb|keras| along with \verb|tensorflow|. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has a consistent, simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}. The models were trained in \verb|Google Colab|, which is a web application provided by Google that enables users to run python code in the web browser with access to GPUs\footnote{\url{https://colab.research.google.com/notebooks/intro.ipynb}}. It is very similar to \verb|Anaconda's| \verb|Jupyter Notebooks|, except that \verb|Colab| runs in the browser, is collaborative and provides free usage of GPUs (meaning model training goes faster).\\
+The code is written purely in python. To create neural network architectures, \verb|keras| along with \verb|tensorflow| is used. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has a consistent, simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}. The models were trained in \verb|Google Colab|, which is a web application provided by Google that enables users to run python code in the web browser with access to GPUs\footnote{\url{https://colab.research.google.com/notebooks/intro.ipynb}}. It is very similar to \verb|Anaconda's| \verb|Jupyter Notebooks|, except that \verb|Colab| runs in the browser, is collaborative and provides free usage of GPUs (meaning model training goes faster).\\
 
 
 \noindent All the code can be found on github: \\
@@ -141,7 +141,7 @@ The code is written purely in python. To create neural network architectures, we
 \noindent The specific model execution workflow can be found \verb|Colab|:\\
 \url{https://colab.research.google.com/drive/12VBz_KrJxeyR_pjpkC87fewv5aMSEI5_}
 
-keras version number, pandas version number, tensorflow version nmber
+%keras version number, pandas version number, tensorflow version nmber
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -159,28 +159,23 @@ For the process of defect classification the pipeline in figure \ref{fig:pipelin
 
 %--> reevaluation| Realised that the results were not very good. So we need to visualise the data and look for separability to make a better model
 
-2.0 Localization of the vehicle:
+\section{Localization of the DFZ}
 
 The vehicle is localized using the combination of multiple data streams: track transponders (Eurobalise) GPS signals, Odometers and Switch detection systems. The reported localization error has been determined to be quite small.
 
+The location is reported with respect to the GPS Antenna of the vehicle which is close to the pantograph. It is reported along with a timestamp corresponding to the location of the vehicle at that time at the location of the antenna. 
+
 \section{Shift of GPS timestamps}
-The location is reported with respect to the GPS Antenna of the vehicle which is close to the pantograph. The location is reported along with a timestamp corresponding to the location of the vehicle at that time at the locatio nof the antenna. \todo{todo}
+Since the exact position (covered distance) at each accelerometer at either side of the GPS antenna is unknown, the goal in this step is to compute these from the reported location of the DFZ. The GPS sensor is sampled at a lower frequency compared to the accelerometers (every $25$ cm vs $24$ kHz respectively). From this, the corresponding GPS positions for each accelerometer sample necessarily need to be found. This is done by linear interpolation using the timestamps of the accelerometers and GPS. 
 
-The SDV has its GPS sensor installed at a specified location on the vehicle body. However, what we need to achieve is the position (covered distance) at each accelerometer at either sides of the GPS. Since the GPS sensor is sampled at a lower frequency compared to the accelerometers (every $25$ cm vs $24$ kHz respectively), we first need to get the corresponding positions for each accelerometer sample. This is done by linear interpolation using the timestamps of the accelerometers and GPS. 
-
-Depending on the direction of the vehicle, the offset between the accelerometers and the GPS sensor positions on the vehicle body is added/subtracted.\todo{todo}
+Depending on the direction of the vehicle, the offset between the accelerometers and the GPS sensor positions on the vehicle body is then added/subtracted to achieve the accelerometer positions.
 
 \section{Peak windows}
 Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length -- wherein Within the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
 
 Since we are assuming that each track entity is identified by a well-formed peak, we first need to find this peak within a reasonable offset from the defect location, after which we center around that within another reasonable offset. 
 
-In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the highest acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
-
-the window offset can be very small (as small as possible without losing the peaks). Otherwise you will merge too many peaks using the peakfinder. 0.5 of even 0.1 should be ok. 
-
-peakfinder does not consider the opposite end of the peaks
-
+In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the maximum, absolute acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
 
 
 \section{Entity library}
@@ -199,18 +194,38 @@ Given a specific measurement ride object, we either retrieve each feature direct
 
 The implementation of this could have made more elegant by operating directly on the dataframe, which might also increase speed of the implementation as the \verb|pandas| library has optimised their dataframe operations. The However, speed and efficency was not a major concern in this project. 
 
-%refer to the defects presented in introduction,  appendix for more signals?
-% show two of each entity and for each axle.
+%refer to the defects presented in introduction?,  appendix for more signals?
 \begin{figure}[H]
 	\centering
-	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
-	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)0}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)1}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)0}
-	\includegraphics[width = 0.31\textwidth]{imgs/defs/r(400,A-184063)1}
-	\caption{Defects}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_6_AXLE_42_077Z_DFZ01}
+	\caption{Insulation Joint}
 \end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_11_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_12_425Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_41_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_46_AXLE_42_425Z_DFZ01}
+	\caption{Switches}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_8_AXLE_42_819Z_DFZ01}
+	\caption{Defect: vignolschiene}
+\end{figure}
+
+
 
 \section{Classification}
 We have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
@@ -378,6 +393,8 @@ Overall recall: 0.587% (+/-0.000)
 Overall auc: 0.572% (+/-0.031)
 \end{verbatim}
 
+average plots
+
 \section{Visualisation of class clustering}
 insert the pca plots
 
@@ -430,6 +447,8 @@ track entity dependent/specific window offsets
 
 tune the peak finding parameters
 
+the window offset can be very small (as small as possible without losing the peaks). Otherwise you will merge too many peaks using the peakfinder. 0.5 of even 0.1 should be ok. 
+
 \subsection{Identification of infrastructure}
 %To better identify infrastructure components and damages (entities), the order and distance between entities should be considered, as well as the uncertainty in the reported location of the entities themselves (databases are not always mm accurate) as well as the uncertainty in the reported location of the vehicle).
 %Expected from layout: "...I....S,I,....Weld,....I,..............I,...S,..W,.."
@@ -442,15 +461,13 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 \newpage
 \section{TODO}
 \begin{itemize}
+	\item PCA plots and get better results
 	\item add speed as a feature
 	\item visualise what the network is doing using Harry's code
-	\item Which type of defects are we actually working with, we can see that it does okay at the switches and ins joints, but no chance with the defects
 	\item concat all the axle channels and train on them
 	\item try to use low pass filter - (would make everything faster)
-	\item get better results
 	\item account for severity
-	\item You can put more citations, for example about some articles focusing on recognizing speech/sound, signals which have also very similar signatures
-	\item add description for the defects?
+	\item get rid of we
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -463,7 +480,7 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %--> UIC defect catalog which SBB uses as a base for classifying the defects
 %--> Some scientific articles on sound recognition/voice
 
-
+%You can put more citations, for example about some articles focusing on recognizing speech/sound, signals which have also very similar signatures
 \newpage
 \cleardoublepage
 \appendix
@@ -471,33 +488,74 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %%% Appendix introduction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-\section{List of defect categories}
+\section{List of defect components}
+\label{app:defcomp}
 \begin{table}[H]
 	\centering
-	\begin{tabular}{|c|} \hline
-		Bankett  \\ \hline 
-		Befestigung \\ \hline
-		Dienstweg \\ \hline
-		Entwässerungsgraben \\ \hline
-		Fahrbahn \\ \hline
-		Gleis \\ \hline
-		Gleisbettung \\ \hline
-		Herzstück \\ \hline
-		Herzstückspitze \\ \hline
-		Kleber \\ \hline
-		Schiene \\ \hline
-		Schienenzwischenlage \\ \hline
-		Schotter \\ \hline
-		Schweissverbindung \\ \hline
-		Schwelle \\ \hline
-		Stockschiene \\ \hline
-		Vignolschiene \\ \hline
-		Weiche \\ \hline
-		Zungenschiene \\ \hline
+	\begin{tabular}{|l|c|} \hline
+		\textbf{Insulation Joint} & $1$ \\ \hline
+		\textbf{Switches} & $2$ \\ \hline 
 	\end{tabular}
-	\caption{Defect categories}
+	\hspace*{0.5cm}	
+	\begin{tabular}{|l|c|} \hline
+		\textbf{Bankett} & 2 \\ \hline 
+		\textbf{Befestigung} & 3\\ \hline
+		\textbf{Dienstweg} & 4\\ \hline
+		\textbf{Entwässerungsgraben} & 5\\ \hline
+		\textbf{Fahrbahn} & 6\\ \hline
+		\textbf{Gleis} & 7\\ \hline
+		\textbf{Gleisbettung} & 8\\ \hline
+		\textbf{Herzstück} & 9\\ \hline
+		\textbf{Herzstückspitze} & 10\\ \hline
+		\textbf{Kleber} & 11\\ \hline
+		\textbf{Schiene} & 12\\ \hline
+		\textbf{Schienenzwischenlage} & 13\\ \hline
+		\textbf{Schotter} & 14\\ \hline
+		\textbf{Schweissverbindung} & 15\\ \hline
+		\textbf{Schwelle} & 16\\ \hline
+		\textbf{Stockschiene} & 17\\ \hline
+		\textbf{Vignolschiene} & 18\\ \hline
+		\textbf{Weiche} & 19\\ \hline
+		\textbf{Zungenschiene} & 20\\ \hline
+	\end{tabular}
+	\caption{Defect components along with class labels}
 \end{table}
 
+\section{List of defect types}
+\label{app:deftyp}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|} \hline
+		\textbf{AT-Schweissung mit Squat}\\ \hline
+		\textbf{Ausbruch in der Zunge} \\ \hline
+		\textbf{Bankett}\\ \hline
+		\textbf{Beschädigte Betonschwellen} \\ \hline 
+		\textbf{Entwässerung oder Wasserkanal verstopft}\\ \hline
+		\textbf{Gleisgeometrie} \\ \hline
+		\textbf{Grundparameter}\\ \hline
+		\textbf{Gleisgeometrie, Spurweite} \\ \hline
+		\textbf{Gleisgeometrie, Standardabweichungen}\\ \hline
+		\textbf{Head-Checking:  Periodische Rissbildung / Ausbrechungen an der Fahrkante} \\ \hline 
+		\textbf{Isolierstoss mit Überwalzung}\\ \hline
+		\textbf{Kilometer-, Hektometer- oder Metertafeln} \\ \hline
+		\textbf{Lose/fehlende Schienenbefestigung}\\ \hline
+		\textbf{Lose/fehlende Schwellenbefestigung}\\ \hline
+		\textbf{Mitten in der Schienenlänge: Oberflächenfehler}\\ \hline
+		\textbf{Mitten in der Schienenlänge: Schleuderstellen oder Schnellbremsspuren}\\ \hline
+		\textbf{Mitten in der Schienenlänge: Squat / Rissbildung und örtliche Einsenkung der Lauffläche}\\ \hline
+		\textbf{Oberflächlicher Fehler (Flügelschiene oder Herz)}\\ \hline
+		\textbf{Schienenende: Sprödbruch}\\ \hline
+		\textbf{Schienenende: Verquetschung}\\ \hline
+		\textbf{Schienenende: örtliche Einsenkung der Lauffläche}\\ \hline
+		\textbf{Schotter auf Schwellen}\\ \hline
+		\textbf{Schotterfliessen, weisser Schotter}\\ \hline
+		\textbf{Ungenügendes Schotterprofil}\\ \hline
+		\textbf{Verletzungen}\\ \hline
+		\textbf{Weiterer Abweichungstyp}\\ \hline
+		\textbf{Zungenspitze angefahren}\\ \hline
+	\end{tabular}
+	\caption{Defect types}
+\end{table}
 \section{Vehicle and accelerometer placements}
 \label{figs:veh}
 \begin{figure}[H]
@@ -530,26 +588,265 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %%% Appendix Implementation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
-%\foreach \n in {0,1,2,3,4,5,6,7,9}{
-%	\begin{figure}[H]
-%	\foreach \k in {0,1,2,3,4,5,6,7,8,9}{
-%		\ifnum\n=\k
-%		\else
-%		\begin{subfigure}[b]{0.19\textwidth}
-%			\centering
-%			\includegraphics[width=\textwidth]{../Cleaning/wekapics/WEKAmnist_all2000CLASS\n_\k}
-%			\caption{Class \n vs\k}
-%			\label{class_\n\k}
-%		\end{subfigure}
-%		\fi
-%		}
-%	\caption{Comparisons with Class \n}
-%	\end{figure}
-%	\ifoddpage
-%		\clearpage
-%	\else
-%	\fi
-%}
+%%%%% Switches
+\begin{comment}
+\subsection{Switches}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_13_AXLE_11_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_13_AXLE_12_425Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_13_AXLE_41_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_13_AXLE_42_425Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_16_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_16_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_16_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_16_AXLE_42_077Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_17_AXLE_11_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_17_AXLE_12_425Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_17_AXLE_41_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_17_AXLE_42_425Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_18_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_18_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_18_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/switches_18_AXLE_42_077Z_DFZ01}
+\end{figure}
+
+%%%%% Ins joints
+\subsection{Insulation Joints}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_3_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_3_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_3_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_3_AXLE_42_077Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_42_077Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_14_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_14_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_14_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_14_AXLE_42_819Z_DFZ01}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/insulationjoint_5_AXLE_42_330Z_DFZ01}
+\end{figure}
+
+%%%%% Defects
+\subsection{Defects}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_0_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_0_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_0_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Bankett_0_AXLE_42_330Z_DFZ01}
+	\caption{Bankett}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Befestigung_0_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Befestigung_0_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Befestigung_0_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Befestigung_0_AXLE_42_819Z_DFZ01}
+	\caption{Befestigung}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Dienstweg_0_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Dienstweg_0_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Dienstweg_0_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Dienstweg_0_AXLE_42_330Z_DFZ01}
+	\caption{Dienstweg}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Entwässerungsgraben_0_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Entwässerungsgraben_0_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Entwässerungsgraben_0_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Entwässerungsgraben_0_AXLE_42_077Z_DFZ01}
+	\caption{Entwässerungsgraben}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/EKW_DKW_1_AXLE_11_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/EKW_DKW_1_AXLE_12_425Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/EKW_DKW_1_AXLE_41_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/EKW_DKW_1_AXLE_42_425Z_DFZ01}
+	\caption{EKW / DKW}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Fahrbahn_0_AXLE_42_330Z_DFZ01}
+	\caption{Fahrbahn}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_3_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_3_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_3_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleis_3_AXLE_42_330Z_DFZ01}
+	\caption{Gleis}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleisbettung_0_AXLE_11_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleisbettung_0_AXLE_12_330Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleisbettung_0_AXLE_41_330Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Gleisbettung_0_AXLE_42_330Z_DFZ01}
+	\caption{Gleisbettung}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Herzstück_1_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Herzstück_1_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Herzstück_1_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Herzstück_1_AXLE_42_077Z_DFZ01}
+	\caption{Herzstück}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schiene_16_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schiene_16_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schiene_16_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schiene_16_AXLE_42_077Z_DFZ01}
+	\caption{Schiene}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_1_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_1_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_1_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schienenzwischenlage_1_AXLE_42_819Z_DFZ01}
+	\caption{Schienenzwischenlage}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schotter_2_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schotter_2_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schotter_2_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schotter_2_AXLE_42_077Z_DFZ01}
+	\caption{Schotter}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schweissverbindung_0_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schweissverbindung_0_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schweissverbindung_0_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schweissverbindung_0_AXLE_42_819Z_DFZ01}
+	\caption{Schweissverbindung}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_0_AXLE_11_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_0_AXLE_12_077Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_0_AXLE_41_077Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Schwelle_0_AXLE_42_077Z_DFZ01}
+	\caption{Schwelle}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Stockschiene_1_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Stockschiene_1_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Stockschiene_1_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Stockschiene_1_AXLE_42_819Z_DFZ01}
+	\caption{Stockschiene}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_13_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_13_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_13_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Vignolschiene_13_AXLE_42_819Z_DFZ01}
+	\caption{Vignolschiene}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Weiche_0_AXLE_11_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Weiche_0_AXLE_12_819Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Weiche_0_AXLE_41_819Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Weiche_0_AXLE_42_819Z_DFZ01}
+	\caption{Vignolschiene}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Zungenschiene_0_AXLE_11_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Zungenschiene_0_AXLE_12_425Z_DFZ01}
+	
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Zungenschiene_0_AXLE_41_425Z_DFZ01}
+	\includegraphics[width = 0.49\textwidth]{../AiyuDocs/new_signalplots/Zungenschiene_0_AXLE_42_425Z_DFZ01}
+	\caption{Zungenschiene}
+\end{figure}
+\end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix Evaluation
@@ -568,45 +865,8 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 
 confusion matrix, epoch plots
 
-%\foreach \n in {0,1,2,3,4,5,6,7,9}{
-%	\begin{figure}[H]
-%	\foreach \k in {0,1,2,3,4,5,6,7,8,9}{
-%		\ifnum\n=\k
-%		\else
-%		\begin{subfigure}[b]{0.19\textwidth}
-%			\centering
-%			\includegraphics[width=\textwidth]{../Cleaning/wekapics/WEKAmnist_all2000CLASS\n_\k}
-%			\caption{Class \n vs\k}
-%			\label{class_\n\k}
-%		\end{subfigure}
-%		\fi
-%		}
-%	\caption{Comparisons with Class \n}
-%	\end{figure}
-%	\ifoddpage
-%		\clearpage
-%	\else
-%	\fi
-%}
 
-%\begin{table}[H]
-%	\centering
-%	\begin{tabular}{|c|c|} \hline
-%		\textbf{Latent Dimension} & $2$ \\ \hline
-%		\textbf{Shape} & 8 $\times$ $8$ \\ \hline
-%		\textbf{Latent s} &  $64$\\ \hline
-%		\textbf{Dist. Mixtures} &  Bernoulli\\ \hline \hline
-%		\textbf{Regularisation $\alpha$ } & $0.001$ \\ \hline
-%	\end{tabular}
-%	\hspace*{0.5cm}
-%	\begin{tabular}{|l|c|} \hline
-%		\textbf{RBF Dimension} & $2$ \\ \hline
-%		\textbf{RBF grid}  & $4\times4$ \\ \hline 
-%		\textbf{RBF centres} & $16$ \\ \hline
-%		\textbf{Basis function} & Gaussian \\ \hline
-%	    \textbf{Widths $\bm{\sigma}$} & $1.0$\\ \hline
-%	\end{tabular}
-%	\caption{The parameters for the latent model and the RBF neural network. Distribution mixtures and basis functions cannot be altered as our implementation is specific for the Bernoulli GTM version}
-%	\label{eval:model}
-%\end{table}
+
+
+
 \end{document}

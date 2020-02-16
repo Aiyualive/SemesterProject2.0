@@ -5,29 +5,31 @@
 \BOOKMARK [1][-]{section.1.4}{Data}{chapter.1}% 5
 \BOOKMARK [1][-]{section.1.5}{Code}{chapter.1}% 6
 \BOOKMARK [0][-]{chapter.2}{Design and Implementation}{}% 7
-\BOOKMARK [1][-]{section.2.1}{Shift of GPS timestamps}{chapter.2}% 8
-\BOOKMARK [1][-]{section.2.2}{Peak windows}{chapter.2}% 9
-\BOOKMARK [1][-]{section.2.3}{Entity library}{chapter.2}% 10
-\BOOKMARK [1][-]{section.2.4}{Classification}{chapter.2}% 11
-\BOOKMARK [2][-]{subsection.2.4.1}{NN class}{section.2.4}% 12
-\BOOKMARK [2][-]{subsection.2.4.2}{ModelMaker class}{section.2.4}% 13
-\BOOKMARK [1][-]{section.2.5}{Visualisation}{chapter.2}% 14
-\BOOKMARK [0][-]{chapter.3}{Evaluation}{}% 15
-\BOOKMARK [1][-]{section.3.1}{Models}{chapter.3}% 16
-\BOOKMARK [1][-]{section.3.2}{Model evaluations}{chapter.3}% 17
-\BOOKMARK [1][-]{section.3.3}{Visualisation of class clustering}{chapter.3}% 18
-\BOOKMARK [1][-]{section.3.4}{Discussion}{chapter.3}% 19
-\BOOKMARK [0][-]{chapter.4}{Conclusion and future work}{}% 20
-\BOOKMARK [1][-]{section.4.1}{Conclusion}{chapter.4}% 21
-\BOOKMARK [1][-]{section.4.2}{Future work}{chapter.4}% 22
-\BOOKMARK [2][-]{subsection.4.2.1}{Channels}{section.4.2}% 23
-\BOOKMARK [2][-]{subsection.4.2.2}{Peak windows}{section.4.2}% 24
-\BOOKMARK [2][-]{subsection.4.2.3}{Identification of infrastructure}{section.4.2}% 25
-\BOOKMARK [2][-]{subsection.4.2.4}{Real-world simulated defects}{section.4.2}% 26
-\BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 27
-\BOOKMARK [0][-]{appendix.A}{Introduction}{}% 28
-\BOOKMARK [1][-]{section.A.1}{List of defect categories}{appendix.A}% 29
-\BOOKMARK [1][-]{section.A.2}{Vehicle and accelerometer placements}{appendix.A}% 30
-\BOOKMARK [1][-]{section.A.3}{SBB defect report example}{appendix.A}% 31
-\BOOKMARK [1][-]{section.A.4}{Implementation}{appendix.A}% 32
-\BOOKMARK [0][-]{appendix.B}{Evaluation}{}% 33
+\BOOKMARK [1][-]{section.2.1}{Localization of the DFZ}{chapter.2}% 8
+\BOOKMARK [1][-]{section.2.2}{Shift of GPS timestamps}{chapter.2}% 9
+\BOOKMARK [1][-]{section.2.3}{Peak windows}{chapter.2}% 10
+\BOOKMARK [1][-]{section.2.4}{Entity library}{chapter.2}% 11
+\BOOKMARK [1][-]{section.2.5}{Classification}{chapter.2}% 12
+\BOOKMARK [2][-]{subsection.2.5.1}{NN class}{section.2.5}% 13
+\BOOKMARK [2][-]{subsection.2.5.2}{ModelMaker class}{section.2.5}% 14
+\BOOKMARK [1][-]{section.2.6}{Visualisation}{chapter.2}% 15
+\BOOKMARK [0][-]{chapter.3}{Evaluation}{}% 16
+\BOOKMARK [1][-]{section.3.1}{Models}{chapter.3}% 17
+\BOOKMARK [1][-]{section.3.2}{Model evaluations}{chapter.3}% 18
+\BOOKMARK [1][-]{section.3.3}{Visualisation of class clustering}{chapter.3}% 19
+\BOOKMARK [1][-]{section.3.4}{Discussion}{chapter.3}% 20
+\BOOKMARK [0][-]{chapter.4}{Conclusion and future work}{}% 21
+\BOOKMARK [1][-]{section.4.1}{Conclusion}{chapter.4}% 22
+\BOOKMARK [1][-]{section.4.2}{Future work}{chapter.4}% 23
+\BOOKMARK [2][-]{subsection.4.2.1}{Channels}{section.4.2}% 24
+\BOOKMARK [2][-]{subsection.4.2.2}{Peak windows}{section.4.2}% 25
+\BOOKMARK [2][-]{subsection.4.2.3}{Identification of infrastructure}{section.4.2}% 26
+\BOOKMARK [2][-]{subsection.4.2.4}{Real-world simulated defects}{section.4.2}% 27
+\BOOKMARK [1][-]{section.4.3}{TODO}{chapter.4}% 28
+\BOOKMARK [0][-]{appendix.A}{Introduction}{}% 29
+\BOOKMARK [1][-]{section.A.1}{List of defect components}{appendix.A}% 30
+\BOOKMARK [1][-]{section.A.2}{List of defect types}{appendix.A}% 31
+\BOOKMARK [1][-]{section.A.3}{Vehicle and accelerometer placements}{appendix.A}% 32
+\BOOKMARK [1][-]{section.A.4}{SBB defect report example}{appendix.A}% 33
+\BOOKMARK [1][-]{section.A.5}{Implementation}{appendix.A}% 34
+\BOOKMARK [0][-]{appendix.B}{Evaluation}{}% 35
