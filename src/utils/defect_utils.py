@@ -225,6 +225,26 @@ def make_defect(obj, axle='all', find_peak_offset=1, window_offset=0.5):
 
     return d_df
 
+def delAxWithNaN(df, NaN):
+    """
+    Delete all the axles that encountered NaN
+    OBS: Not very efficient way of deleting them, but it does the job
+    """
+    for index in NaN:
+        spl = index.split('AXLE_')
+        ax11 = spl[0] + 'AXLE_11'+ spl[1][2:]
+        ax12 = spl[0] + 'AXLE_12'+ spl[1][2:]
+        ax41 = spl[0] + 'AXLE_41'+ spl[1][2:]
+        ax42 = spl[0] + 'AXLE_42'+ spl[1][2:]
+
+        for a in [ax11, ax12, ax41, ax42]:
+            try:
+                df = df.drop(a)
+                print("Index: " + a + " is dropped")
+            except:
+                continue
+    return df
+
 def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
     if axle == 'all':
         axle = ['AXLE_11', 'AXLE_12', 'AXLE_41', 'AXLE_42']
@@ -240,7 +260,7 @@ def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
     # datarame
     df = pd.DataFrame()
     driving_direction = get_direction(obj)
-
+    NaN = []
     for ax in axle:
         columns = ["timestamps", "accelerations", "window_length(s)",
                    "severity", "vehicle_speed(m/s)", "axle",
@@ -272,9 +292,11 @@ def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
 
         count = 0
         for i, row in tqdm(COMPONENT.iterrows(), total = len(COMPONENT), desc=type + " " + ax):
-            timestamp = row[time_label]
+            timestamp  = row[time_label]
+            index_name = "%s_%d_%s_%s"%(type, count, ax, obj.campaign)
 
             if np.isnan(timestamp):
+                NaN.append(index_name)
                 continue
 
             timestamps, accelerations = get_peak_window(
@@ -304,11 +326,13 @@ def make_entity(obj, type, axle='all', find_peak_offset=1, window_offset=0.5):
                                 track_direction, switch_id])
 
             temp_df = pd.DataFrame([features],
-                                   index   = ["%s_%d_%s_%s"%(type, count, ax, obj.campaign)],
+                                   index   = [index_name],
                                    columns = columns)
 
             df = pd.concat([df, temp_df], axis=0)
             count += 1
+
+    df = delAxWithNaN(df, NaN)
 
     return df
 

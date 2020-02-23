@@ -1,8 +1,7 @@
 t_n = 1
-N = 24001
+N = 24000
 T = t_n / N
 f_s = 1/T
-
 
 from scipy.signal import welch
 from scipy.fftpack import fft
@@ -188,11 +187,18 @@ def plot_wavelet(df, savefigure=False, save_path="", waveletname = 'cmor1-1.5', 
             fig.savefig('AiyuDocs/test_imgs/wavelet_' + name,  bbox_inches='tight')
 
 def plot_lowpass(df, savefigure=False, save_path=""):
+    new = pd.DataFrame()
     for name, v in df.iterrows():
         acc = v['accelerations']
         fig, ax = plt.subplots(figsize=(12,8))
         ax.plot(acc, color="b", alpha=0.5, label='original signal')
+
         rec = _lowpassfilter(acc, 0.4)
+        temp_df = pd.DataFrame([rec],
+                                index   = [name],
+                                columns = ['accelerations'])
+        new = pd.concat([new, temp_df], axis=0)
+
         ax.plot(rec, 'k', label='DWT smoothing}', linewidth=2)
         ax.legend()
         ax.set_title('Removing High Frequency Noise with DWT', fontsize=18)
@@ -203,6 +209,7 @@ def plot_lowpass(df, savefigure=False, save_path=""):
 
         if savefigure == True:
             fig.savefig('AiyuDocs/test_imgs/lowpass_' + name,  bbox_inches='tight')
+    return new
 
 def plot_waveletfilter(df, savefigure=False, save_path=""):
     for name, v in df.iterrows():

@@ -33,63 +33,57 @@
 %%% Intro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current track-condition assessment system is expensive, time consuming and ineffective, primarily involving manual inspection. 
+Railway companies need to continuously and sufficiently maintain the train tracks and optimally detect defects in order to have a more punctual and more effective train system. However, the current track-condition assessment system is expensive, time consuming and ineffective, primarily involving manual inspection. This condition assessment is evolving from a manual-labor based approach to a data-driven focused industrialized assessment. This paradigm shift from manual to data-driven approach is taking place at this current point in time, as more railway companies are making this transition and funding research within this area as seen in \cite{Sharma2018DatadrivenOO}, \cite{modeltrain}, \cite{Deutsche21:online} and \cite{Howdigit41:online}.
 
-This condition assessment is evolving from a manual-labor based approach to a data-driven focused industrialized assessment. This paradigm shift from manual to data-driven approach is taking place at this current point in time, as more railway companies are making this transition and funding research within this area as seen in \cite{Sharma2018DatadrivenOO}, \cite{modeltrain}, \cite{Deutsche21:online}, \cite{Howdigit41:online}.
+Switzerland's \textit{Swiss Federal Railways} (SBB), is one of those companies being a part of this paradigm shift. SBB has specifically built one special \textit{Diagnostic Vehicle} (Diagnosefahrzeug - DFZ) designed for defect detection and identification among other purposes. For this, accelerometers have been installed at the front and back of the DFZ to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh} for the accelerometer positions).
 
-Switzerland's \textit{Swiss Federal Railways} (SBB), is one of those companies being a part of this paradigm shift. SBB has specifically built one special \textit{Diagnostic Vehicle} (Diagnosefahrzeug - DFZ) designed for defect detection and identification among other purposes. For this, accelerometers have been installed at the front and back of the DFZ to collect the signal responses from the wheel and the train track (see appendix \ref{figs:veh}).
-
-A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each type of defect will have a specific signature that will allow its identification and classification. This is similar to the idea presented in \cite{Introduc31:online}, \cite{pmid28590422} about human activity recognition.
+A defect in train tracks can be seen as a discontinuity. As a train passes over this discontinuity, it will result in a perturbation that can be detected by sensors. It is our main assumption that each defect type will have a specific signature, which will allow for its identification and classification. This assumption is well-grounded in the litterature as seen in \cite{Introduc31:online}, \cite{pmid28590422} where the assumption is made for human activity recognition.
 
 \section{Objective}
-The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further toward a predictive maintenance which will result in a more reliable network \cite{unknown}.
+The objective of this project is to identify and classify rail surface defects. We aim to build an effective machine learning pipeline that takes information about defects as input and outputs a classification confidence for these defects. By succesfully identifying and classifying the defects, we take one step further toward predictive train-infrastucture maintenance, which will ultimately result in a more reliable network \cite{unknown}.
 
 \section{Defects}
 \label{sec:defects}
 A defect can be seen as a deviation from a standard train track; and can be further sub-categorized based on official defect documentation \cite{rail:online} provided by \textit{International Union of Railways} (UIC). Upon inspection of defective tracks, SBB inspectors reports defects with reference to the UIC-based, defect report document by SBB. An example of this can be seen in \ref{app:report}.
-%Gleis	149.849086	(400, A-184063)	                  
-%chienenzwischenlage	4.989620	(400, A-146358)	
-%Bankett	1169.510537	(400, A-103213)
-%Schwelle	0.000000	(400, A-118152)	
-%Vignolschiene	0.000000	(400, A-231400)	
-%Fahrbahn	0.000000	(400, A-233599)	
-%First column is track types (object)
 
-Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. 
+Generally, a defect is separated into two overarching types: range- and point-defects. I.e. a defect that is detected at a single point versus a defect that is detected at varying lengths. A point defect is perceived as a sharp signal response, whereas a range-defect is perceived over a greater time period. Examples of point and range defects can be seen respectively in \ref{fig:pointdef} and \ref{fig:rangedef}.
 \begin{figure}[H]
+	
 	\centering
 	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
 	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
 	\includegraphics[width = 0.2\textwidth]{imgs/defs/p(400,A-118152)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-231400)0}
 	\includegraphics[width = 0.38\textwidth]{imgs/defs/p(400,A-233599)0}
-	\caption{Left, middle, right: \\Schwelle: \textit{Beschädigte Betonschwellen} (A-$118152$), \\Fahrbahn: \textit{Verletzungen} (A-$233599$), \\Vignolschiene: \textit{Verletzungen} (A-$231400$). \\The format is: track component: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. (Source of pictures: SBB's defect report document)}
+	\caption{\textbf{Left}: Schwelle: \textit{Beschädigte Betonschwellen} (A-$118152$); \textbf{middle:} Fahrbahn: \textit{Verletzungen} (A-$233599$); \textbf{right:} Vignolschiene: \textit{Verletzungen} (A-$231400$). The format is: track component: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length equals to zero, and thus have been classified as point defects using our terminology. (Source of pictures: SBB's defect report document)}
+	\label{fig:pointdef}
 \end{figure}
 \raggedbottom
 \begin{figure}[H]
 	\centering
 	%\includegraphics[width = 0.49\textwidth]{imgs/defs/p(400,A-103206)0}
 	%\caption{Defect ID: A-$103206$; Report set ID: $400$}
-	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-184063)0}
-	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-184063)1}
+	\includegraphics[width = 0.29\textwidth]{imgs/defs/r(400,A-184063)0}
+	\includegraphics[width = 0.29\textwidth]{imgs/defs/r(400,A-184063)1}
 	
-	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-146358)0}
-	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-146358)1}
+	\includegraphics[width = 0.29\textwidth]{imgs/defs/r(400,A-146358)0}
+	\includegraphics[width = 0.29\textwidth]{imgs/defs/r(400,A-146358)1}
 \end{figure}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 0.3\textwidth]{imgs/defs/r(400,A-103213)0}
-	\caption{Top, middle, bottom:\\ Gleis-$149.8 m$: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-$184063$),\\ Schienenzwischenlage-$5.0 m$: \textit{Weiterer Abweichungstyp} (A-$146358$),\\ Bankett-$1169.5 m$: \textit{Ungenügendes Schotterprofil} (A-$103213$).\\ The format is: track component-length: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
+	\includegraphics[width = 0.29\textwidth]{imgs/defs/r(400,A-103213)0}
+	\caption{\textbf{Top:} Gleis-$149.8 m$: \textit{Head-Checking: Periodische Rissbildung / Ausbrechungen an der Fahrkante} (A-$184063$); \textbf{middle:} Schienenzwischenlage-$5.0 m$: \textit{Weiterer Abweichungstyp} (A-$146358$); \textbf{bottom}: Bankett-$1169.5 m$: \textit{Ungenügendes Schotterprofil} (A-$103213$). The format is: track component-length: \textit{defect type} (defect ID). These have all been reported as defects (with subcategories) with a length strictly greater than zero, and thus have been classified as range defects using our terminology. Most of these range defects have two pictures likely to give more detail. (Source of pictures: SBB's defect report document)}
+	\label{fig:rangedef}
 \end{figure}
 \raggedbottom % to get of unnecessary vertical spacing
 Furthermore, each defect is associated with a variety of attributes such as: associated component, defect component location, defect type etc. For this work, the focus has been on the defect component/category. That is, the track component with which the defect was identified on (see appendix \ref{app:defcomp}). This is, however, only a rough classification, as this attribute exists at a 'higher level', seeing that the lowest level of defect sub-division is the actual defect type (see appendix \ref{app:deftyp} for a list of defect types).
 
-The defect attribute for analysis is not a trivial choice, as the signal responses likely depend on the defect type its associated component, its location on the component. In the future, it will be important to account for other attributes. Albeit, this work only considers the defect components. In the following, 'defect' will thus refer to these defect components.
+The defect attribute for analysis is not a trivial choice, as the signal responses likely depend on the defect type, its associated component and its location on the component etc. In the future, it will be important to account for other attributes. Albeit, this work only considers the defect components. In the following, 'defect' will thus refer to these defect components.
 
 Finally, only the point defects are subject to analysis, as this simplifies the problem statement; range-defects and its associated factors are thus disregarded. In the future, range defects naturally also need to be taken into account.
 
 \section{Switches and insulation joints}
-To distinguish between defects and non-defects, this work also considers \textit{switches} and \textit{insulation joints}' seen in the figures \ref{fig:swi} and \ref{fig:ins}. The defect signals can vary a lot depending on the component. In addition, these sample amounts are far less compared to that of switches and insulation joints. With the incorporation of these non-defects,  we can thus have access to more samples, where these samples are suspected to have clearer signatures -- easier to classify.
+To distinguish between defects and non-defects, this work also considers \textit{switches} and \textit{insulation joints}' seen in the figures \ref{fig:swi} and \ref{fig:ins}. Fact of the matter, is that, defect signals can vary a lot depending on the defect component. In addition, these sample amounts are far less compared to that of switches and insulation joints. With the incorporation of these non-defects, access to more samples is achieved, while these samples are suspected to have clearer signatures -- easier to classify.
 
 \begin{figure}[H]
 	\centering
@@ -106,12 +100,12 @@ To distinguish between defects and non-defects, this work also considers \textit
 	\label{fig:ins}
 \end{figure}
 
-In this report, the word 'entity' will be used as an umbrella term for the different track entities: switch, insulation joint and defect.
+In order to not get confused about the different terms, the word 'entity' will be used as an umbrella term for the different track entities: switch, insulation joint and defect.
 
 \section{Data}
 The data has been collected and provided by SBB. Using their DFZ, SBB has made trips back and forth to different cities in Switzerland in order to collect various data including but not limited to accelerometer data. After the data collection, the data is imported into a Python-VR object, which is composed of \verb|pandas| \verb|DataFrames|. \verb|Python| objects with pandas \verb|DataFrames| were chosen for their functional flexibility in terms of data storage and data accessibility.
 
-The accelerometers capture the accelerations at the vertical (Z) and transversal (Y) axes (along with the timestamps at each recording), of which, only the Z axis was considered, as it is assumed to be the most responsive to vertical perturbations. These accelerometers are installed on both leading (axle 1) and trailing axles (axle 4) of the measurement coach. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the DFZ. 
+The accelerometers capture the accelerations at the vertical (Z) and transversal (Y) axes (along with the timestamps at each recording), of which, only the Z axis was considered in this project, as it is assumed to be the most responsive to vertical perturbations. These accelerometers are installed on both leading (axle 1) and trailing axles (axle 4) of the measurement coach. See appendix \ref{figs:veh} for visualisations of the accelerometer placements on the DFZ. 
 
 In this work, the following DFZ measurement rides in table \ref{tab:rides} are used for classification.
 
@@ -132,14 +126,14 @@ Lastly, defect attributes and locations were retrieved from SBB's database and s
 
 \section{Code}
 \label{int:sec:code}
-The code is written purely in python. To create neural network architectures, \verb|keras| along with \verb|tensorflow| is used. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has a consistent, simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}. The models were trained in \verb|Google Colab|, which is a web application provided by Google that enables users to run python code in the web browser with access to GPUs\footnote{\url{https://colab.research.google.com/notebooks/intro.ipynb}}. It is very similar to \verb|Anaconda's| \verb|Jupyter Notebooks|, except that \verb|Colab| runs in the browser, is collaborative and provides free usage of GPUs (meaning model training goes faster).\\
+The code is written purely in python. To create neural network architectures, \verb|keras| (version \verb|2.2.5|) along with \verb|tensorflow| (version \verb|2.1.0|) is used. \verb|keras| is essentially a high-level neural networks library which runs on top of \verb|tensorflow|. It has a consistent, simple API and provides clear and actionable feedback upon user error. Models are easily made by connecting configurable building blocks together, with few restrictions \cite{TensorFl31:online}. The models were trained in \verb|Google Colab|, which is a web application provided by Google that enables users to run python code in the web browser with access to GPUs\footnote{\url{https://colab.research.google.com/notebooks/intro.ipynb}}. It is very similar to \verb|Anaconda's| \verb|Jupyter Notebooks|, except that \verb|Colab| runs in the browser, is collaborative and provides free usage of GPUs (meaning model training goes faster).\\
 
 
 \noindent All the code can be found on github: \\
 \url{https://github.com/Aiyualive/SemesterProject2.0}.\\
 
-\noindent The specific model execution workflow can be found \verb|Colab|:\\
-\url{https://colab.research.google.com/drive/12VBz_KrJxeyR_pjpkC87fewv5aMSEI5_}
+\noindent The latest model evaluation workflow can be found in \verb|Colab|:\\
+\url{https://colab.research.google.com/drive/10lxoYyX1bMRkdQiIQsf_87_xhXDccOKJ}
 
 %keras version number, pandas version number, tensorflow version nmber
 
@@ -161,38 +155,47 @@ For the process of defect classification the pipeline in figure \ref{fig:pipelin
 
 \section{Localization of the DFZ}
 
-The vehicle is localized using the combination of multiple data streams: track transponders (Eurobalise) GPS signals, Odometers and Switch detection systems. The reported localization error has been determined to be quite small.
-
-The location is reported with respect to the GPS Antenna of the vehicle which is close to the pantograph. It is reported along with a timestamp corresponding to the location of the vehicle at that time at the location of the antenna. 
+The vehicle is localized using the combination of multiple data streams: track transponders (Eurobalise), GPS signals, Odometers and Switch detection systems. The location is reported with respect to the GPS Antenna of the vehicle which is close to the pantograph, where the reported localization error has been determined to be quite small. It is reported along with a timestamp corresponding to the location of the vehicle at that time, at the location of the antenna. 
 
 \section{Shift of GPS timestamps}
 Since the exact position (covered distance) at each accelerometer at either side of the GPS antenna is unknown, the goal in this step is to compute these from the reported location of the DFZ. The GPS sensor is sampled at a lower frequency compared to the accelerometers (every $25$ cm vs $24$ kHz respectively). From this, the corresponding GPS positions for each accelerometer sample necessarily need to be found. This is done by linear interpolation using the timestamps of the accelerometers and GPS. 
 
-Depending on the direction of the vehicle, the offset between the accelerometers and the GPS sensor positions on the vehicle body is then added/subtracted to achieve the accelerometer positions.
+Depending on the direction of the vehicle, the offset between the accelerometers and the GPS sensor positions on the vehicle body is then added/subtracted to achieve the accelerometer positions. An illustration of this process is shown in \ref{fig:gpsshift}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.7\textwidth]{imgs/gpsshift}
+	\caption{The location of each timestamp of the accelerometers have to be determined through linear interpolation}
+	\label{fig:gpsshift}
+\end{figure}
 
 \section{Peak windows}
-Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length -- wherein Within the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
+Retrieving the signal response around the defect location forms a crucial aspect in the overarching pipeline. The goal of this step is to, around each defect, create a "window" containing accelerometer accelerations of a specified time length, wherein the highest acceleration recording around is found in the center. As a result, all of these windows would be uniform in the sense that they are all centered according to the highest recording of a defect. It is then assumed that each window forms the signature of each track entity. 
 
-Since we are assuming that each track entity is identified by a well-formed peak, we first need to find this peak within a reasonable offset from the defect location, after which we center around that within another reasonable offset. 
+Since it is assumed that each track entity is identified by a well-formed peak, one first needs to find this peak within a reasonable offset from the defect location. Thereaftere, that peak is centered within a window with another reasonable window length offset.
 
-In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, we search for the maximum, absolute acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, we then center it in a $1$ second window ($0.5$ sec on each side).
+In the code, this is done by defining two parameters: \verb|find_peak_offset = 1| and \verb|window_offset = 0.5|. I.e. given a defect timestamp, a search is performed to find the maximum, absolute acceleration recording that has occured $1$ second after and $1$ second before the defect timestamp. Once the peak has been found, it is centered in a $1$ second window ($0.5$ sec on each side). An illustration of this proces can be seen in \ref{fig:peak_windows}.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{imgs/peak_windows}
+	\caption{Setting peak/acceleration windows for an entity}
+	\label{fig:peak_windows}
+\end{figure}
 
 \section{Entity library}
-The peak windows arguably forms the central feature of the defect library. However, based on domain knowledge, other features like vehicle speed also needs to be considered for our neural network. Apart from the peak windows, we have likewise extracted other relevant features that might be useful for classifcation:
-%timestamps	accelerations	window_length(s)	severity	vehicle_speed(m/s)	axle	campagin_ID	driving_direction	ID	class_labe
-%timestamps	accelerations	window_length(s)	severity	vehicle_speed(m/s)	axle	campagin_ID	driving_direction	defect_type	defect_length(m)	line, defect_ID	class_label
+The peak windows arguably forms the central feature of the defect library. However, based on domain knowledge, other features like vehicle speed as well as defect severity likewise needs to be considered for our neural network:
+
 \begin{itemize}
-	\item \textbf{Timestamps:} timestamps for the sampled acceleration
-	\item \textbf{Acceleration:} sampled acceleration at axle box.
-	\item \textbf{Vehicle speed (m/s):} vehicle speed at the closest timestamp
-	\item \textbf{Severity:} Urgency of the entity; defects have an urgency label signifying how much time is left before acting; labels $1,2,3,4$, where urgency decreases in ascending order. Insulation joints and switches have been self-engineered with label $5$ -- all entities need to have the same feature column for training.
+	\item \textbf{Peak/acceleration windows:} accelerations of length 1 for each reported entity.
+	\item \textbf{Vehicle speed (m/s):} vehicle speed at the closest timestamp of the reported entity.
+	\item \textbf{Severity/urgency:} defects have an urgency label signifying how much time is left before acting; labels $1,2,3,4$, where urgency decreases in ascending order. Insulation joints and switches have been self-engineered with label $5$, as all entities need to have the same feature column for training.
 \end{itemize}
-Additional information about each entity has been retrieved as well, such as: driving direction, corresponding entity IDs etc. For each entity, we crucially set a true, class label such that we are able to do supervised learning.
+Additional information about each entity has been retrieved as well, such as: timestamps, driving direction, corresponding entity IDs etc. 
 
-Given a specific measurement ride object, we either retrieve each feature directly from the corresponding \verb|dataframe| or with the use of designated helper functions for those requring extra processing. Currently, we have have a 2-level nested \verb|for loop|, looping for each axle outerly, and looping for each entity entry innerly.
+Given a specific measurement ride object, we either retrieve each feature directly from the corresponding \verb|dataframe| or with the use of designated helper functions for those requring extra processing. Currently, have have a 2-level nested \verb|for loop|, looping for each axle outerly, and looping for each entity entry innerly.
 
-The implementation of this could have made more elegant by operating directly on the dataframe, which might also increase speed of the implementation as the \verb|pandas| library has optimised their dataframe operations. The However, speed and efficency was not a major concern in this project. 
+The implementation of this could have made more elegant by operating directly on the dataframe, which might also increase speed of the implementation as the \verb|pandas| library has optimised their dataframe operations. However, speed and efficency was not a major concern in this project. 
 
 The resulting plots for each entity can be seen in figures \ref{fig:insjoint}, \ref{fig:switches}, \ref{fig:defects}; for the defects seen in the the introduction, refer to appendix \ref{app:introdefects}.
 %refer to the defects presented in introduction?,  appendix for more signals?
@@ -230,13 +233,11 @@ The resulting plots for each entity can be seen in figures \ref{fig:insjoint}, \
 \end{figure}
 
 
-
 \section{Classification}
-We have created a primary \verb|NN| class (short for neural network) along with a \verb|ModelMaker| class. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as we can keep track of how the models have been modified and improved. 
+A primary \verb|NN| (neural network) class along with a \verb|ModelMaker| class have been created. The former does everything from pre-processing the data to evaluating the used model. The latter, as the name suggests, is utlised for creating and using different models, which is useful as one can keep track of how the models have been modified and improved. 
 
 \subsection{NN class}
-To make a classification, we first need to select the relevant features. Then we simply feed the features into an \verb|NN| object, where the API of the \verb|NN| class can be called for classification. The usage of the \verb|NN| class is demonstrated below in \ref{tab:nnclass}.
-
+To make a classification, relevant feature selection needs to be performed. The features are then simply fed into an \verb|NN| object, where the API of the \verb|NN| class can be called for classification. The usage of the \verb|NN| class is demonstrated below in \ref{tab:nnclass}.
 
 \begin{table}[H]
 	\centering
@@ -259,7 +260,7 @@ To make a classification, we first need to select the relevant features. Then we
 		\multicolumn{2}{c}{ \textbf{Other utility API functions} }	
 		\\ \hline 
 		\noalign{\global\arrayrulewidth=0.05mm}
-		\verb|measure_performance()| & currently only on validation data \\ \hline
+		\verb|measure_performance()| &  \\ \hline
 		\verb|plot_metrics()|          \\  \hline
 		\verb|plot_confusion_matrix()| \\ \hline
 		\verb|load_weights()|             \\ \hline
@@ -278,182 +279,337 @@ To make a classification, we first need to select the relevant features. Then we
 \raggedbottom % To get rid of weird spacing
 
 \subsection{ModelMaker class}
-As mentioned in the introduction \ref{int:sec:code}, this is where we make use of \verb|keras|.
+\label{sec:modelmaker}
+Below is the code for building the baseline model in \ref{sec:modeval} using \verb|keras|. 
+\begin{minted}[fontsize=\footnotesize, frame=single, linenos=true]{python}
+def _makeModel2(self):
+    model = Sequential()
+    model.add(Reshape((self.seq_len, self.channels),
+                       input_shape=(self.seq_len * self.channels,)))
+    model.add(Conv1D(filters=20,
+                     kernel_size=10,
+                     input_shape=(self.seq_len, self.channels),
+                     activation= 'relu')) 
+    model.add(MaxPooling1D(pool_size=24))
+    model.add(Flatten())
+    model.add(Dense(16, activation='relu'))
+    model.add(Dropout(rate=0.3,seed=1))
+    model.add(Dense(self.n_classes, activation='softmax'))
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=Adam(learning_rate=0.0001),
+                  metrics=self.metrics)
+    self.model = model
+\end{minted}
 
-epochs, batch size
+\noindent \textbf{Line 1-4}\\
+The model is firstly defined as a feed forward neural network. Secondly, the input shape has to be correctly formatted. As input, the model needs to receive the input shape of (number of samples, signal length $\times$ number of channels). Each sample is then converted into the shape: (signal length, number of channel). For instance, inputting 4 axle channels each of $24000$ (24 kHZ accelerometers) acceleration readings is converted: $(24000 \times 4,) \rightarrow (24000, 4)$\\
 
-conv 1 d,
+\noindent \textbf{Line 5-8}\\
+The input is then convolved with $20$ fitlers/feature detectors of kernel size $10$. \verb|relu| is the Rectified Linear Activation, which is the standard activation function used in the majority of machine learning applications. Insert drawing\todo{}\\
 
-kernel size
+\noindent\textbf{Line 9}\\
+For each filter, \verb|MaxPooling| takes a number of accelerations defined by the \verb|pool_size| as input and outputs the max acceleration, resulting in a smaller signal of length: original signal length divided by \verb|pool_size| . In the general case, this would correspond to segmenting the filters into retrieving the max accelerations. Insert picture\todo{}\\
 
-filter
+\noindent \textbf{Line 10-13} \\
+The resulting filters of the max pooling is then flattened into a 1D array, after which it is fed into 16 neurons with \verb|relu| activation. A \verb|Dropout| layer is then added to prevent overfitting; by randomly removing neuron connections. Finally, each neuron in the last \verb|Dense| layer outputs a probability (using \verb|softmax| activation) corresponding to its designated class. The final classification class of a training sample is then taken to be the maximum of these probabilities. Insert picture \todo{}.\\
 
-flatten
+\noindent \textbf{Line 14-17} \\
+The model is then compiled, where the overall training goal is to minimize the cost/loss function, \verb|cross-entropy|, which is the common loss function used for multi-class classification.
 
-dropout
-
-sequential model
-
-maxpooling
-
-dense
-
-loss
-
-learning rate
-
-activation functions
-
-input shape
-
-See example of this in next chapter. 
-
-callbacks - when training
-
-metrics can be used for logging
-\section{Visualisation}
-Finally, after evaluating the results (results can be seen in the next section) from the neural network, we have not achieved any significant results. Arguably, the visualisations of class separability should have been handled first. However, the previous steps took the majority of the time.
-
-
-using PCA
+\section{Feature-set visualisations}
+After evaluating the results from the model (results can be seen in \ref{sec:modeval}), we have not achieved any significant results. Using PCA on the feature-set, the aim is to visualise the class clustering.\todo{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
-Here we will present the results and discuss the findings herein.
 
+In this chapter, the results are presented and the findings are discussed. Insert more describing text? More effort is need in general for this chapter\todo{}
 
-\section{Models}
+\section{Baseline Model}
+\label{sec:model}
+Experimenting with models have been an ongoing process throughout this project; in the end a final baseline model has been determined to be the one seen in table \ref{tab:model}. This very simple convolutional neural network  is explained previously in \ref{sec:modelmaker}. The hyper-parameters that are used for training can be seen in table \ref{tab:hyperp}.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|c|c|c| c|} \hline
 		\textbf{Layer} & \textbf{Output Shape } & \textbf{Number of params} \\ \hline \hline 
-		- & - &  -  \\ \hline 
+		Conv1D & $(, 23991, 20)$  &  220  \\ \hline 
+		MaxPooling (24) & $(, 999, 20)$  &  -  \\ \hline 
+		Flatten & $(, 19980)$  &  -  \\ \hline 
+		Dense & $(, 16)$  &  319696  \\ \hline 
+		Dropout & $(, 16)$  &  -  \\ \hline 
+		Dense & (, num\_classes)  &  187  \\ \hline 
 	\end{tabular}
-	\caption{Model 1}
-	\label{datasets}
+	\caption{Baseline model}
+	\label{tab:model}
 \end{table}
-
-Draw models \url{http://alexlenail.me/NN-SVG/AlexNet.html} \todo{do one model at a time}
-
-\section{Model evaluations}
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{|c|c|c|} \hline
-		\textbf{Defect} & $2$ & $ \%$\\ \hline
+	\begin{tabular}{|l|c|} \hline
+		\textbf{Hyper-parameters} & \textbf{Value} \\ \hline \hline 
+		Epochs  & $20$ \\ \hline 
+		Batch size & Full training set  \\ \hline 
+		Optimizer & Adam ($0.0001$)  \\ \hline 
+		Loss function & Cross-entropy  \\ \hline 
 	\end{tabular}
-	\caption{Entity distribution, class distributions}
+	\caption{Hyperparameters and its accompanying values}
+	\label{tab:hyperp}
+\end{table}
+The epoch value was found to strike a good balance for the bias-variance tradeoff (basically prevent overfitting to the training data). Since memory is not of high importance, we input the full training set as the batch size. Meaning, all the training samples are seen at once for each training epoch. The chosen optimizer is the default choice in the Deep Learning community and provides adaptive learning rate with initial value set to $0.0001$. Finally, the cross-entropy loss function is commonly used for multi-class, categorical classification. Insert drawing of model\todo{}
+
+\section{Dataset class distributions}
+Given the full feature-set, the model is trained on $85\%$ of the data and validated on the remaining $15\%$ both seen in \ref{tab:classdist}. The model is trained, crucially, by weighing the imbalanced classes according to its percentage of the total training set. That is, minority classes are given higher importance.
+
+Worth mentioning is the fact that this is the same validation set that was used for model selection during training, which is not best practice. It would have been ideal to use a separate un-seen test set for this evaluation, although with the limited training data, it has been deemed adequate. Otherwise not enough information would be sufficient for both training and evaluation. 
+%The breakdown of the training an validation set can be found in table \ref{tab:classdist}.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|r|l|}
+	\multicolumn{1}{c}{}\\ \hline
+	\textbf{Class} & \textbf{Defect Comp.} \\ \hline
+		0  & Fahrbahn \\ \hline 
+		1  & Gleis \\ \hline 
+		2  & Herzstück \\ \hline 
+		3  & Schiene \\ \hline 
+		4  & Schienenzwischenlage \\ \hline 
+		5  & Schotter \\ \hline 
+		6  & Schwelle \\ \hline
+		7  & Vignolschiene \\ \hline
+		8  & Zungenschiene \\ \hline
+		9  & Ins. joint  \\ \hline
+		10 & Switch \\ \hline
+	\end{tabular}
+	\begin{tabular}{|c|c|c|} \hline
+	\multicolumn{2}{c}{\textbf{Training set}}\\ \hline
+	\makebox[4em]{\textbf{Count}} & \makebox[4em]{\textbf{Percent}} \\ \hline
+		$93$  & $4.02\%$ \\ \hline 
+		$57$  & $2.46\%$ \\ \hline 
+		$46$  & $1.99\%$ \\ \hline 
+		$180$ & $7.78\%$ \\ \hline 
+		$50$  & $2.16\%$ \\ \hline
+		$148$ & $6.39\%$ \\ \hline 
+		$51$  & $2.20\%$ \\ \hline
+		$161$ & $6.95\%$ \\ \hline
+		$34$  & $1.47\%$ \\ \hline
+		$988$ & $42.68\%$ \\ \hline
+		$507$ & $21.90\%$ \\ \hline
+	\end{tabular}
+%	\vspace*{0.5cm}\\
+	\begin{tabular}{|c|c|c|} \hline
+	\multicolumn{2}{c}{\textbf{Validation set}}\\ \hline 
+	\makebox[4em]{\textbf{Count}} & \makebox[4em]{\textbf{Percent}} \\ \hline
+		$11$  & $2.69\%$ \\ \hline 
+		$15$  & $3.67\%$ \\ \hline 
+		$10$  & $2.44\%$ \\ \hline 
+		$32$  & $7.82\%$ \\ \hline 
+		$6$   & $1.47\%$ \\ \hline 
+		$20$  & $4.89\%$ \\ \hline 
+		$13$  & $3.18\%$ \\ \hline
+		$35$  & $8.56\%$ \\ \hline
+		$10$  & $2.44\%$ \\ \hline
+		$160$ & $39.12\%$ \\ \hline
+		$97$  & $23.72\%$ \\ \hline
+	\end{tabular}
+	\caption{Class distributions among training and validation set. The full dataset consists of $\bm{2724}$ samples. The training set totals $\bm{2315}$ samples, and the validation set totals $\bm{409}$ samples.}
+	\label{tab:classdist}
 \end{table}
 
-In this section we evaluate our model with regard to a variety of metrics: loss (\textbf{L}), accuracy (\textbf{ACC}), true positives (\textbf{TP}), false positives (\textbf{FP}), true negatives (\textbf{TN}), false negatives (\textbf{FN}), precision (\textbf{P}), recall (\textbf{R}), area under the curve (\textbf{AUC}).
-%&{L}&{ACC}&{TP}&{TN}&{FP}&{FN}&{P}&{R}&{AUC}
+Worth mentioning is the fact that each of these were trained on different training and validation sets. This was a mistake that was only realised later, where the ideal would be to use the same sets for all the model and feature set combinations. For now, the differences are rather minor and \ref{tab:classdist} shows a sample distribution for evaluation of the final  featureset (row) in the metric results table, \ref{tab:metresult}. 
+
+%\newpage
+\section{Metrics and feature-set}
+As the training process is stochastic in nature, the model is trained 10 times (experiments), after which an average along with the associated standard deviation are computed. In addition, the following metrics are also used to define the model performance: loss (\textbf{L}), accuracy (\textbf{ACC}), F1-score (\textbf{F1}), area under the curve (\textbf{AUC}) and the associated confusion matrix (\textbf{CM}). \todo{explain metrics?} These results are summarised in table \ref{tab:metresult}.
+
+The baseline model has been utilised to determine the best feature-set with the assumption that this feature set would generalize to future NN models. The feature-set combinations can be found in table \ref{tab:features}.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|c|l|} \hline
+		\textbf{Feature-sets} & \textbf{\# feat.} & \textbf{Parameters} \\ \hline \hline 
+		All-AX    & 4 & 1s acc. window \\ \hline 
+		AX        & 1 & 1s acc. window \\ \hline 
+		AX-LP     & 1 & 1s acc. window filtered at $0.63$ threshold \\ \hline
+		AX,SP     & 2 & 1s acc. window, vehicle speed \\ \hline
+		AX-LP, SP & 2 & 1s acc. window filtered at $0.63$ threshold, vehicle speed \\ \hline 
+	\end{tabular}
+	\caption{All feature-sets used for defect classification. \textbf{Reminder}: 1 second window corresponds to 24000 samples since each accelerometer is sampled at 24kHz}
+	\label{tab:features}
+\end{table}
+
+% 0.5 windows
+%Overall loss: 1.847% (+/-0.130)
+%Overall ACC: 0.440% (+/-0.015)
+%Overall AUC: 0.811% (+/-0.049)
+%Overall F1: 0.346% (+/-0.024)
+%Overall F1W: 0.247% (+/-0.054)
+%Overall AVG_AUC: 0.578% (+/-0.048)
 \begin{table}[H]
 		\centering 
 		\begin{tabular}{|l||*{5}{c|}}\hline
 			\backslashbox{Metric}{Model}
-			&\makebox[6.3em]{Model 1}&\makebox[6.3em]{}&\makebox[6.3em]{}&\makebox[6.3em]{} 
+			&\makebox[5em]{L}&\makebox[5em]{ACC)}&\makebox[5em]{F1}&\makebox[5em]{AUC} 
 			\\\hline\hline
-			L   & $-$ & $-$ & $-$ & $-$ \\ \hline
-			ACC & $-$ & $-$ & $-$ & $-$ \\ \hline
-			TP  & $-$ & $-$ & $-$ & $-$ \\ \hline
-			FP  & $-$ & $-$ & $-$ & $-$ \\ \hline
-			TN  & $-$ & $-$ & $-$ & $-$ \\ \hline
-			FN  & $-$ & $-$ & $-$ & $-$ \\ \hline
-			P   & $-$ & $-$ & $-$ & $-$ \\ \hline
-			R   & $-$ & $-$ & $-$ & $-$ \\ \hline
-			AUC & $-$ & $-$ & $-$ & $-$ \\ \hline
+			BL (ALL-AX)   & $2.089\ (\pm 0.118)$ & $0.411\ (\pm 0.144)$ & $0.303\ (\pm 0.107)$ & $0.508\ (\pm 0.048)$ \\ \hline
+			BL (AX) & $2.223\ (\pm 0.050)$ & $0.378\ (\pm 0.041)$ & $0.271\ (\pm 0.031)$ & $0.463\ (\pm 0.060)$ \\ \hline
+			BL (AX-LP) & $2.223\ (\pm 0.069)$ & $0.384\ (\pm 0.034)$ & $0.311\ (\pm 0.030)$ & $0.540\ (\pm 0.032)$ \\ \hline
+			BL (AX, SP) & $1.850\ (\pm 0.112)$ & $0.431\ (\pm 0.025)$ & $0.337\ (\pm 0.027)$ & $0.583\ (\pm 0.054)$ \\ \hline
+			BL (AX-LP, SP) & $1.845\ (\pm 0.118)$ & $0.443\ (\pm 0.021)$ & $0.357\ (\pm 0.026)$ & $0.593\ (\pm 0.052)$ \\ \hline
 		\end{tabular}
-		\captionof{table}{Average metrics times and their standard deviations in parenthesis - rel diff?}
-		\label{tab:resBenchmark}
+		\captionof{table}{Average metrics times and their standard deviations in parenthesis over 10 experiments. BL is short for baseline model. The parenthesis denotes the used feature-set. (All-AX), (AX), (AX, LP) and (AX,SP) denote that a single training sample respectively consists of: all 4 axle channels, 1 individual axle channel, 1 individual axle channel low-pass filtered and 1 individual axle channel along with its corresponding speed.}
+		\label{tab:metresult}
 \end{table} 
 
+\section{Plots}
+In the following, the training and validation plots for each metric (loss, acc) during each epoch are presented. The format is: \textbf{Top:} confusion matrix for the predicted vs true classes/labels. \textbf{Left:} average training/validation loss accompanied by error bars. \textbf{Right}: average training/validation accuracy accompanied by error bars.
 
-\textbf{intermediate results}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axall-cm}
+	
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axall-avg-loss}
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axall-avg-acc}
+	\caption{\textbf{BL (ALL-AX)}}
+\end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/ax-cm}
+	
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/ax-avg-loss}
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/ax-avg-acc}
+	\caption{\textbf{BL (AX)}}
+\end{figure}
 
-average plots
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlp-cm}
+	
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlp-avg-loss}
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlp-avg-acc}
+	\caption{\textbf{BL (AX-LP)}}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axsp-cm}
+	
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axsp-avg-loss}
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axsp-avg-acc}
+	\caption{\textbf{BL (AX, SP)}}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlpsp-cm}
+	
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlpsp-avg-loss}
+	\includegraphics[width = 0.39\textwidth]{models/PLOTS/axlpsp-avg-acc}
+	\caption{\textbf{BL (AX-LP, SP)}}
+\end{figure}
+
+The remaining metric plots could not be retrieved as \verb|Tensorflow| has to be configured in quite a complex manner to make it account for other metrics. This could however be incorporated with more time. Albeit,he primary utility of metrics during training is for logging and for utilising suitable callbacks.\\
+
+Add individual training plots for each experiment to the appendix. These are only confusion matrices taken from one experiment, although it would be better to compute the average confusion matrix from all the experiments. Perhaps, it would be better to just keep the last result plot and move the worse results to the appendix\todo{}
 
 \section{Visualisation of class clustering}
-insert the pca plots
+\begin{figure}[H]
+	\centering	
+	\includegraphics[width = 0.5\textwidth]{imgs/class_sep0}
+	
+	\includegraphics[width = 0.5\textwidth]{imgs/class_sep1}
+	\caption{PCA class separability}
+\end{figure}
 
+Insert more plots like this, has not been done fully\todo{}
+
+\newpage
 \section{Discussion}
-Data amount, circumvent: could self-engineer data. 
+From the resulting metrics and plots, it is evident that no truly significant results were achieved. However it can be said with good confidence that using a feature-set consisting of lowpass-filtered acceleration windows in addition to vehicle speed results in better performance. These findings suggests that further pre-processing techniques and more sophisticated feature selection will achieve better classification results. 
 
-should have done visualisation first, if we have clear cluster separation, applying a neural network would be a bit exaggerated. And in that case, we could opt for a simple multi class support vector machine from the \verb|sklearn| library. However, using \verb|tensorflow| was the plan from the get-go as it is more industrially-applicable, so we disregarded simpler methods.
+With regard to each feature-set, it can be seen from \textbf{all 4 channels}, that it has the worst confidences as the standard deviations are rather high compared to the other feature-sets. The accompanying plots also illustrate this matter. For this particular case, this can likely be explained by the four times smaller sample amount compared to the other feature-sets, as all 4 axle channels are combined into one sample. Minority-class removal has been done at the same threshold as the others (class samples above 10). Generally, it can be said that the model's poor results are very likely attributed to the small-size and class imbalance of the dataset.
 
-ensure that data is uniform. That is, some of the data has calibration and some hasnt. 
+For \textbf{single axle}, actual confidence in results can be seen by the decrease in error bars in the plots. Although, overfitting to the training data happens after the 14th epoch, as the training loss dips below the validation loss. To prevent this from happening, one can employ \verb|callbacks| during training such that it stops when meeting certain user-defined requirements. For this evaluation, this has not been done as variables are kept the same throughout feature-set evaluations.
 
-more sophisticated use of features.
+\textbf{Low-pass} filtering the acceleration windows generally follows the same trend as the previous feature-set. For this case it can be seen that this extra pre-processing step improves performance of metrics. When accounting for the \textbf{single axle channel with vehicle speed}, it can be seen that more classes can be predicted; resulting in more of a general classifier as well as achieveing higher overall metric scores. For this particular feature-set (and the next) it can be seen that there is still a bit more room for improvement in the training loss as it is still in the process of converging. 
 
-Look more into defect types, its specifics
+The last examined feature-set, \textbf{single, low-pass filtered axle channel and corresponding vehicle speed}, has the best performance metrics out of all and shows better variety in its classification predictions.
 
-Sometimes the defect can only be detected from one side of the track -- AX11 and AX12 as one defect crossing sample with two signatures seen from different location. This would help in cases where the defect is only on one side of the track.
+Furthermore, the confusion matrices show that there is no prediction for some of the classes. This is likely due to the segmentation of the signal when passing the input through the model as explained in \ref{sec:modelmaker}. It is suspected that a prediction for each class could be reached by perhaps \verb|average pooling| instead of \verb|max pooling|. 
 
-%Many a times the validation set is used as the test set, but it is not good practice. The test set is generally well curated. It contains carefully sampled data that spans the various classes that the model would face, when used in the real world.
+From all confusion matrices, it can be observed that preference is given to a select-few classes. Namely, number 9 (insulation joint) as expected, number 3, 7, 5. Surprisingly enough, for the switches (number 10) few predictions exist and they primarily gets classified as insulation joints. In fact, from looking at the acceleration windows of switches, they do not seem distinct from any other signal. This is however in contrast to the insulation joints, where clearly defined maximal peaks are defined at the center. 
 
-You are on tracks which are "brand new- built in 2006-2018".  so the defects are all minor. The new measurement data we recently got would work much much better since they drove on pretty bad bad bad stuff :)
+Finally, other important factors to take into account when evaluating this model, are the age of the tracks and severity of the defects. The utilised data in this work are produced from the DFZ which drove on brand new tracks built in 2006-2018. As a result, the defects severities are all minor; $648$ and $304$ out of $1264$ defects, are labeled 4 and 3 respectively (lowest severity labels).
 
+Comment more on the metrics individually in the future.\todo{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Conclusion and future work
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Conclusion and future work}
-
-%%% CONCLUSION
-\section{Conclusion}
-Results were quite mediocre, but has a lot of room for improvement. I am sure that given more time I would be able to explore and evaluate the results further.
-
-how good is the foundation to move onwards with further research
-
-library code is built in an extensible form
-
-overlap between switch and insulation joints
-
-
+\chapter{Future work and conclusion}
+This future work section sounds more like a discussion and perhaps needs to be moved to the previous chapter\todo{}
 %%% FUTURE WORK
 \section{Future work}
-There is still a lot of work that needs to be done in this project. These are summarised in the next sub-sections -- in no particular order. 
+There is still a lot of work that needs to be done in this project. These are summarised in the next sub-sections, in no particular order. 
 
 \subsection{Channels}
 It might be interesting to consider sensor fusion of the ZY axes and the axle channels (8 total channels). The transverse axis, Y, would especially be valuable for switches as this channel can pick up sideways hits in the case of switches. These switch signals are clearly different from that of the other entities and may thus be more easily separable.
 	
-In this project, only the accelerometer accelerations at the axle-boxes were considered. However, the other accelerometer sensors higher up in the vehicle: bogie(Z, Y) and body (Y) (see appendix \ref{figs:veh}), will also be worth analyzing.
+In this project, only the accelerometer accelerations at the axle-boxes were considered. However, the other accelerometer sensors higher up in the vehicle: bogie(Z, Y) and body (Y) (see appendix \ref{figs:veh}), will also be worth analyzing. 
+
+Finally, in order to ensure that each axle channel response is uniform, it is also important to account for the varying calibrations of the accelerometers.
+
+\subsection{Feature-set}
+Another interesting aspect would be to account for the severity as a feature/input to the model; or even as the classification output.
+
+For periodic, heartbeat electrocardiogram signals, heartbeat-specific features have been extracted as seen in \cite{10.3389/fphy.2019.00103}. Perhaps, a similar approach could have been employed for this project. Although, the entity signals are not periodic, and may thus not have the same applicability.
 
 \subsection{Peak windows}
-we must not set the findpeakoffset too high
+If the peak windows are not retrieved, sized and positioned optimally, much information about the entities are lost. Hence, the acceleration windows arguably forms the most crucial aspect of the feature-set. Evidently, the goal of these windows is to strike a fine balance between capturing the most important information vs. capturing disruptive information. E.g. another peak at the corners of the window or merged peaks. Thus, the ideal would be to search for the peaks within an appropriate offset from the defect location and then center around the 'best' peak with the smallest possible window. For this project, a window length of 1 second was set for all entities. Although, a smaller window length could likely have been employed.
 
-track entity dependent/specific window offsets
+Furthermore, each entity vary a lot in terms of the signal responses. E.g. switch signals usually have two high amplitude responses. For this, it might be suitable to define entity specifc window lengths. This would however necessitate a slightly more sophisticated neural network, as the inputted signal lengths would not be equal, thus requiring multiple inputs. 
 
-tune the peak finding parameters
+\subsection{Identification of entities}
+The identification of the infrastructure components has relied on a direct information retrieval from SBB's databases. Albeit, they are not always reliable. To improve the identification method, a fusion of different track entity information would provide a better measure of identification. I.e. the order and distance between entities, as well as the uncertainty in the reported location of the DFZ. Considering that insulation joints and switches might overlap in the signal responses, this would be an improvement to the current identification process. A visualisation of this could be seen in listing \ref{layout}. S, I, C and '...' (dots) denote switch, insulation joint, distance between track component respectively.
 
-the window offset can be very small (as small as possible without losing the peaks). Otherwise you will merge too many peaks using the peakfinder. 0.5 of even 0.1 should be ok. 
+\begin{lstlisting}[frame=single, caption=Expected layout of entities vs actual layout., label=layout]
+    Expected: "...I,....S,I,....C,....I,..............I,...S,..C,.."
+    Measured: "...I,..S,...I,...C,...I,......I,...,...S,..C,.."
+\end{lstlisting}
 
-\subsection{Identification of infrastructure}
-%To better identify infrastructure components and damages (entities), the order and distance between entities should be considered, as well as the uncertainty in the reported location of the entities themselves (databases are not always mm accurate) as well as the uncertainty in the reported location of the vehicle).
-%Expected from layout: "...I....S,I,....Weld,....I,..............I,...S,..W,.."
-%Measured hits: "...I..S,...I,...Weld,...I,......I...,...S,..W,.."
-	
+Furthermore, at times the defect can only be detected from one side of the track (AX11 and AX12) as one defect crossing sample with two signatures seen from different location. This would help in cases where the defect is only on one side of the track.
+
+\subsection{Class separability}
+More emphasis should be placed on feature-set class separability to determine which set of features provide the best classification confidence; better class clustering leads to better classification.\todo{}
+
+The visualisation of class separation should arguably have been done first. Considering the fact that if a clear cluster separation exists, then applying a neural network would be a bit exaggerated. In that case, a simple multi-class support-vector machine from the \verb|sklearn| library would suffice for this task.
+
+\subsection{Visualisation of neural network}
+The idea of this subsection is to use class activation maps to visualise how the neural network makes its decisions.\todo{}
+
 \subsection{Real-world simulated defects}
-I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-hatchery/}}, where our team built a prototype with a model train. We let the model train drive on the track with self-engineered defects. 
+A crucial limitation to this project is the defects sample amounts. Another approach to gather these samples is to self-engineer them by implementing a small-scale model of the real-life train infrastructure. This was exactly the goal for our team in the ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-hatchery/}}, where we built such a model to collect signal responses from self-engineered defects. Even though it would be an extremely simplified model of the real-world, it would, however, provide proof of conccept for the idea of data-driven defect identification and classification.
 
+%%% CONCLUSION
+\newpage
+\section{Conclusion}
+The aim of this project has been to identify and classify rail surface defects. A machine learning pipeline that takes information about defects as input and outputs the corresponding classification confidence, has been built. The empirical space of focus has been on track defect components of zero-length, where the identification of these has relied solely the information provided in SBB's database.
+
+The resulting classification has not shown any significant results. They have shown that using the retrieved acceleration windows are usable for this classification task, although there is much room for improvement by potentially tweaking the model as well as working with other features. It has been found that inputting the low-pass filtered acceleration windows along with corresponding vehicle speed produces notable improvement in the classification confidence
+
+Despite the mediocre results, this work lays a good foundation to move onwards with further research. Not to mention the fact the library code is built in a modular, extensible manner for further improvements.
 
 \newpage
-\section{TODO}
+\section{Todo}
 \begin{itemize}
-	\item F1 weighted (this already has info about true positive values) \verb|sklearn.metrics.f1_score|
-	\item AUC
-	\item tune models
-	\item do acceleration channels
-	\item PCA plots and get better results
-	\item add speed as a feature
-%	\item visualise what the network is doing using Harry's code
-	\item concat all the axle channels and train on them
-	\item try to use low pass filter - (would make everything faster)
-	\item account for severity
-	\item get rid of 'we'
+	\item insert pictures
+	\item make the training sets uniform hroughout all the model/feature evaluations
+	\item see if outlier removal helps?
+	\item Do class separation visualisations
+	\item test the auc score
+	\item Change name of SBBproject to feature generator
+	\item \verb|defects['severity'].value_counts()|
+	\item Overall model explanation - poolsize of 24, 20 filters
 \end{itemize}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -471,69 +627,44 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix introduction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%0 Bankett
-%1 Befestigung
-%2 Dienstweg
-%3 EKW / DKW
-%4 Einfache und symmetrische Weiche
-%5 Entwässerungsgraben
-%6 Fahrbahn
-%7 Gleis
-%8 Gleisbettung
-%9 Halbe Zungenvorrichtung
-%10 Herzstück
-%11 Herzstückspitze
-%12 Kleber
-%13 Rippenplatte
-%14 Schiene
-%15 Schienenklemme
-%16 Schienenzwischenlage
-%17 Schotter
-%18 Schweissverbindung
-%19 Schwelle
-%20 Stockschiene
-%21 Vignolschiene
-%22 Weiche
-%23 Zungenschiene
-%24 insulationjoint
-%25 switches
+
 \chapter{Introduction}
 \section{List of defect components}
 \label{app:defcomp}
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|l|c|} \hline
-		\textbf{Bankett} & 0 \\ \hline 
-		\textbf{Befestigung} & 1\\ \hline
-		\textbf{Dienstweg} & 2\\ \hline
-		\textbf{EKW / DKW} & 3\\ \hline
-		\textbf{Einfache und symmetrische Weiche} & 4\\ \hline
-		\textbf{Entwässerungsgraben} & 5\\ \hline
-		\textbf{Fahrbahn} & 6\\ \hline
-		\textbf{Gleis} & 7\\ \hline
-		\textbf{Gleisbettung} & 8\\ \hline
-		\textbf{Halbe Zungenvorrichtung} & 9\\ \hline
-		\textbf{Herzstück} & 10\\ \hline
-		\textbf{Herzstückspitze} & 11\\ \hline
-		\textbf{Kleber} & 12\\ \hline
-		\textbf{Rippenplatte} & 13\\ \hline
-		\textbf{Schiene} & 14\\ \hline
-		\textbf{Schienenklemme} & 15\\ \hline
-		\textbf{Schienenzwischenlage} & 16\\ \hline
-		\textbf{Schotter} & 17\\ \hline
-		\textbf{Schweissverbindung} & 18\\ \hline
-		\textbf{Schwelle} & 19\\ \hline
-		\textbf{Stockschiene} & 20\\ \hline
-		\textbf{Vignolschiene} & 21\\ \hline
-		\textbf{Weiche} & 22\\ \hline
-		\textbf{Zungenschiene} & 23\\ \hline
+		\textbf{Bankett} \\ \hline 
+		\textbf{Befestigung} \\ \hline
+		\textbf{Dienstweg} \\ \hline
+		\textbf{EKW / DKW} \\ \hline
+		\textbf{Einfache und symmetrische Weiche} \\ \hline
+		\textbf{Entwässerungsgraben} \\ \hline
+		\textbf{Fahrbahn} \\ \hline
+		\textbf{Gleis} \\ \hline
+		\textbf{Gleisbettung} \\ \hline
+		\textbf{Halbe Zungenvorrichtung} \\ \hline
+		\textbf{Herzstück} \\ \hline
+		\textbf{Herzstückspitze} \\ \hline
+		\textbf{Kleber} \\ \hline
+		\textbf{Rippenplatte} \\ \hline
+		\textbf{Schiene} \\ \hline
+		\textbf{Schienenklemme} \\ \hline
+		\textbf{Schienenzwischenlage} \\ \hline
+		\textbf{Schotter} \\ \hline
+		\textbf{Schweissverbindung} \\ \hline
+		\textbf{Schwelle} \\ \hline
+		\textbf{Stockschiene} \\ \hline
+		\textbf{Vignolschiene} \\ \hline
+		\textbf{Weiche} \\ \hline
+		\textbf{Zungenschiene} \\ \hline
 	\end{tabular}
 	\hspace*{0.5cm}	
 	\begin{tabular}{|l|c|} \hline
-		\textbf{Insulation Joint} & 24 \\ \hline
-		\textbf{Switches} & 25 \\ \hline 
+		\textbf{Insulation Joint} \\ \hline
+		\textbf{Switches} \\ \hline 
 	\end{tabular}
-	\caption{Defect components along with class labels}
+	\caption{The entities that are subject to classification}
 \end{table}
 
 \section{List of defect types}
@@ -930,20 +1061,137 @@ I have participated in ETH Hatchery \footnote{\url{https://sph.ethz.ch/eth-week-
 %%% Appendix Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
+
+
+\section{All 4 axle channels}
 \begin{table}[H]
 	\centering
-\begin{tabular}{|l|ccccccccc|}
+\begin{tabular}{|l|cccc|}
 	\hline
 	\backslashbox{run \#}{Metrics}
-&{L}&{ACC}&{TP}&{TN}&{FP}&{FN}&{P}&{R}&{AUC} \\\hline\hline
-	1 & $-$ & $-$ & $-$ & $-$ & $-$ & $-$ & $-$ & $-$ & $-$ \\ \hline
+	&{L}&{ACC}&{TP}&{TN} \\\hline\hline
+		1 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		2 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		3 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		4 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		5 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		6 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		7 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		8 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		9 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		10 & $-$ & $-$ & $-$ & $-$ \\ \hline
 \end{tabular}
 	\caption{Experiment result of 10 runs}
 \end{table}
+confusion matrix, epoch plots for each experiment
 
-confusion matrix, epoch plots
+\section{Single axle channel}
+\begin{table}[H]
+	\centering
+\begin{tabular}{|l|cccc|}
+	\hline
+	\backslashbox{run \#}{Metrics}
+	&{L}&{ACC}&{TP}&{TN} \\\hline\hline
+		1 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		2 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		3 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		4 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		5 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		6 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		7 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		8 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		9 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		10 & $-$ & $-$ & $-$ & $-$ \\ \hline
+\end{tabular}
+	\caption{Experiment result of 10 runs}
+\end{table}
+confusion matrix, epoch plots for each experiment
+\section{Low pass-filtered single axle channel}
+\begin{table}[H]
+	\centering
+\begin{tabular}{|l|cccc|}
+	\hline
+	\backslashbox{run \#}{Metrics}
+	&{L}&{ACC}&{TP}&{TN} \\\hline\hline
+		1 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		2 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		3 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		4 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		5 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		6 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		7 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		8 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		9 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		10 & $-$ & $-$ & $-$ & $-$ \\ \hline
+\end{tabular}
+	\caption{Experiment result of 10 runs}
+\end{table}
+confusion matrix, epoch plots for each experiment
+\section{Single axle channel with speed}
+\begin{table}[H]
+	\centering
+\begin{tabular}{|l|cccc|}
+	\hline
+	\backslashbox{run \#}{Metrics}
+	&{L}&{ACC}&{TP}&{TN} \\\hline\hline
+		1 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		2 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		3 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		4 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		5 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		6 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		7 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		8 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		9 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		10 & $-$ & $-$ & $-$ & $-$ \\ \hline
+\end{tabular}
+	\caption{Experiment result of 10 runs}
+\end{table}
+confusion matrix, epoch plots for each experiment
+\section{Lowpass filtered single axle channel with speed}
+\begin{table}[H]
+	\centering
+\begin{tabular}{|l|cccc|}
+	\hline
+	\backslashbox{run \#}{Metrics}
+	&{L}&{ACC}&{TP}&{TN} \\\hline\hline
+		1 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		2 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		3 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		4 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		5 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		6 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		7 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		8 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		9 & $-$ & $-$ & $-$ & $-$ \\ \hline
+		10 & $-$ & $-$ & $-$ & $-$ \\ \hline
+\end{tabular}
+	\caption{Experiment result of 10 runs}
+\end{table}
+confusion matrix, epoch plots for each experiment
 
 
+
+%\foreach \n in {0,1,2,3,4,5,6,7,9}{
+%	\begin{figure}[H]
+%	\foreach \k in {0,1,2,3,4,5,6,7,8,9}{
+%		\ifnum\n=\k
+%		\else
+%		\begin{subfigure}[b]{0.19\textwidth}
+%			\centering
+%			\includegraphics[width=\textwidth]{../Cleaning/wekapics/WEKAmnist_all2000CLASS\n_\k}
+%			\caption{Class \n vs\k}
+%			\label{class_\n\k}
+%		\end{subfigure}
+%		\fi
+%		}
+%	\caption{Comparisons with Class \n}
+%	\end{figure}
+%	\ifoddpage
+%		\clearpage
+%	\else
+%	\fi
+%}
 
 
 
